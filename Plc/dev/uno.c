@@ -77,6 +77,31 @@ DIN_t DI4 = { .gpif = { .gpio = { .port = GPIOB, .pin = 1 } }, .eeprom = &din_ee
 
 bool din_pwmi_init = false;
 
+//------------------------------------------------------------------------------------------------- AIN
+
+uint8_t ain_channels[] = {
+  ADC_IN_PA0, ADC_IN_PA1
+};
+
+uint16_t ain_output[sizeof(ain_channels)];
+
+ADC_t ain_adc = {
+  .prescaler = ADC_Prescaler_2,
+  .interrupt_level = 3,
+  .measurements = {
+    .channels = ain_channels,
+    .count = sizeof(ain_channels),
+    .output = ain_output,
+    .sampling_time = ADC_SamplingTime_160,
+    .oversampling_enable = true,
+    .oversampling_ratio = ADC_OversamplingRatio_256,
+    .oversampling_shift = 4
+  }
+};
+
+AIN_t AI1 = { .adc = &ain_adc, .channel = 0, .type = AIN_Type_Volts };
+AIN_t AI2 = { .adc = &ain_adc, .channel = 1, .type = AIN_Type_Volts };
+
 //------------------------------------------------------------------------------------------------- Functions
 
 void PLC_Init(void)
@@ -119,6 +144,10 @@ void PLC_Init(void)
   if(din_pwmi_init) {
     PWMI_Init(&din_pwmi);
   }
+  // Wejścia analogowe (AI)
+  ADC_Init(&ain_adc);
+  ADC_Measurements(&ain_adc);
+  ADC_Wait(&ain_adc);
 }
 
 void PLC_Loop(void)
@@ -135,5 +164,13 @@ void PLC_Loop(void)
   DIN_Loop(&DI4);
   if(din_pwmi_init && PWMI_Loop(&din_pwmi)) {
     // PWMI_Print(&fan_inputs);
+  }
+  // Wejścia analogowe (AI)
+  ADC_Measurements(&ain_adc);
+  if(ain_adc.overrun) {
+    // DBG_String("ADC overrun:");
+    // DBG_uDec(ain_adc.overrun);
+    // DBG_Enter();
+    ain_adc.overrun = 0;
   }
 }

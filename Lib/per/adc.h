@@ -9,15 +9,11 @@
   #define ADC_RECORD 0
 #endif
 
-#ifndef ADC_RECORD
-  #define ADC_RECORD 0
-#endif
-
 #if(ADC_RECORD)
   #include "per/tim.h"
 #endif
 
-#define resistor_divider_factor(vcc, up, down, resolution) (float)(vcc * (up + down) / down / ((1 << resolution) - 1))
+#define resistor_divider_factor(vcc, up, down, resolution) ((float)vcc * (up + down) / down / ((1 << resolution) - 1))
 #define volts_factor(vcc, resolution) (float)(vcc / ((1 << resolution) - 1))
 
 //-----------------------------------------------------------------------------

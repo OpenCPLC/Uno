@@ -42,3 +42,28 @@ int main(void)
   // main_classic();
   main_modern();
 }
+
+AIN_t *analog_input = &AI1;
+
+#define TEMPERATURE_MIN_4mA  -40.0 // [°C]
+#define TEMPERATURE_MAX_20mA 125.0 // [°C]
+
+void main(void)
+{
+  analog_input->type = AIN_Type_mAmps;
+  PLC_Init();
+  float a = (TEMPERATURE_MIN_4mA - TEMPERATURE_MAX_20mA) / (20 - 4);
+  float b = TEMPERATURE_MIN_4mA - (a * 4);
+  while(1) {
+    float_t current_mA = AIN_Value(analog_input);
+    float_t temperature = -273;
+    if(current_mA < 2) {
+      // ERROR
+    }
+    else {
+      temperature = (a * current_mA) + b;
+      // TODO: use temperature
+    }
+    PLC_Loop();
+  }
+}

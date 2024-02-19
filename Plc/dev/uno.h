@@ -4,6 +4,7 @@
 #include "relay.h"
 #include "din.h"
 #include "dout.h"
+#include "ain.h"
 
 // Wyjścia cyfrowe przekaźnikowe (RO)
 extern RELAY_t RO1;
@@ -28,6 +29,10 @@ extern DIN_t DI1;
 extern DIN_t DI2;
 extern DIN_t DI3;
 extern DIN_t DI3;
+
+// Wejścia analogowe (AI)
+extern AIN_t AI1;
+extern AIN_t AI2;
 
 // Functions
 void PLC_Init(void);
