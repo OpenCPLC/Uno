@@ -39,7 +39,7 @@ bool start_button;
 bool stop_button;
 bool motor_running;
 
-void main_classic(void)
+int main(void)
 {
   PLC_Init();
   while(1) {
@@ -65,7 +65,7 @@ DIN_t *start_button = &DI1;
 DIN_t *stop_button = &DI2;
 RELAY_t *motor_running = &RO1;
 
-void main_modern(void)
+int main(void)
 {
   PLC_Init();
   while(1) {
@@ -80,10 +80,6 @@ void main_modern(void)
 }
 ```
 
-
-
-
-
 ### Wejścia analogowe **`AI`**
 
 W sterowniku **Uno** mamy do dyspozycji 2 wejścia analogowe `AI1` i `AI2`. Wejście analogowe pozwala na pomiar wartości napięcia w zakresie **0-10V**, gdy pole type jest ustawione na `AIN_Type_Volts` _(domyślnie)_, lub prądu w zakresie **0-20mA**, gdy pole type jest ustawione na AIN_Type_mAmps. Funkcją, która zwraca nam zmierzoną wartość, jest `AIN_Value`.  W przykładzie pobierana jest wartość prądu, sprawdzane jest, czy nie jest ona mniejsza niż **2mA**, co wskazywałoby na brak podpiętego czujnika, a następnie prąd jest przeliczany na temperaturę.
@@ -96,7 +92,7 @@ AIN_t *analog_input = &AI1;
 #define TEMPERATURE_MIN_4mA  -40.0 // [°C]
 #define TEMPERATURE_MAX_20mA 125.0 // [°C]
 
-void main(void)
+int main(void)
 {
   analog_input->type = AIN_Type_mAmps;
   PLC_Init();
