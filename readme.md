@@ -21,7 +21,7 @@ END_VAR
 
 start_button := I0.1
 stop_button := I0.2
-motor_running := Q0.0
+motor_running := Q0.1
 
 IF safety_signal AND start_button THEN
   motor_running := TRUE;
@@ -29,7 +29,7 @@ ELSIF NOT safety_signal THEN
   motor_running := FALSE;
 END_IF
 
-Q0.0 := motor_running
+Q0.1 := motor_running
 
 END_PROGRAM
 ```
