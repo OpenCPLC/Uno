@@ -11,12 +11,6 @@ void SYSCFG_RAMP_PA11_PA12(void);
 
 //------------------------------------------------------------------------------------------------- RCC
 
-#define RCC_CFGR_SWS_HSI (0UL)
-#define RCC_CFGR_SWS_HSE (0x00000008UL)
-#define RCC_CFGR_SWS_PLL (0x00000010UL)
-#define RCC_CFGR_SWS_LSI (0x00000018UL)
-#define RCC_CFGR_SWS_LSE (0x00000020UL)
-
 typedef enum {
   RCC_HSI_16MHz = 0,
   RCC_HSI_8MHz = 1,

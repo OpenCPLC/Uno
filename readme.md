@@ -1,43 +1,51 @@
-## Essential tools
+## OpenCPLC
 
-Do pracy z projektem **OpenCPLC** wymagany jest minimalny zestaw narzędzi, identyczny z tym używanym do pracy z mikrokontrolerami STM32. W skład tego zestawu wchodzą:
+Projekt zapewnia warstwę pośrednią pomiędzy Twoją aplikacją, a peryferiami mikrokontrolera. Trochę podobnie jak w **Arduino**, jednak bardziej w kierunku automatyki. Bez włsnego IDE oraz angażowania C++.
 
-- Pakiet narzędzi [**GNU Arm Embedded Toolchain**](https://developer.arm.com/downloads/-/gnu-rm): Obejmuje on między innymi kompilator.
-- On-Chip Debugger: [**OpenOCD** ](https://gnutoolchains.com/arm-eabi/openocd/) Umożliwia komunikację z mikrokontrolerem za pomocą programatora ST-Link.
-- Narzędzia do zarządzania procesem kompilacji programów, jakim jest [**Make**](https://www.gnu.org/software/make/)
+W świecie technologii, programowanie staje się coraz bardziej złożone _(często na życzenie samych programistów)_. Niekiedy poziom skomplikowania aplikacji jest nieproporcjonalny do problemu, który rozwiązuje lub wartości, jaką dostarcza. Chcemy, aby nasza biblioteka była możliwie prosta, interfejs intuicyjny, a nakład technologiczny minimalny. Wykorzystujemy dobrze znane narzędzia, takie jak **Visual Studio Code**, system kontroli wersji **Git** oraz język **C**, który pomimo swojego wieku nadal jest numerem jeden wśród programistów Embedded. Nic nie stoi więc na przeszkodzie, aby jego pojawiło się go trochę więcej w automatyce, co pozwoli iść branży z duchem IT!
 
-Aby zainstalować narzędzia, można skorzystać z menedżera pakietów [**Chocolatey**](https://chocolatey.org/), który umożliwia prostą instalację wymaganych komponentów.
+Zapotrzebowanie na automatyków było, jest i będzie bardzo duże. W przeszłości, kiedy programistów było niewiele, a za automatykę brali się elektrycy, zaprojektowanie języka, jakim jest ladder logic było strzałem w dziesiątkę, bo wykorzystywało logikę znaną z elektryki. Obecnie sytuacja jest odwrotna, a kod w języku C często jest bardziej czytelny dla absolwentów kierunków technicznych niż drzewo logiczne złożone z styków i cewek.
 
+Porównajmy implementacje systemu **start-stop** w języku **SCL**, **ladder** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku **C** wydaje Ci się bardziej zrozumiały to prawdopodobnie ta droga jest dla Ciebie:
+
+- System start-stop w **SCL**
+
+```scl
+PROGRAM main
+
+VAR
+  start_button: BOOL := FALSE;
+  stop_button: BOOL := FALSE;
+  motor_running: BOOL := FALSE;
+END_VAR
+
+start_button := I0.1
+stop_button := I0.2
+motor_running := Q0.0
+
+IF safety_signal AND start_button THEN
+  motor_running := TRUE;
+ELSIF NOT safety_signal THEN
+  motor_running := FALSE;
+END_IF
+
+Q0.0 := motor_running
+
+END_PROGRAM
 ```
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-choco install make
-```
 
-Instalacja **Make** automatycznie utworzy zmienną systemową, jednak w przypadku pozostałych programów konieczne będzie ręczne jej utworzenie.
+- System start-stop w **lader logic**
 
-🪟 Run » `sysdm.cpl` » Advanced » **Environment Variables**
+![Lader](/Image/lader.png)
 
-- ARMGCC → `C:\Embedded\ArmGCC\bin`
-- Path » `%ARMGCC%` and `C:\Embedded\OpenOCD\bin`
-
-Na zakończenie należy otworzyć konsolę i zweryfikować, czy wszystkie pakiety zostały zainstalowane poprawnie. Można to zrobić przy użyciu komendy `--version`.
-
-```bash
-make --version
-openocd --version
-arm-none-eabi-gcc --version
-```
-
-## Examples
-
-### System `start`-`stop`
-
-Classic Style
+- System start-stop w ANSI C _(mapowanie z użyciem zmiennych)_
 
 ```c
-bool start_button;
-bool stop_button;
-bool motor_running;
+#import "uno"
+
+bool start_button = false;
+bool stop_button = false;
+bool motor_running = false;
 
 int main(void)
 {
@@ -45,7 +53,6 @@ int main(void)
   while(1) {
     start_button = DIN_State(&DI1);
     stop_button = DIN_State(&DI2);
-    motor_running = RELAY_State(&RO1);
     if(stop_button) {
       motor_running = false;
     }
@@ -58,9 +65,11 @@ int main(void)
 }
 ```
 
-Modern Style
+- System start-stop w ANSI C _(mapowanie z użyciem wskaźników)_
 
 ```c
+#import "uno"
+
 DIN_t *start_button = &DI1;
 DIN_t *stop_button = &DI2;
 RELAY_t *motor_running = &RO1;
@@ -79,6 +88,62 @@ int main(void)
   }
 }
 ```
+
+Nie zapominajmy, że język [C](https://pl.wikipedia.org/wiki/C_(j%C4%99zyk_programowania)) powstał jako język ogólnego przeznaczenia, zatem charakteryzuje się dużą uniwersalnością, szczególnie względem sandbox'ów dostarczanych przez producentów sterowników PLC.
+
+## Essential tools
+
+Progamowanie sterownika **Uno** oraz całej linii **OpenCPLC** należy rozpoczą od sklonowania repozytorium, co jest rownoważne z skopiowaniem wszystkich plików projektowych. Potrzeby jest do tego [klient GIT](https://git-scm.com/download/win). Po jego instalacji wystarczy włączyć konsolę systemową i wpisać komendę:
+
+```bash
+git clone https://github.com/OpenCPLC/Uno
+```
+
+Zalecamy pracować z [Visual Studio Code](https://code.visualstudio.com/), gdyż jest to bardzo popularne IDE i właśnie dla niego zapewniamy wsparcie. Te narzędzia są dość uniwersalne i duża szansa, że już jest znasz i wykorzystujesz, jeśli nie to napewno znajdziesz do nich wiele zastosować.
+
+Do pracy ze sterownikami OpenCPLC wymagany jest również zestaw bardziej specjalistycznych narzędzi, identyczny z tym używanym do pracy z mikrokontrolerami **STM32**. W skład tego zestawu wchodzą:
+
+- Pakiet narzędzi [**GNU Arm Embedded Toolchain**](https://developer.arm.com/downloads/-/gnu-rm): Obejmuje on między innymi kompilator.
+- On-Chip Debugger: [**OpenOCD** ](https://gnutoolchains.com/arm-eabi/openocd/) Umożliwia komunikację z mikrokontrolerem za pomocą programatora ST-Link.
+- Narzędzia do zarządzania procesem kompilacji programów, jakim jest [**Make**](https://www.gnu.org/software/make/)
+
+Aby zainstalować **Make**, można skorzystać z menedżera pakietów [**Chocolatey**](https://chocolatey.org/), który umożliwia prostą instalację wymaganych komponentów. Wystarczy otworzyć **PowerShell** jako 🛡️administrator i wywołać komendy:
+
+```
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choco install make
+```
+
+Instalacja **Make** automatycznie utworzy zmienną systemową, jednak w przypadku pozostałych programów konieczne będzie ręczne ich utworzenie.
+
+🪟 Run » `sysdm.cpl` » Advanced » **Environment Variables**
+
+- ARMGCC → `C:\Embedded\ArmGCC\bin`
+- Path » `%ARMGCC%` oraz `C:\Embedded\OpenOCD\bin`
+
+![Env](/Image/env.png)
+
+Na zakończenie należy otworzyć konsolę i zweryfikować, czy wszystkie pakiety zostały zainstalowane poprawnie. Można to zrobić przy użyciu komendy `--version`.
+
+```bash
+arm-none-eabi-gcc --version
+openocd --version
+make --version
+```
+
+Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na skrypt 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko wywołać skrypt z konsoli jako 🛡️administrator podając nazwę projektu `-n`.
+
+```bash
+./wizard.exe -n [naza-projektu]
+```
+
+Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością pamięci `-m`, wymuszenie innego poziomu optymalizacji `-o` oraz ponowne wygenerowanie plików konfiguracyjnych `-r`.
+
+```bash
+./wizard.exe -n [naza-projektu] -m 128kB -o 0g -r
+```
+
+## Examples
 
 ### Wejścia analogowe **`AI`**
 
