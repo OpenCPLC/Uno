@@ -118,8 +118,8 @@ Instalacja **Make** automatycznie utworzy zmienną systemową, jednak w przypadk
 
 🪟 Run » `sysdm.cpl` » Advanced » **Environment Variables**
 
-- ARMGCC → `C:\Embedded\ArmGCC\bin`
-- Path » `%ARMGCC%` oraz `C:\Embedded\OpenOCD\bin`
+- ARMGCC → `C:\OpenCPLC\ArmGCC\bin`
+- Path » `%ARMGCC%` oraz `C:\OpenCPLC\OpenOCD\bin`
 
 ![Env](/Image/env.png)
 
