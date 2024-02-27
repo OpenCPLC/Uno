@@ -8,7 +8,7 @@ Zapotrzebowanie na automatyków było, jest i będzie bardzo duże. W przeszło�
 
 Porównajmy implementacje systemu **start-stop** w języku **SCL**, **ladder** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku **C** wydaje Ci się bardziej zrozumiały to prawdopodobnie ta droga jest dla Ciebie:
 
-- System start-stop w **SCL**
+- System start-stop w SCL
 
 ```scl
 PROGRAM main
@@ -34,7 +34,7 @@ Q0.1 := motor_running
 END_PROGRAM
 ```
 
-- System start-stop w **lader logic**
+- System start-stop w lader logic
 
 ![Lader](/Image/lader.png)
 

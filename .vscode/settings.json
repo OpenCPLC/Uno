@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.h": "c",
+    "type_traits": "c",
+    "limits": "c"
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.mouseWheelZoom": true
+}
