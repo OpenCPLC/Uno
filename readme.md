@@ -2,8 +2,8 @@
 
 - 1\. [OpenCPLC](#opencplc-) - Wstęp
 - 2\. [Essential tools](#essential-tools-) - Konfiguracja środowiska
-- 3\. [Basic - Examples](#basic---examples-) - Przykłady podstawowe
-- 4\. [Multi-thread - Examples](#multi-thread---examples-) - Przykłady wielowątkowe
+- 3\. [Basic Examples](#basic-examples-) - Przykłady podstawowe
+- 4\. [Multi-thread Examples](#multi-thread-examples-) - Przykłady wielowątkowe
 
 ## OpenCPLC [➥](#-content)
 
@@ -150,7 +150,7 @@ Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością p
 ./wizard.exe -n [naza-projektu] -m 128kB -o 0g -r
 ```
 
-## Basic - Examples [➥](#-content)
+## Basic Examples [➥](#-content)
 
 ### Wejścia analogowe **`AI`**
 
@@ -185,7 +185,7 @@ int main(void)
 }
 ```
 
-## Multi-thread - Examples [➥](#-content)
+## Multi-thread Examples [➥](#-content)
 
 Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności.  Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami. Z poziomu aplikacji w funkcji głównej `main` przekazujemy funkcję wątków wraz z pamięcią podręczną `stack` _(za pomocą funkcji `thread`)_. Konieczne jest dość dokładne oszacowanie, ile pamięci będzie potrzebował dany wątek. Następnie wystarczy uruchomić system przełączania wątków `VRTS_Init`.
 
