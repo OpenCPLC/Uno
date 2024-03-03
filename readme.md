@@ -2,9 +2,9 @@
 
 - 1\. [OpenCPLC](#opencplc-) - Wstęp
 - 2\. [Essential tools](#essential-tools-) - Konfiguracja środowiska
-- 3\. [Basic - Examples](#basic-examples-) - Przykłady podstawowe
-- 4\. [Multi-thread - Examples](#multi-thread-examples-) - Przykłady wielowątkowe
-- 
+- 3\. [Basic - Examples](#basic---examples-) - Przykłady podstawowe
+- 4\. [Multi-thread - Examples](#multi-thread---examples-) - Przykłady wielowątkowe
+
 ## OpenCPLC [➥](#-content)
 
 Projekt zapewnia warstwę pośrednią pomiędzy Twoją aplikacją, a peryferiami mikrokontrolera. Trochę podobnie jak w **Arduino**, jednak bardziej w kierunku automatyki. Bez włsnego IDE oraz angażowania C++.
@@ -246,7 +246,9 @@ int loop(void)
 }
 ```
 
-# Pomiar temperatury `RTD`
+### Pomiar temperatury `RTD`
+
+W przykładzie przeprowadzany jest pomiar temperatury przy użyciu **4**-przewodowego czujnika rezystancyjnego **PT1000**. W funkcji `RTD_Loop` pomiar jest wykonywany `10` razy, a następnie uzyskane wartości są uśredniane i przeliczane na temperaturę. Odczyt temperatury odbywa się z poziomu głównej pętli `loop`.
 
 ```c
 #include "uno.h"
@@ -260,6 +262,9 @@ static uint32_t stack_loop[512];
 int main(void)
 {
   PLC_Init();
+  RTD.type = MAX31865_Type_PT1000;
+  RTD.wire = MAX31865_Wire_4;
+  RTD.oversampling = 10;
   RTD_Init();
   thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
   thread(&RTD_Loop, stack_plc, sizeof(stack_plc));

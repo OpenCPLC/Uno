@@ -285,7 +285,7 @@ SPI_Master_t rtd_spi = {
 
 //------------------------------------------------------------------------------------------------- MAX31865
 
-MAX31865_t rtd_max31865 = {
+MAX31865_t RTD = {
   .spi = &rtd_spi,
   .ready = &rtd_gpio_drdy,
   .type = MAX31865_Type_PT100,
@@ -297,16 +297,16 @@ MAX31865_t rtd_max31865 = {
 
 void RTD_Init(void)
 {
-  MAX31865_Init(&rtd_max31865);
+  MAX31865_Init(&RTD);
 }
 
 void RTD_Loop(void)
 {
-  MAX31865_Loop(&rtd_max31865);
+  MAX31865_Loop(&RTD);
   let();
 }
 
 float RTD_Temperature(void)
 {
-  return rtd_max31865.temperature;
+  return RTD.temperature;
 }

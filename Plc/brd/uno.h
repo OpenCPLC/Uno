@@ -40,9 +40,6 @@ extern AIN_t AI2;
 // Functions
 void PLC_Init(void);
 void PLC_Loop(void);
-void RTD_Init(void);
-void RTD_Loop(void);
-float RTD_Temperature(void);
 
 #ifndef PLC_RS485_BUFFER_SIZE
   #define PLC_RS485_BUFFER_SIZE 1000
@@ -50,6 +47,11 @@ float RTD_Temperature(void);
 
 extern UART_t RS1;
 extern UART_t RS2;
+
+extern MAX31865_t RTD;
+void RTD_Init(void);
+void RTD_Loop(void);
+float RTD_Temperature(void);
 
 //---------------------------------------------------------------------------------------------------------------------
 #endif
