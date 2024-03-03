@@ -1,7 +1,12 @@
-#ifndef DOUT_H_
-#define DOUT_H_
+#ifndef MAX31865_H_
+#define MAX31865_H_
 
 #include "spi-master.h"
+#include "math.h"
+
+#define MAX31865_CFG_BIAS  (1 << 7)
+#define MAX31865_CFG_SHOT  (1 << 5)
+#define MAX31865_CFG_FSCLR (1 << 1)
 
 typedef enum {
   MAX31865_Reg_Read_Configuration = 0x00,
@@ -42,6 +47,11 @@ typedef struct {
   MAX31865_Wire_e wire;
   MAX31865_Reject_e reject;
   float temperature;
+  uint8_t oversampling;     // 15-25ms
+
 } MAX31865_t;
+
+void MAX31865_Init(MAX31865_t *rtd);
+status_t MAX31865_Loop(MAX31865_t *rtd);
 
 #endif

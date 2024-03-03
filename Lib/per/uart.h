@@ -1,11 +1,10 @@
-#ifndef PER_UART_H_
-#define PER_UART_H_
+#ifndef UART_H_
+#define UART_H_
 
 #include "int.h"
 #include "tim.h"
 #include "file.h"
 #include "buff.h"
-#include "queue.h"
 #include "main.h"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -66,8 +65,6 @@ typedef struct {
   GPIO_t *gpio_direction;
   TIM_t *tim;
   BUFF_t *rx_buff;
-  QUEUE_t *tx_queue;
-  UART_Mode_e mode; // TODO
   DMA_Channel_TypeDef *_tx_dma;
   DMAMUX_Channel_TypeDef *_tx_dmamux;
   uint8_t prefix;
@@ -77,26 +74,6 @@ typedef struct {
   bool _busy_tc;
 } UART_t;
 
-//---------------------------------------------------------------------------------------------------------------------
-
-#define UART_TASK_TYPE_COUNT 1
-
-typedef enum {
-  UART_Task_Free = 0,
-  UART_Task_Send = 1
-} UART_Task_e;
-
-#pragma pack(1)
-typedef struct {
-  UART_t *uart;
-  uint8_t *buffer;
-  uint16_t size;
-  bool *mutex;
-  uint8_t *temporary;
-  bool copy;
-} UART_Task_t;
-#pragma pack()
-
 //--------------------------------------------------------------------------------------------------------------------------------
 
 void UART_Init(UART_t *uart);
@@ -104,24 +81,16 @@ void UART_ReInit(UART_t *uart);
 bool UART_During(UART_t *uart);
 bool UART_IsBusy(UART_t *uart);
 bool UART_IsFree(UART_t *uart);
-todo_t UART_Todo(UART_t *uart);
 
+access_t UART_Send(UART_t *uart, uint8_t *array, uint16_t length);
+access_t UART_SendFile(UART_t *uart, FILE_t *file);
 uint16_t UART_ReadSize(UART_t *uart);
 uint16_t UART_ReadArray(UART_t *uart, uint8_t *array);
 char *UART_ReadString(UART_t *uart);
 uint8_t UART_ReadToFile(UART_t *uart, FILE_t *file);
-void UART_ReadSkip(UART_t *uart);
+bool UART_ReadSkip(UART_t *uart);
 
-task_t UART_SendArray(UART_t *uart, uint8_t *buffer, uint16_t size, bool *mutex, bool copy);
-task_t UART_SendString(UART_t *uart, char *str, bool *mutex, bool copy);
-task_t UART_SendFile(UART_t *uart, FILE_t *file, bool copy);
-
-todo_t UART_Loop(UART_t *uart);
-
-//--------------------------------------------------------------------------------------------------------------------------------
-
-extern const uint8_t(*UART_ErtsVector[])(UART_t *uart);
-extern const uint8_t uart_erts_jump[];
+uint16_t UART_CalcTime(UART_t *uart, uint16_t length);
 
 //--------------------------------------------------------------------------------------------------------------------------------
 #endif

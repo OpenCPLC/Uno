@@ -1,73 +1,5 @@
 #include "uart.h"
 
-//-------------------------------------------------------------------------------------------------
-
-bool UART_During(UART_t *uart)
-{
-  return uart->_busy_tc;
-}
-
-bool UART_IsBusy(UART_t *uart)
-{
-  return uart->_busy_tx;
-}
-
-bool UART_IsFree(UART_t *uart)
-{
-  return !(uart->_busy_tx);
-}
-
-todo_t UART_Todo(UART_t *uart)
-{
-  return QUEUE_Todo(uart->tx_queue);
-}
-
-//------------------------------------------------------------------------------------------------- Run
-
-static access_t UART_Run(UART_t *uart, uint8_t *array, uint16_t length)
-{
-  if(!uart->_busy_tx) {
-    if(uart->gpio_direction) GPIO_Set(uart->gpio_direction);
-    uart->_tx_dma->CCR &= ~DMA_CCR_EN;
-    uart->_tx_dma->CMAR = (uint32_t)array;
-    uart->_tx_dma->CNDTR = length;
-    if(uart->prefix) uart->reg->TDR = uart->prefix;  // send address for stream
-    uart->_tx_dma->CCR |= DMA_CCR_EN;
-    uart->_busy_tx = true;
-    uart->_busy_tc = true;
-    return FREE;
-  }
-  else return BUSY;
-}
-
-//------------------------------------------------------------------------------------------------- Queue
-
-status_t UART_QueueStart(UART_Task_t *task)
-{
-  if(UART_IsBusy(task->uart)) return ERR;
-  if(task->copy) UART_Run(task->uart, task->temporary, task->size);
-  else UART_Run(task->uart, task->buffer, task->size);
-  return OK;
-}
-
-status_t UART_QueueEnd(UART_Task_t *task)
-{
-  if(task->copy) dloc(task->temporary);
-  else if(task->mutex) *task->mutex = false;
-  return OK;
-}
-
-const char uart_send_name[] = "send";
-
-QUEUE_TaskService_t uart_send = {
-  .name = uart_send_name,
-  .object_size = sizeof(UART_Task_t),
-  .Start = (status_t (*)(void *))&UART_QueueStart,
-  .End = (status_t (*)(void *))UART_QueueEnd
-};
-
-const QUEUE_TaskService_t *uart_services[] = { NULL, &uart_send };
-
 //------------------------------------------------------------------------------------------------- Interrupt
 
 static void UART_InterruptDMA(UART_t *uart)
@@ -82,7 +14,7 @@ static void UART_InterruptDMA(UART_t *uart)
 static void UART_InterruptEV(UART_t *uart)
 {
   if(uart->reg->ISR & USART_ISR_RXNE_RXFNE) {
-    BUFF_Push(uart->rx_buff, (uint8_t)(uart->reg->RDR));
+    BUFF_Push(uart->buff, (uint8_t)(uart->reg->RDR));
     if(uart->tim) {
       TIM_ResetValue(uart->tim);
       TIM_Enable(uart->tim);
@@ -95,7 +27,7 @@ static void UART_InterruptEV(UART_t *uart)
   }
   if(uart->reg->ISR & USART_ISR_RTOF) {
     uart->reg->ICR |= USART_ICR_RTOCF;
-    BUFF_Break(uart->rx_buff);
+    BUFF_Break(uart->buff);
   }
 }
 
@@ -145,13 +77,12 @@ const GPIO_Map_t uart_rx_map[] = {
 
 void UART_Init(UART_t *uart)
 {
-  if(!uart->tx_queue->services) uart->tx_queue->services = uart_services;
   if(uart->gpio_direction) {
     uart->gpio_direction->mode = GPIO_Mode_Output;
     GPIO_Init(uart->gpio_direction);
   }
   if(!uart->timeout) uart->timeout = 40;
-  BUFF_Init(uart->rx_buff);
+  BUFF_Init(uart->buff);
   uart->_tx_dma = (DMA_Channel_TypeDef*)(DMA1_BASE + 8 + (20 * (uart->dma_channel - 1)));
   uart->_tx_dmamux = (DMAMUX_Channel_TypeDef*)(DMAMUX1_BASE + (4 * (uart->dma_channel - 1)));
   RCC->AHBENR |= RCC_AHBENR_DMA1EN;
@@ -191,7 +122,7 @@ void UART_Init(UART_t *uart)
     uart->tim->prescaler = 100;
     uart->tim->auto_reload = ((float)SystemCoreClock * uart->timeout / (uart->baud) / 100);
     uart->tim->function = (void (*)(void*))BUFF_Break;
-    uart->tim->function_struct = (void*)uart->rx_buff;
+    uart->tim->function_struct = (void*)uart->buff;
     uart->tim->interrupt_level = uart->interrupt_level;
     uart->tim->one_pulse_mode = true;
     uart->tim->enable = true;
@@ -214,83 +145,96 @@ void UART_ReInit(UART_t *uart)
   UART_Init(uart);
 }
 
+//------------------------------------------------------------------------------------------------- Flags
+
+bool UART_During(UART_t *uart)
+{
+  return uart->_busy_tc;
+}
+
+bool UART_IsBusy(UART_t *uart)
+{
+  return uart->_busy_tx;
+}
+
+bool UART_IsFree(UART_t *uart)
+{
+  return !(uart->_busy_tx);
+}
+
+//------------------------------------------------------------------------------------------------- Run
+
+access_t UART_Send(UART_t *uart, uint8_t *array, uint16_t length)
+{
+  if(!uart->_busy_tx) {
+    if(uart->gpio_direction) GPIO_Set(uart->gpio_direction);
+    uart->_tx_dma->CCR &= ~DMA_CCR_EN;
+    uart->_tx_dma->CMAR = (uint32_t)array;
+    uart->_tx_dma->CNDTR = length;
+    if(uart->prefix) uart->reg->TDR = uart->prefix; // send address for stream
+    uart->_tx_dma->CCR |= DMA_CCR_EN;
+    uart->_busy_tx = true;
+    uart->_busy_tc = true;
+    return FREE;
+  }
+  else return BUSY;
+}
+
+access_t UART_SendFile(UART_t *uart, FILE_t *file)
+{
+  return UART_Send(uart, file->buffer, file->size);
+}
+
 //------------------------------------------------------------------------------------------------- Read
 
 uint16_t UART_ReadSize(UART_t *uart)
 {
-  return BUFF_Size(uart->rx_buff);
+  return BUFF_Size(uart->buff);
 }
 
 uint16_t UART_ReadArray(UART_t *uart, uint8_t *array)
 {
-  return BUFF_Array(uart->rx_buff, array);
+  return BUFF_Array(uart->buff, array);
 }
 
 char *UART_ReadString(UART_t *uart)
 {
-  return BUFF_String(uart->rx_buff);
+  return BUFF_String(uart->buff);
 }
 
 uint8_t UART_ReadToFile(UART_t *uart, FILE_t *file)
 {
   if(UART_ReadSize(uart) > file->limit) return ERR;
-  file->size = BUFF_Array(uart->rx_buff, file->buffer);
+  file->size = BUFF_Array(uart->buff, file->buffer);
   return OK;
 }
 
-void UART_ReadSkip(UART_t *uart)
+bool UART_ReadSkip(UART_t *uart)
 {
-  BUFF_Skip(uart->rx_buff);
+  return BUFF_Skip(uart->buff);
 }
 
-//------------------------------------------------------------------------------------------------- Send
-
-task_t UART_SendArray(UART_t *uart, uint8_t *buffer, uint16_t size, bool *mutex, bool copy)
+void UART_ReadClear(UART_t *uart)
 {
-  if(!size) return TASK_FREE;
-  uint8_t *temporary = NULL;
-  if(copy) {
-    temporary = aloc(size);
-    if(!temporary) return TASK_FREE;
-    memcpy(temporary, buffer, size);
-  }
-  else if(mutex) {
-    if(*mutex) return TASK_FREE;
-    *mutex = true;
-  }
-  UART_Task_t task = { .uart = uart, .buffer = buffer, .size = size, .mutex = mutex, .copy = copy, .temporary = temporary };
-  return QUEUE_Push(uart->tx_queue, UART_Task_Send, (void*)&task, NULL, NULL);
-}
-
-task_t UART_SendString(UART_t *uart, char *str, bool *mutex, bool copy)
-{
-  return UART_SendArray(uart, (uint8_t *)str, strlen(str), mutex, copy);
-}
-
-task_t UART_SendFile(UART_t *uart, FILE_t *file, bool copy)
-{
-  return UART_SendArray(uart, file->buffer, file->size, &file->mutex, copy);
+  return BUFF_Clear(uart->buff);
 }
 
 //-------------------------------------------------------------------------------------------------
 
-todo_t UART_Loop(UART_t *uart)
+/**
+ * @brief Oblicza czas trwania transmisji dla określonej długości ramki UART.
+ * @param uart Wskaźnik do struktury UART_t reprezentującej ustawienia interfejsu UART.
+ * @param length Długość ramki w ilości bajtów.
+ * @return uint16_t Czas trwania transmisji w milisekundach.
+ */
+uint16_t UART_CalcTime(UART_t *uart, uint16_t length)
 {
-  if(uart->_todo_dma) {
-    uart->_todo_dma = false;
-    if(!uart->gpio_direction) uart->_busy_tx = false;
-    QUEUE_End(uart->tx_queue);
-  }
-  if(uart->_todo_tc) {
-    uart->_todo_tc = false;
-    uart->_busy_tc = false;
-    if(uart->gpio_direction) {
-      uart->_busy_tx = false;
-      GPIO_Rst(uart->gpio_direction);
-    }
-  }
-  if(UART_IsBusy(uart)) return TASK_FREE;
-  return QUEUE_Start(uart->tx_queue);
+  uint32_t bits = 10; // start_bit + space
+  if(uart->parity) bits++;
+  switch(uart->stop_bits) {
+    case UART_StopBits_0_5: case UART_StopBits_1_0: bits += 1; 
+    case UART_StopBits_1_5: case UART_StopBits_2_0: bits += 2;
+  } 
+  return 1000 * ((bits * length) + uart->timeout) / uart->baud;
 }
 
-//-------------------------------------------------------------------------------------------------

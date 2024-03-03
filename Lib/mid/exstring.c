@@ -354,7 +354,6 @@ int find_array(uint8_t *array, uint16_t length, char *pattern)
 
 #endif
 //-------------------------------------------------------------------------------------------------
-#if(EXSTRING_INCLUDE_CUT)
 
 char *cut_this(char *str, char *pattern, EXSTRING_Cut_e mode)
 {
@@ -391,9 +390,7 @@ char *cut(char *str_in, char *pattern, EXSTRING_Cut_e mode)
   return str_out;
 }
 
-#endif
 //-------------------------------------------------------------------------------------------------
-#if(EXSTRING_INCLUDE_TRIM)
 
 static int _find_char(char byte, char *list)
 {
@@ -445,7 +442,6 @@ char *trim(char *str)
   return ltrim(rtrim(str));
 }
 
-#endif
 //-------------------------------------------------------------------------------------------------
 
 uint16_t count_of_char(char *str, char val)
@@ -544,7 +540,6 @@ char *replace_char(char *pattern, char replacement, char *original)
 }
 
 //-------------------------------------------------------------------------------------------------
-#if(EXSTRING_INCLUDE_REPLACE_STR)
 
 /**
  * Funkcja podmienia wybrane znaki w danym łańcuchu.
@@ -579,5 +574,4 @@ char *replace_str(char *pattern, char *replacement, char *original)
 	return returned;
 }
 
-#endif
 //------------------------------------------------------------------------------------------------

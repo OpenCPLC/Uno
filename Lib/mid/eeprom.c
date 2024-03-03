@@ -142,11 +142,13 @@ uint8_t EEPROM_Cache(EEPROM_t *eeprom)
 
 uint8_t EEPROM_Save(uint32_t *data)
 {
+  if(!eeprom_cache) return ERR;
   return EEPROM_Write(eeprom_cache, data);
 }
 
 uint8_t EEPROM_Load(uint32_t *data)
 {
+  if(!eeprom_cache) return ERR;
   return EEPROM_Read(eeprom_cache, data);
 }
 

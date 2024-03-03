@@ -248,50 +248,14 @@ void DBG_PrintArrayBash(FILE_t *file, char **argv, uint16_t argc, uint8_t limit_
 
 //-------------------------------------------------------------------------------------------------
 
-task_t DBG_SendArray(uint8_t *buffer, uint16_t size, bool *mutex, bool copy)
+access_t DBG_Send(uint8_t *array, uint16_t length)
 {
-  return UART_SendArray(dbg_state.uart, buffer, size, mutex, copy);
+  return UART_Send(dbg_state.uart, array, length);
 }
 
-task_t DBG_SendString(UART_t *uart, char *str, bool *mutex, bool copy)
+access_t DBG_SendFile(UART_t *uart, FILE_t *file)
 {
-  return UART_SendArray(uart, (uint8_t *)str, strlen(str), mutex, copy);
-}
-
-task_t DBG_SendFile(UART_t *uart, FILE_t *file, bool copy)
-{
-  return UART_SendArray(uart, file->buffer, file->size, &file->mutex, copy);
-}
-
-//-------------------------------------------------------------------------------------------------
-
-static todo_t _DBG_Loop(void)
-{
-  return UART_Loop(dbg_state.uart);
-}
-
-static task_t _DBG_Push(void)
-{
-  uint8_t task = DBG_SendFile(dbg_state.uart, dbg_state.file, true);
-  if(task) {
-    dbg_state.file->size = 0;
-    return task;
-  }
-  return TASK_FREE;
-}
-
-todo_t DBG_Loop(void)
-{
-  _DBG_Push();
-  return _DBG_Loop();
-}
-
-void DBG_Wait(void)
-{
-  _DBG_Push();
-  do {
-    _DBG_Loop();
-  } while(UART_Todo(dbg_state.uart) || UART_During(dbg_state.uart));
+  return UART_SendFile(dbg_state.uart, file);
 }
 
 //-------------------------------------------------------------------------------------------------

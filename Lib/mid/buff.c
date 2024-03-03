@@ -2,6 +2,10 @@
 
 //-------------------------------------------------------------------------------------------------
 
+/** 
+ * @brief Inicjalizuje bufor kołowy.
+ * @param buff Wskaźnik do struktury bufora.
+ */
 inline void BUFF_Init(BUFF_t *buff)
 {
   buff->head = buff->mem;
@@ -11,15 +15,25 @@ inline void BUFF_Init(BUFF_t *buff)
   buff->msg_tail = 0;
 }
 
+/** 
+ * @brief Dodaje bajt `value` do bufora kołowego.
+ * @param buff Wskaźnik do struktury bufora.
+ * @param value Wartość do dodania.
+ */
 inline void BUFF_Push(BUFF_t *buff, uint8_t value)
 {
   *buff->head = value;
   buff->msg_counter++;
   buff->head++;
   if(buff->head >= buff->end) buff->head = buff->mem;
+  // if(buff->head == buff->tail) HardFault_Handler();
   buff->break_on = true;
 }
 
+/** 
+ * @brief Oznacza koniec bieżącej wiadomości, jeśli ustawiona jest przerwa.
+ * @param buff Wskaźnik do struktury bufora.
+ */
 inline void BUFF_Break(BUFF_t *buff)
 {
   if(buff->break_on) {
@@ -31,12 +45,23 @@ inline void BUFF_Break(BUFF_t *buff)
   }
 }
 
+/** 
+ * @brief Zwraca rozmiar bieżącej wiadomości w buforze.
+ * @param buff Wskaźnik do struktury bufora.
+ * @return Rozmiar bieżącej wiadomości.
+ */
 uint16_t BUFF_Size(BUFF_t *buff)
 {
   if(buff->msg_head != buff->msg_tail) return buff->msg_size[buff->msg_tail];
   return 0;
 }
 
+/** 
+ * @brief Kopiuje zawartość bieżącej wiadomości do zewnętrznej tablicy.
+ * @param buff Wskaźnik do struktury bufora.
+ * @param array Wskaźnik do tablicy docelowej.
+ * @return Rozmiar skopiowanej wiadomości.
+ */
 uint16_t BUFF_Array(BUFF_t *buff, uint8_t *array)
 {
   uint16_t size = BUFF_Size(buff);
@@ -54,6 +79,11 @@ uint16_t BUFF_Array(BUFF_t *buff, uint8_t *array)
   return size;
 }
 
+/** 
+ * @brief Tworzy dynamiczny ciąg znaków z zawartością bieżącej wiadomości w buforze.
+ * @param buff Wskaźnik do struktury bufora.
+ * @return Wskaźnik do dynamicznie alokowanego ciągu znaków.
+ */
 char *BUFF_String(BUFF_t *buff)
 {
   char *string = NULL;
@@ -66,7 +96,12 @@ char *BUFF_String(BUFF_t *buff)
   return string;
 }
 
-void BUFF_Skip(BUFF_t *buff)
+/** 
+ * @brief Pomija bieżącą wiadomość w buforze.
+ * @param buff Wskaźnik do struktury bufora.
+ * @return Zwraca `true`, jeżeli wiadomość zostałą pominięta/
+ */
+bool BUFF_Skip(BUFF_t *buff)
 {
   uint16_t size = BUFF_Size(buff);
   if(size) {
@@ -77,7 +112,18 @@ void BUFF_Skip(BUFF_t *buff)
     }
     buff->msg_tail++;
     if(buff->msg_tail >= BUFF_MESSAGE_LIMIT) buff->msg_tail = 0;
+    return true;
   }
+  return false;
+}
+
+/** 
+ * @brief Czyści cały bufor przez pomijanie wiadomości, dopóki nie ma więcej wiadomości.
+ * @param buff Wskaźnik do struktury bufora.
+ */
+void BUFF_Clear(BUFF_t *buff)
+{
+  while(1) BUFF_Skip(buff);
 }
 
 //-------------------------------------------------------------------------------------------------

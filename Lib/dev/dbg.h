@@ -48,12 +48,5 @@ uint8_t DBG_Clear(void);
 void DBG_PrintArray(FILE_t *file, uint16_t limit, uint16_t offset, void (*Print)(void *));
 void DBG_PrintArrayBash(FILE_t *file, char **argv, uint16_t argc, uint8_t limit_index, uint8_t offset_index, void (*Print)(void *));
 
-task_t DBG_SendArray(uint8_t *buffer, uint16_t size, bool *mutex, bool copy);
-task_t DBG_SendString(UART_t *uart, char *str, bool *mutex, bool copy);
-task_t DBG_SendFile(UART_t *uart, FILE_t *file, bool copy);
-
-uint8_t DBG_Loop(void);
-void DBG_Wait(void);
-
 //-------------------------------------------------------------------------------------------------
 #endif

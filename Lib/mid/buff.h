@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <string.h>
-#include "mem.h"
+#include "new.h"
 
 #ifndef BUFF_MESSAGE_LIMIT
   #define BUFF_MESSAGE_LIMIT 32
@@ -31,7 +31,8 @@ uint16_t BUFF_Read(BUFF_t *buff, uint8_t *array);
 uint16_t BUFF_Size(BUFF_t *buff);
 uint16_t BUFF_Array(BUFF_t *buff, uint8_t *array);
 char *BUFF_String(BUFF_t *buff);
-void BUFF_Skip(BUFF_t *buff);
+bool BUFF_Skip(BUFF_t *buff);
+void BUFF_Clear(BUFF_t *buff);
 
 //-------------------------------------------------------------------------------------------------
 #endif

@@ -5,6 +5,9 @@
 #include "din.h"
 #include "dout.h"
 #include "ain.h"
+#include "max31865.h"
+#include "dbg.h"
+#include "bash.h"
 
 // Wyjścia cyfrowe przekaźnikowe (RO)
 extern RELAY_t RO1;
@@ -37,6 +40,16 @@ extern AIN_t AI2;
 // Functions
 void PLC_Init(void);
 void PLC_Loop(void);
+void RTD_Init(void);
+void RTD_Loop(void);
+float RTD_Temperature(void);
+
+#ifndef PLC_RS485_BUFFER_SIZE
+  #define PLC_RS485_BUFFER_SIZE 1000
+#endif
+
+extern UART_t RS1;
+extern UART_t RS2;
 
 //---------------------------------------------------------------------------------------------------------------------
 #endif

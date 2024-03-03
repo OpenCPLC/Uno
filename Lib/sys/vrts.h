@@ -1,5 +1,5 @@
-#ifndef VRTS_H
-#define VRTS_H
+#ifndef VRTS_H_
+#define VRTS_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -34,12 +34,15 @@ void delay(uint32_t ms);
 void sleep(uint32_t ms);
 bool timeout(uint32_t ms, bool (*Free)(void *), void *subject);
 uint64_t gettick(uint32_t offset_ms);
+void delay_until(uint64_t *tick);
+void sleep_until(uint64_t *tick);
 bool waitfor(uint64_t *tick);
 int32_t watch(uint64_t tick);
 
 void VRTS_Init(void);
 void VRTS_Lock(void);
 bool VRTS_Unlock(void);
+uint8_t VRTS_ActiveThread(void);
 bool SYSTICK_Init(uint32_t systick_ms);
 
 #endif

@@ -5,6 +5,10 @@
 #include "file.h"
 #include "main.h"
 
+#ifndef BASH_FILE_LIMIT
+  #define BASH_FILE_LIMIT 12
+#endif
+
 #ifndef BASH_DBG
   #define BASH_DBG 1
 #endif

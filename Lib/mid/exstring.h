@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdarg.h>
-#include "mem.h"
+#include "new.h"
 
 #ifndef EXSTRING_INCLUDE_ARRAY
   #define EXSTRING_INCLUDE_ARRAY 1
@@ -59,31 +59,23 @@ char *reverse_this_string(char *str);
 char *reverse_string(char *str_in);
 int find(char *str, char *pattern);
 int find_right(char *str, char *pattern);
-#if(EXSTRING_INCLUDE_ARRAY)
-  void reverse_this_array(uint8_t *array, uint16_t length);
-  uint8_t *reverse_array(uint8_t *array, uint16_t length);
-  int find_array(uint8_t *array, uint16_t length, char *pattern);
-#endif
-#if(EXSTRING_INCLUDE_CUT)
-  char *cut_this(char *str, char *pattern, CUT_e option);
-  char *cut(char *str_in, char *pattern, CUT_e option);
-#endif
-#if(EXSTRING_INCLUDE_TRIM)
-  char *ltrim_list(char *str, char *list);
-  char *ltrim(char *str);
-  char *rtrim_list(char *str, char *list);
-  char *rtrim(char *str);
-  char *trim_list(char *str, char *list);
-  char *trim(char *str);
-#endif
+void reverse_this_array(uint8_t *array, uint16_t length);
+uint8_t *reverse_array(uint8_t *array, uint16_t length);
+int find_array(uint8_t *array, uint16_t length, char *pattern);
+char *cut_this(char *str, char *pattern, EXSTRING_Cut_e option);
+char *cut(char *str_in, char *pattern, EXSTRING_Cut_e option);
+char *ltrim_list(char *str, char *list);
+char *ltrim(char *str);
+char *rtrim_list(char *str, char *list);
+char *rtrim(char *str);
+char *trim_list(char *str, char *list);
+char *trim(char *str);
 uint16_t count_of_char(char *str, char val);
 char *extraction(char *str, char delimiter, int position);
 int explode(char ***arr_ptr, char *str, char delimiter);
 char *replace_this_char(char *pattern, char replacement, char *str);
 char *replace_char(char *pattern, char replacement, char *original);
-#if(EXSTRING_INCLUDE_REPLACE_STR)
-  char* replace_string(char *pattern, char *replacement, char *original);
-#endif
+char* replace_string(char *pattern, char *replacement, char *original);
 
 //-------------------------------------------------------------------------------------------------
 

@@ -32,6 +32,7 @@ bool thread(void (*handler)(void), uint32_t *stack, uint16_t size)
   stack[size - 2] = (uint32_t)handler; // PC: Point to the handler function
   stack[size - 3] = (uint32_t)&VRTS_TaskFinished; // LR: Point to a function to be called when the handler returns
   // Next: R12, R3, R2, R1, R0, R7, R6, R5, R4, R11, R10, R9, R8
+  NEW_Init(vrts_state.size);
   vrts_state.size++;
   return true;
 }
@@ -80,6 +81,15 @@ void let(void)
 }
 #endif
 
+uint8_t VRTS_ActiveThread(void)
+{
+  #if(VRTS_SWITCHING)
+    return vrts_state.thread_nbr;
+  #else
+    return 0;
+  #endif
+}
+
 uint64_t gettick(uint32_t offset_ms)
 {
   return vrts_ticker + ((offset_ms + (vrts_ms - 1)) / vrts_ms);
@@ -107,6 +117,20 @@ bool timeout(uint32_t ms, bool (*Free)(void *), void *subject)
     let();
   }
   return true;
+}
+
+void delay_until(uint64_t *tick)
+{
+  if(!*tick) return;
+  while(*tick > vrts_ticker) let();
+  *tick = 0;
+}
+
+void sleep_until(uint64_t *tick)
+{
+  if(!*tick) return;
+  while(*tick > vrts_ticker) __WFI();
+  *tick = 0;
 }
 
 bool waitfor(uint64_t *tick)

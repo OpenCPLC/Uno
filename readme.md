@@ -1,4 +1,11 @@
-## OpenCPLC
+## ⚓ Content
+
+- 1\. [OpenCPLC](#opencplc-) - Wstęp
+- 2\. [Essential tools](#essential-tools-) - Konfiguracja środowiska
+- 3\. [Basic - Examples](#basic-examples-) - Przykłady podstawowe
+- 4\. [Multi-thread - Examples](#multi-thread-examples-) - Przykłady wielowątkowe
+- 
+## OpenCPLC [➥](#-content)
 
 Projekt zapewnia warstwę pośrednią pomiędzy Twoją aplikacją, a peryferiami mikrokontrolera. Trochę podobnie jak w **Arduino**, jednak bardziej w kierunku automatyki. Bez włsnego IDE oraz angażowania C++.
 
@@ -91,7 +98,7 @@ int main(void)
 
 Nie zapominajmy, że język [C](https://pl.wikipedia.org/wiki/C_(j%C4%99zyk_programowania)) powstał jako język ogólnego przeznaczenia, zatem charakteryzuje się dużą uniwersalnością, szczególnie względem sandbox'ów dostarczanych przez producentów sterowników PLC.
 
-## Essential tools
+## Essential tools [➥](#-content)
 
 Progamowanie sterownika **Uno** oraz całej linii **OpenCPLC** należy rozpoczą od sklonowania repozytorium, co jest rownoważne z skopiowaniem wszystkich plików projektowych. Potrzeby jest do tego [klient GIT](https://git-scm.com/download/win). Po jego instalacji wystarczy włączyć konsolę systemową i wpisać komendę:
 
@@ -143,7 +150,7 @@ Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością p
 ./wizard.exe -n [naza-projektu] -m 128kB -o 0g -r
 ```
 
-## Examples
+## Basic - Examples [➥](#-content)
 
 ### Wejścia analogowe **`AI`**
 
@@ -174,6 +181,102 @@ int main(void)
       // TODO: use temperature
     }
     PLC_Loop();
+  }
+}
+```
+
+## Multi-thread - Examples [➥](#-content)
+
+Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności.  Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami. Z poziomu aplikacji w funkcji głównej `main` przekazujemy funkcję wątków wraz z pamięcią podręczną `stack` _(za pomocą funkcji `thread`)_. Konieczne jest dość dokładne oszacowanie, ile pamięci będzie potrzebował dany wątek. Następnie wystarczy uruchomić system przełączania wątków `VRTS_Init`.
+
+### Komunikacja `RS485`
+
+W sterowniku **Uno** dostępne są dwa interfejsy **RS485**: `RS1` oraz `RS2`. Wsparcie obejmuje protokoły **Modbus RTU** oraz **BACnet** w trybach master i slave.
+
+W przykładzie nawiązujemy komunikację z urządzeniem o adresie `0x02` za pomocą protokołu **Modbus RTU**. W konfiguracji rejestr `0x10 `jest ustawiany na wartość `1152`. Proces konfiguracji jest powtarzany, dopóki urządzenie nie udzieli odpowiedzi. W głównej pętli loop dokonuje się odczytu trzech rejestrów. Wartość `uint16` jest odczytywana z rejestru `0x14`, natomiast wartości `uint32` z rejestru `0x15` i `0x16`. Warto zauważyć, że protokół Modbus nie narzuca konkretnej kolejności bajtów dla zmiennych 32-bitowych, co może wymagać odwrócenia kolejności słów 16-bitowych, aby uzyskać prawidłową wartość. W trakcie komunikacji, `timeout` jest ustawiany na `1000`ms, a przerwa między odpowiedzią a kolejnym zapytaniem wynosi `500`ms.
+
+```c
+#include "uno.h"
+#include "modbus-master.h"
+
+int loop(void);
+
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[512];
+
+UART_t *rs485 = &RS1;
+
+#define ADDR 0x02
+
+int main(void)
+{
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_plc, sizeof(stack_plc));
+  VRTS_Init();
+  while(1);
+}
+
+struct {
+  uint16_t uint16;
+  uint32_t uint32;
+} regmap;
+
+int loop(void)
+{
+  while(MODBUS_PresetRegister(rs485, ADDR, 0x10, 1152, 1000)) { // config
+    DBG_String("MODBUS no-respond");
+    delay(1000);
+  }
+  while(1) {
+    if(MODBUS_ReadHoldingRegisters(rs485, ADDR, 0x14, 3, &regmap, 1000)) {
+      DBG_String("MODBUS uint16:NULL uint32:NULL");
+      delay(1000);
+    }
+    else {
+      DBG_String("MODBUS uint16:");
+      DBG_uDec(regmap.uint16);
+      // regmap.uint32 = (regmap.uint32 >> 16) | (regmap.uint32 << 16); // swap if necessary
+      DBG_String(" uint32:");
+      DBG_uDec(regmap.uint32);
+      DBG_Enter();
+      delay(500);
+    }
+  }
+}
+```
+
+# Pomiar temperatury `RTD`
+
+```c
+#include "uno.h"
+
+int loop(void);
+
+static uint32_t stack_plc[64];
+static uint32_t stack_rtd[64];
+static uint32_t stack_loop[512];
+
+int main(void)
+{
+  PLC_Init();
+  RTD_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&RTD_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_plc, sizeof(stack_plc));
+  VRTS_Init();
+  while(1);
+}
+
+int loop(void)
+{
+  while(1) {
+    float temperature = RTD_Temperature();
+    DBG_String("TEMP ");
+    DBG_Float(temperature, 3);
+    DBG_Char("C");
+    DBG_Enter();
+    delay(1000);
   }
 }
 ```

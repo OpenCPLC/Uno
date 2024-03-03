@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------------------------- STRUCT
 
 struct {
-  FILE_t **files;
+  FILE_t *file[BASH_FILE_LIMIT];
   uint8_t file_count;
   void (*callback)(char **, uint16_t);
   bool flash_autosave;
@@ -15,20 +15,26 @@ struct {
   void (*Reset)(void);
 } bash_state;
 
-void BASH_Init(FILE_t **files, void (*callback)(char **, uint16_t))
+void BASH_AddFile(FILE_t *file)
 {
-  bash_state.files = files;
-  bash_state.callback = callback;
-  bash_state.flash_autosave = false;
-  bash_state.cache = files[0];
-  bash_state.src = files[0];
-  bash_state.dsc = files[0];
-  bash_state.file_count = 0;
-  while(*files) {
-    FILE_FlashLoad(*files);
-    bash_state.file_count++;
-    files++;
+  bash_state.file[bash_state.file_count] = file;
+  if(!bash_state.file_count) {
+    bash_state.cache = file;
+    bash_state.src = file;
+    bash_state.dsc = file;
   }
+  bash_state.file_count++;
+  FILE_FlashLoad(file);
+}
+
+void BASH_SetCallback(void (*callback)(char **, uint16_t))
+{
+  bash_state.callback = callback;
+}
+
+void BASH_SetFlashAutosave(void (*callback)(char **, uint16_t))
+{
+  bash_state.flash_autosave = true;
 }
 
 //------------------------------------------------------------------------------------------------- DATA
@@ -73,7 +79,7 @@ static void BASH_File(char **argv, uint16_t argc, STREAM_t *stream)
     DBG_Enter();
     for(uint8_t i = 0; i < bash_state.file_count; i++) {
       DBG_String("  "); DBG_uDec(i);
-      DBG_Char(':'); DBG_String((char *)bash_state.files[i]->name);
+      DBG_Char(':'); DBG_String((char *)bash_state.file[i]->name);
       DBG_Enter();
     }
     return;
@@ -81,7 +87,7 @@ static void BASH_File(char **argv, uint16_t argc, STREAM_t *stream)
   #endif
   if(!strcmp(argv[1], "cache") && argc == 3) { // FILE cache [file-nbr]
     uint8_t nbr = atoi(argv[2]);
-    if(nbr < bash_state.file_count) bash_state.cache = bash_state.files[nbr];
+    if(nbr < bash_state.file_count) bash_state.cache = bash_state.file[nbr];
     #if(BASH_DBG)
       FILE_Print(bash_state.cache);
     #endif
@@ -90,8 +96,8 @@ static void BASH_File(char **argv, uint16_t argc, STREAM_t *stream)
   if(!strcmp(argv[1], "src-dsc") && argc == 4) { // FILE src-dsc [src-file-nbr] [dsc-file-nbr]
     uint8_t a = atoi(argv[2]);
     uint8_t b = atoi(argv[3]);
-    if(a < bash_state.file_count) bash_state.src = bash_state.files[a];
-    if(b < bash_state.file_count) bash_state.dsc = bash_state.files[b];
+    if(a < bash_state.file_count) bash_state.src = bash_state.file[a];
+    if(b < bash_state.file_count) bash_state.dsc = bash_state.file[b];
     #if(BASH_DBG)
       FILE_Print(bash_state.src);
       FILE_Print(bash_state.dsc);
@@ -166,8 +172,8 @@ static void BASH_File(char **argv, uint16_t argc, STREAM_t *stream)
       src = bash_state.src;
       dsc = bash_state.dsc;
     } else if(argc == 4) {
-      src = bash_state.files[atoi(argv[2])];
-      dsc = bash_state.files[atoi(argv[3])];
+      src = bash_state.file[atoi(argv[2])];
+      dsc = bash_state.file[atoi(argv[3])];
     }
     if(FILE_Copy(dsc, src))
       _BASH_AccessDenied(dsc);
@@ -324,7 +330,7 @@ uint8_t BASH_Loop(STREAM_t *stream)
         }
         else
       #endif
-      if(!strcmp(argv[0], "file")) BASH_File(argv, argc, stream);
+      if(!strcmp(argv[0], "file") && bash_state.file_count) BASH_File(argv, argc, stream);
       else if(!strcmp(argv[0], "uid")) BASH_Uid(argv, argc);
       #if(BASH_RTC)
         else if(!strcmp(argv[0], "rtc")) BASH_Rtc(argv, argc);

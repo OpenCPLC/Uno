@@ -184,7 +184,6 @@ status_t FILE_StructDrop(FILE_t *file, uint8_t count)
 }
 
 //------------------------------------------------------------------------------------------------- RTC
-#if(INCLUDE_RTC)
 
 status_t FILE_Date(FILE_t *file, RTC_Datetime_t *datetime)
 {
@@ -263,7 +262,6 @@ status_t FILE_NowMs(FILE_t *file)
   return FILE_DatetimeMs(file, &datetime);
 }
 
-#endif
 //-------------------------------------------------------------------------------------------------
 
 status_t FILE_Ip(FILE_t *file, uint8_t *ip)
