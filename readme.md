@@ -3,7 +3,8 @@
 - 1\. [OpenCPLC](#opencplc-) - Wstęp
 - 2\. [Essential tools](#essential-tools-) - Konfiguracja środowiska
 - 3\. [Basic Examples](#basic-examples-) - Przykłady podstawowe
-- 4\. [Multi-thread Examples](#multi-thread-examples-) - Przykłady wielowątkowe
+- 4\. [Utils Examples](#basic-examples-) - Pomocne narzędzia
+- 5\. [Multi-thread Examples](#multi-thread-examples-) - Przykłady wielowątkowe
 
 ## OpenCPLC [➥](#-content)
 
@@ -185,6 +186,110 @@ int main(void)
 }
 ```
 
+## Utils Examples [➥](#-content)
+
+Poza peryferiami wejścia-wyjścia...
+
+### Losowanie
+
+
+
+### Zarządzanie czasem
+
+Gdy nie jest wymagana duża precyzja...
+
+```c
+#include "uno.h"
+#include "rng.h"
+
+void Task(void)
+{
+  uint32_t delay_ms = rng(1000, 3000);
+  delay(delay_ms);
+}
+
+int main(void)
+{
+  PLC_Init();
+  while(1) {
+    uint64_t tick = 0;
+    while(1)
+    {
+      delay_until(&tick); // zaczekaj na zakończenie odliczania
+      tick = gettick(seconds(5)); // rozpocznij odliczanie 5s
+      DBG_String("TASK synchronized"); // wyświetlane co 5s
+      Task(); // zadanie trwające 1-3 sekundy
+      PLC_Loop();
+    }
+  }
+}
+```
+
+Wykonywanie zadania z opóźnieniem
+
+```c
+#include "uno.h"
+
+int main(void)
+{
+  PLC_Init();
+  while(1) {
+    uint64_t tick = 0;
+    while(1)
+    {
+      if(DIN_Rais(&DI1)) {
+        tick = gettick(minutes(2));
+        DBG_String("TASK scheduled 2m");
+        // zadanie zaplanowane za 2 minuty
+      }
+      // something
+      if(waitfor(&tick)) {
+        RELAY_Set(&RO1);
+        DBG_String("TASK completed");
+        // zadanie wykonane
+      }
+      PLC_Loop();
+    }
+  }
+}
+```
+
+
+### Harmonogram zadań CRON
+
+```c
+#include "uno.h"
+
+void WednesdayNight(void)
+{
+
+}
+
+void CheckInput(DIN_t *din)
+{
+
+}
+
+void FirstDayMonth(void)
+{
+  
+}
+
+int main(void)
+{
+  CRON_Task(&WednesdayNight, NULL, CRON_NULL, RTC_WEDNESDAY, 23, 00); // Wednesday  23:00
+  CRON_Task(&CheckInput,     &DI1, CRON_NULL, CRON_NULL,     06, 30); // Everyday   06:30
+  CRON_Task(&FirstDayMonth,  NULL, 1,         CRON_NULL,     17, 45); // xxxx-xx-01 17:45
+  PLC_Init(); 
+  while(1) {
+    PLC_Loop();
+  }
+}
+```
+
+### Komunikacja `RS485`
+
+
 ## Multi-thread Examples [➥](#-content)
 
 Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności.  Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami. Z poziomu aplikacji w funkcji głównej `main` przekazujemy funkcję wątków wraz z pamięcią podręczną `stack` _(za pomocą funkcji `thread`)_. Konieczne jest dość dokładne oszacowanie, ile pamięci będzie potrzebował dany wątek. Następnie wystarczy uruchomić system przełączania wątków `VRTS_Init`.
@@ -193,7 +298,7 @@ Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdz
 
 W sterowniku **Uno** dostępne są dwa interfejsy **RS485**: `RS1` oraz `RS2`. Wsparcie obejmuje protokoły **Modbus RTU** oraz **BACnet** w trybach master i slave.
 
-W przykładzie nawiązujemy komunikację z urządzeniem o adresie `0x02` za pomocą protokołu **Modbus RTU**. W konfiguracji rejestr `0x10 `jest ustawiany na wartość `1152`. Proces konfiguracji jest powtarzany, dopóki urządzenie nie udzieli odpowiedzi. W głównej pętli loop dokonuje się odczytu trzech rejestrów. Wartość `uint16` jest odczytywana z rejestru `0x14`, natomiast wartości `uint32` z rejestru `0x15` i `0x16`. Warto zauważyć, że protokół Modbus nie narzuca konkretnej kolejności bajtów dla zmiennych 32-bitowych, co może wymagać odwrócenia kolejności słów 16-bitowych, aby uzyskać prawidłową wartość. W trakcie komunikacji, `timeout` jest ustawiany na `1000`ms, a przerwa między odpowiedzią a kolejnym zapytaniem wynosi `500`ms.
+W przykładzie nawiązujemy komunikację z urządzeniem o adresie `0x02` za pomocą protokołu **Modbus RTU**. W konfiguracji rejestr `0x10` jest ustawiany na wartość `1152`. Proces konfiguracji jest powtarzany, dopóki urządzenie nie udzieli odpowiedzi. W głównej pętli loop dokonuje się odczytu trzech rejestrów. Wartość `uint16` jest odczytywana z rejestru `0x14`, natomiast wartości `uint32` z rejestru `0x15` i `0x16`. Warto zauważyć, że protokół Modbus nie narzuca konkretnej kolejności bajtów dla zmiennych 32-bitowych, co może wymagać odwrócenia kolejności słów 16-bitowych, aby uzyskać prawidłową wartość. W trakcie komunikacji, `timeout` jest ustawiany na `1000`ms, a przerwa między odpowiedzią a kolejnym zapytaniem wynosi `500`ms.
 
 ```c
 #include "uno.h"
@@ -229,7 +334,7 @@ int loop(void)
     delay(1000);
   }
   while(1) {
-    if(MODBUS_ReadHoldingRegisters(rs485, ADDR, 0x14, 3, &regmap, 1000)) {
+    if(MODBUS_ReadHoldingRegisters(rs485, ADDR, 0x14, 3, (uint16_t *)&regmap, 1000)) {
       DBG_String("MODBUS uint16:NULL uint32:NULL");
       delay(1000);
     }

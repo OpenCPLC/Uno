@@ -15,7 +15,8 @@
   #define VRTS_SWITCHING 1
 #endif
 
-#define sec(ms) (1000 * ms)
+#define seconds(ms)  (1000 * ms)
+#define minutes(min) (60 * 1000 * min)
 
 typedef enum {
   VRTS_Status_Idle = 1,

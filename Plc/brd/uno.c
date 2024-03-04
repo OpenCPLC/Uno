@@ -42,7 +42,7 @@ void TO_Frequency(float frequency)
 //------------------------------------------------------------------------------------------------- DOUT XO
 
 PWM_t xo_pwm = {
-  .reg = TIM15,
+  .reg = TIM2,
   .prescaler = 49,
   .channel[TIM_CH1] = TIM2_CH1_PA15,
   .channel[TIM_CH2] = TIM2_CH2_PB3,

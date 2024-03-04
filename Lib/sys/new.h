@@ -18,6 +18,8 @@
 
 //-------------------------------------------------------------------------------------------------
 
+void NEW_Init(uint8_t thread_nbr);
+void *new_static(size_t size);
 void *new(size_t size);
 void clear();
 

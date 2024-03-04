@@ -64,7 +64,7 @@ typedef struct {
   uint16_t timeout;
   GPIO_t *gpio_direction;
   TIM_t *tim;
-  BUFF_t *rx_buff;
+  BUFF_t *buff;
   DMA_Channel_TypeDef *_tx_dma;
   DMAMUX_Channel_TypeDef *_tx_dmamux;
   uint8_t prefix;

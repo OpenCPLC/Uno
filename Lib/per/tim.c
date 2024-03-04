@@ -160,12 +160,10 @@ static void TIM_Interrupt(TIM_t *tim)
 void TIM_Init(TIM_t *tim)
 {
   RCC_EnableTIM(tim->reg);
-
 	tim->reg->PSC = tim->prescaler;
 	if(!tim->auto_reload) TIM_MaxAutoreload(tim);
 	else tim->reg->ARR = tim->auto_reload;
 	tim->reg->CR1 |= (!(tim->one_pulse_mode) << TIM_CR1_ARPE_Pos) | (tim->one_pulse_mode << TIM_CR1_OPM_Pos);
-
 	if(tim->enable) TIM_Enable(tim);
 	if(tim->enable_interrupt) {
 	  INT_EnableTIM(tim->reg, tim->interrupt_level, (void (*)(void *))&TIM_Interrupt, tim);

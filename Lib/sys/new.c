@@ -5,10 +5,15 @@ uint16_t new_size;
 
 //-------------------------------------------------------------------------------------------------
 
+void *new_static(size_t size)
+{
+  new_size += size;
+  return malloc(size);
+}
+
 void NEW_Init(uint8_t thread_nbr)
 {
-  new_size += sizeof(NEW_t);
-  NEW_t *new_stack = malloc(sizeof(NEW_t));
+  NEW_t *new_stack = new_static(sizeof(NEW_t));
   new_stacks[thread_nbr] = new_stack;
 }
 
