@@ -103,7 +103,7 @@ int main(void)
 
 Nie zapominajmy, że język [C](https://pl.wikipedia.org/wiki/C_(j%C4%99zyk_programowania)) powstał jako język ogólnego przeznaczenia, zatem charakteryzuje się dużą uniwersalnością, szczególnie względem sandbox'ów dostarczanych przez producentów sterowników PLC.
 
-## 🐞 Essential-tools [➥](#-content)
+## 🛠️ Essential-tools [➥](#-content)
 
 Progamowanie sterownika **Uno** oraz całej linii **OpenCPLC** należy rozpoczą od sklonowania repozytorium, co jest rownoważne z skopiowaniem wszystkich plików projektowych. Potrzeby jest do tego [klient GIT](https://git-scm.com/download/win). Po jego instalacji wystarczy włączyć konsolę systemową i wpisać komendę:
 
