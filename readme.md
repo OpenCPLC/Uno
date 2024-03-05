@@ -1,7 +1,7 @@
 ## ⚓ Content
 
 - 👋 [OpenCPLC](#-opencplc-) - Wstęp
-- ⚙️ [Essential-tools](#-essential-tools-) - Konfiguracja środowiska
+- ⚙️ [Essential-tools](#%EF%B8%8F-essential-tools-) - Konfiguracja środowiska
 - 🐞 [Programing-debugging](#-programing-debugging-) - Programowanie i debugowanie
 - 🧵 [Multi-thread](#-multi-thread-) - Programowanie wielowątkowe
 - 🧩 Examples - Przykłady
