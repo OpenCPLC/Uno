@@ -3,12 +3,12 @@
 - 👋 [OpenCPLC](#-opencplc-) - Wstęp
 - 🛠️ [Essential tools](#-essential-tools-) - Konfiguracja środowiska
 - 🐞 [Programing-debugging](#-programing-debugging-) - Programowanie i debugowanie
-- 🧵 [Multi-thread](#-programing-and-debugging-) - Programowanie wielowątkowe
+- 🧵 [Multi-thread](#-multi-thread-) - Programowanie wielowątkowe
 - 🧩 Examples - Przykłady
-    - 1️⃣ [General IO](./doc/guide-1-io.md) - 🕹️ Wyjścia i wejścia
-    - 2️⃣ [Communication](./doc/guide-2-com.md) - 🔗 Komunikacja RS485 i I2C
-    - 3️⃣ [Time](./doc/guide-3-time.md) - ⌚ Kontrola i zarządzanie czasem
-    - 4️⃣ [Bash](./doc/guide-4-bash.md) - ⌨️ Sterowanie komendami powłoki
+    - 1\. [General IO](./doc/guide-1-io.md) - 🕹️ Wyjścia i wejścia
+    - 2\. [Communication](./doc/guide-2-com.md) - 🔗 Komunikacja RS485 i I2C
+    - 3\. [Time](./doc/guide-3-time.md) - ⌚ Kontrola i zarządzanie czasem
+    - 4\. [Bash](./doc/guide-4-bash.md) - ⌨️ Sterowanie komendami powłoki
 
 # 👋 OpenCPLC [➥](#-content)
 
