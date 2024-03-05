@@ -151,9 +151,9 @@ bool GPIF_Edge(GPIF_t *gpif)
 void GPIF_Init(GPIF_t *gpif)
 {
   gpif->gpio.mode = GPIO_Mode_Input;
-  if(!gpif->filter_ms) gpif->filter_ms = GPIF_FILTER_DELAULT;
-  if(!gpif->filter_ms) gpif->filter_ms = GPIF_TOGGLE_DELAULT;
-  if(!gpif->edge_ms) gpif->edge_ms = GPIF_EDGE_DELAULT;
+  if(!gpif->ton_ms) gpif->ton_ms = GPIF_TON_DELAULT;
+  if(!gpif->toff_ms) gpif->toff_ms = GPIF_TOFF_DELAULT;
+  if(!gpif->toggle_ms) gpif->toggle_ms = GPIF_TOGGLE_DELAULT;
   GPIO_Init(&gpif->gpio);
   gpif->value = GPIO_In(&gpif->gpio);
 }
@@ -162,22 +162,25 @@ bool GPIF_Loop(GPIF_t *gpif)
 {
   bool in = GPIO_In(&gpif->gpio);
   if(in == gpif->value) {
-    gpif->_filter_tick = gettick(gpif->filter_ms);
+    gpif->_tio_tick = in ? gettick(gpif->ton_ms) : gettick(gpif->toff_ms);
   }
   else {
-    if(waitfor(&gpif->_filter_tick)) {
+    if(waitfor(&gpif->_tio_tick)) {
       gpif->value = in;
       gpif->_toggle_tick = gettick(gpif->toggle_ms);
-      gpif->_edge_tick = gettick(gpif->edge_ms);
-      if(gpif->value) gpif->rais = true;
-      else gpif->fall = true;
+      if(gpif->value) {
+        gpif->_res_rais_tick = gettick(gpif->rais);
+        gpif->rais = true;
+      }
+      else {
+        gpif->_res_fall_tick = gettick(gpif->rais);
+        gpif->fall = true;
+      }
     }
   }
   waitfor(&gpif->_toggle_tick);
-  if(waitfor(&gpif->_edge_tick)) {
-    gpif->rais = false;
-    gpif->fall = false;
-  }
+  if(waitfor(&gpif->_res_rais_tick)) gpif->rais = false;
+  if(waitfor(&gpif->_res_fall_tick)) gpif->fall = false;
   return gpif->value;
 }
 

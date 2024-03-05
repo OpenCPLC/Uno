@@ -101,9 +101,9 @@ float DIN_Fill(DIN_t *din)
 bool DIN_Init(DIN_t *din)
 {
   if(din->eeprom) {
-    EEPROM_Read(din->eeprom, &din->gpif.filter_ms);
-    EEPROM_Read(din->eeprom, &din->gpif.toggle_ms);
-    EEPROM_Read(din->eeprom, &din->gpif.edge_ms);
+    if(!din->gpif.ton_ms) EEPROM_Read(din->eeprom, &din->gpif.ton_ms);
+    if(!din->gpif.toff_ms) EEPROM_Read(din->eeprom, &din->gpif.toff_ms);
+    if(!din->gpif.toggle_ms) EEPROM_Read(din->eeprom, &din->gpif.toggle_ms);
   }
   if(din->fast_counter) return true;
   GPIF_Init(&din->gpif);
@@ -127,26 +127,26 @@ bool DIN_Loop(DIN_t *din)
  * Ustawia parametry `filter_ms`, `toggle_ms` oraz `edge_ms`.
  * Ustawienie wartości na `0xFFFF` przywróci domyślną wartość.
  * @param din Wskaźnik do struktury reprezentującej wejście cyfrowe (DI).
- * @param filter_ms Czas trwania filtra sygnału w milisekundach.
+ * @param ton_ms Czas trwania filtru cyfrowego podczas narastania sygnału w milisekundach.
+ * @param toff_ms Czas trwania filtru cyfrowego podczas opadania sygnału w milisekundach.
  * @param toggle_ms Maksymalny czas, gdzie zmiany sygnału traktowane są jako sygnał przemienny (Toggling).
- * @param edge_ms Czas po którym może nastąpić kolejne zbocze narastające lub opadające.
  */
-void DIN_Settings(DIN_t *din, uint16_t filter_ms, uint16_t toggle_ms, uint16_t edge_ms)
+void DIN_Settings(DIN_t *din, uint16_t ton_ms, uint16_t toff_ms, uint16_t toggle_ms)
 {
-  if(filter_ms && filter_ms != din->gpif.filter_ms) {
-    if(filter_ms == 0xFFFF) din->gpif.filter_ms = GPIF_FILTER_DELAULT;
-    else din->gpif.filter_ms = filter_ms;
-    EEPROM_Write(din->eeprom, &din->gpif.filter_ms);
+  if(ton_ms && ton_ms != din->gpif.ton_ms) {
+    if(ton_ms == DIN_DEFAULT) din->gpif.ton_ms = GPIF_TON_DELAULT;
+    else din->gpif.ton_ms = ton_ms;
+    if(din->eeprom) EEPROM_Write(din->eeprom, &din->gpif.ton_ms);
+  }
+  if(toff_ms && toff_ms != din->gpif.toff_ms) {
+    if(toff_ms == DIN_DEFAULT) din->gpif.toff_ms = GPIF_TOFF_DELAULT;
+    else din->gpif.toff_ms = toff_ms;
+    if(din->eeprom) EEPROM_Write(din->eeprom, &din->gpif.toff_ms);
   }
   if(toggle_ms && toggle_ms != din->gpif.toggle_ms) {
-    if(toggle_ms == 0xFFFF) din->gpif.toggle_ms = GPIF_FILTER_DELAULT;
+    if(toggle_ms == DIN_DEFAULT) din->gpif.toggle_ms = GPIF_TOGGLE_DELAULT;
     else din->gpif.toggle_ms = toggle_ms;
-    EEPROM_Write(din->eeprom, &din->gpif.toggle_ms);
-  }
-    if(edge_ms && edge_ms != din->gpif.edge_ms) {
-    if(edge_ms == 0xFFFF) din->gpif.edge_ms = GPIF_FILTER_DELAULT;
-    else din->gpif.edge_ms = edge_ms;
-    EEPROM_Write(din->eeprom, &din->gpif.edge_ms);
+    if(din->eeprom) EEPROM_Write(din->eeprom, &din->gpif.toggle_ms);
   }
 }
 

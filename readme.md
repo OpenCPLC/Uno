@@ -1,12 +1,16 @@
 ## ⚓ Content
 
-- 1\. [OpenCPLC](#opencplc-) - Wstęp
-- 2\. [Essential tools](#essential-tools-) - Konfiguracja środowiska
-- 3\. [Basic Examples](#basic-examples-) - Przykłady podstawowe
-- 4\. [Utils Examples](#basic-examples-) - Pomocne narzędzia
-- 5\. [Multi-thread Examples](#multi-thread-examples-) - Przykłady wielowątkowe
+- 👋 [OpenCPLC](#-opencplc-) - Wstęp
+- 🛠️ [Essential tools](#-essential-tools-) - Konfiguracja środowiska
+- 🐞 [Programing-debugging](#-programing-debugging-) - Programowanie i debugowanie
+- 🧵 [Multi-thread](#-programing-and-debugging-) - Programowanie wielowątkowe
+- 🧩 Examples - Przykłady
+    - 1️⃣ [General IO](./doc/guide-1-io.md) - 🕹️ Wyjścia i wejścia
+    - 2️⃣ [Communication](./doc/guide-2-com.md) - 🔗 Komunikacja RS485 i I2C
+    - 3️⃣ [Time](./doc/guide-3-time.md) - ⌚ Kontrola i zarządzanie czasem
+    - 4️⃣ [Bash](./doc/guide-4-bash.md) - ⌨️ Sterowanie komendami powłoki
 
-## OpenCPLC [➥](#-content)
+# 👋 OpenCPLC [➥](#-content)
 
 Projekt zapewnia warstwę pośrednią pomiędzy Twoją aplikacją, a peryferiami mikrokontrolera. Trochę podobnie jak w **Arduino**, jednak bardziej w kierunku automatyki. Bez włsnego IDE oraz angażowania C++.
 
@@ -44,7 +48,7 @@ END_PROGRAM
 
 - System start-stop w lader logic
 
-![Lader](/Image/lader.png)
+![Lader](/img/lader.png)
 
 - System start-stop w ANSI C _(mapowanie z użyciem zmiennych)_
 
@@ -99,7 +103,7 @@ int main(void)
 
 Nie zapominajmy, że język [C](https://pl.wikipedia.org/wiki/C_(j%C4%99zyk_programowania)) powstał jako język ogólnego przeznaczenia, zatem charakteryzuje się dużą uniwersalnością, szczególnie względem sandbox'ów dostarczanych przez producentów sterowników PLC.
 
-## Essential tools [➥](#-content)
+## 🛠️ Essential tools [➥](#-content)
 
 Progamowanie sterownika **Uno** oraz całej linii **OpenCPLC** należy rozpoczą od sklonowania repozytorium, co jest rownoważne z skopiowaniem wszystkich plików projektowych. Potrzeby jest do tego [klient GIT](https://git-scm.com/download/win). Po jego instalacji wystarczy włączyć konsolę systemową i wpisać komendę:
 
@@ -129,7 +133,7 @@ Instalacja **Make** automatycznie utworzy zmienną systemową, jednak w przypadk
 - ARMGCC → `C:\OpenCPLC\ArmGCC\bin`
 - Path » `%ARMGCC%` oraz `C:\OpenCPLC\OpenOCD\bin`
 
-![Env](/Image/env.png)
+![Env](/img/env.png)
 
 Na zakończenie należy otworzyć konsolę i zweryfikować, czy wszystkie pakiety zostały zainstalowane poprawnie. Można to zrobić przy użyciu komendy `--version`.
 
@@ -151,242 +155,41 @@ Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością p
 ./wizard.exe -n [naza-projektu] -m 128kB -o 0g -r
 ```
 
-## Basic Examples [➥](#-content)
+## 🐞 Programing-debugging [➥](#-content)
 
-### Wejścia analogowe **`AI`**
+Poruszyć temat magistrali SWD.
+Złącza do programowania IDC.
+Programatora.
 
-W sterowniku **Uno** mamy do dyspozycji 2 wejścia analogowe `AI1` i `AI2`. Wejście analogowe pozwala na pomiar wartości napięcia w zakresie **0-10V**, gdy pole type jest ustawione na `AIN_Type_Volts` _(domyślnie)_, lub prądu w zakresie **0-20mA**, gdy pole type jest ustawione na AIN_Type_mAmps. Funkcją, która zwraca nam zmierzoną wartość, jest `AIN_Value`.  W przykładzie pobierana jest wartość prądu, sprawdzane jest, czy nie jest ona mniejsza niż **2mA**, co wskazywałoby na brak podpiętego czujnika, a następnie prąd jest przeliczany na temperaturę.
+### Strumień danych wyjściowych `DBG`
+
+W procesie tworzenia i testowania oprogramowania kluczową rolę odgrywa etap debugowania, który polega na identyfikowaniu, lokalizowaniu i eliminowaniu błędów w kodzie źródłowym. W tym celu przygotowano zestaw funkcji `DBG`, które wykorzystują interfejs UART do wypisywania zmiennych różnych typów.  To rozwiązanie jest zdecydowanie bardziej efektywne od korzystania z implementacji funkcji `sprintf`.
 
 ```c
 #include "uno.h"
 
-AIN_t *analog_input = &AI1;
-
-#define TEMPERATURE_MIN_4mA  -40.0 // [°C]
-#define TEMPERATURE_MAX_20mA 125.0 // [°C]
-
-int main(void)
+int main2(void)
 {
-  analog_input->type = AIN_Type_mAmps;
   PLC_Init();
-  float a = (TEMPERATURE_MIN_4mA - TEMPERATURE_MAX_20mA) / (20 - 4);
-  float b = TEMPERATURE_MIN_4mA - (a * 4);
   while(1) {
-    float_t current_mA = AIN_Value(analog_input);
-    float_t temperature = -273;
-    if(current_mA < 2) {
-      // ERROR
-    }
-    else {
-      temperature = (a * current_mA) + b;
-      // TODO: use temperature
-    }
+    char *text = "text";
+    DBG_String("DBG string "); DBG_String(text); DBG_Enter();
+    DBG_String("DBG char "); DBG_Char('$'); DBG_Enter();
+    uint8_t array[] = { 49, 50, 51 };
+    DBG_String("DBG array "); DBG_Array(array, sizeof(array)); DBG_Enter();
+    DBG_String("DBG udec "); DBG_Dec(-69); DBG_Enter();
+    DBG_String("DBG dec "); DBG_uDec(46); DBG_Enter();
+    DBG_String("DBG float "); DBG_Float(21.37, 2); DBG_Enter();
+    DBG_String("DBG hex "); DBG_Hex8(0xF1); DBG_Enter();
+    DBG_String("DBG bin "); DBG_Bin8(0b11001010); DBG_Enter();
+    DBG_String("DBG now "); DBG_Now();
     PLC_Loop();
+    delay(seconds(2));
   }
 }
 ```
 
-## Utils Examples [➥](#-content)
-
-Poza peryferiami wejścia-wyjścia...
-
-### Losowanie
-
-
-
-### Zarządzanie czasem
-
-Gdy nie jest wymagana duża precyzja...
-
-```c
-#include "uno.h"
-#include "rng.h"
-
-void Task(void)
-{
-  uint32_t delay_ms = rng(1000, 3000);
-  delay(delay_ms);
-}
-
-int main(void)
-{
-  PLC_Init();
-  while(1) {
-    uint64_t tick = 0;
-    while(1)
-    {
-      delay_until(&tick); // zaczekaj na zakończenie odliczania
-      tick = gettick(seconds(5)); // rozpocznij odliczanie 5s
-      DBG_String("TASK synchronized"); // wyświetlane co 5s
-      Task(); // zadanie trwające 1-3 sekundy
-      PLC_Loop();
-    }
-  }
-}
-```
-
-Wykonywanie zadania z opóźnieniem
-
-```c
-#include "uno.h"
-
-int main(void)
-{
-  PLC_Init();
-  while(1) {
-    uint64_t tick = 0;
-    while(1)
-    {
-      if(DIN_Rais(&DI1)) {
-        tick = gettick(minutes(2));
-        DBG_String("TASK scheduled 2m");
-        // zadanie zaplanowane za 2 minuty
-      }
-      // something
-      if(waitfor(&tick)) {
-        RELAY_Set(&RO1);
-        DBG_String("TASK completed");
-        // zadanie wykonane
-      }
-      PLC_Loop();
-    }
-  }
-}
-```
-
-
-### Harmonogram zadań CRON
-
-```c
-#include "uno.h"
-
-void WednesdayNight(void)
-{
-
-}
-
-void CheckInput(DIN_t *din)
-{
-
-}
-
-void FirstDayMonth(void)
-{
-  
-}
-
-int main(void)
-{
-  CRON_Task(&WednesdayNight, NULL, CRON_NULL, RTC_WEDNESDAY, 23, 00); // Wednesday  23:00
-  CRON_Task(&CheckInput,     &DI1, CRON_NULL, CRON_NULL,     06, 30); // Everyday   06:30
-  CRON_Task(&FirstDayMonth,  NULL, 1,         CRON_NULL,     17, 45); // xxxx-xx-01 17:45
-  PLC_Init(); 
-  while(1) {
-    PLC_Loop();
-  }
-}
-```
-
-### Komunikacja `RS485`
-
-
-## Multi-thread Examples [➥](#-content)
+## 🧵 Multi-thread [➥](#-content)
 
 Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności.  Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami. Z poziomu aplikacji w funkcji głównej `main` przekazujemy funkcję wątków wraz z pamięcią podręczną `stack` _(za pomocą funkcji `thread`)_. Konieczne jest dość dokładne oszacowanie, ile pamięci będzie potrzebował dany wątek. Następnie wystarczy uruchomić system przełączania wątków `VRTS_Init`.
 
-### Komunikacja `RS485`
-
-W sterowniku **Uno** dostępne są dwa interfejsy **RS485**: `RS1` oraz `RS2`. Wsparcie obejmuje protokoły **Modbus RTU** oraz **BACnet** w trybach master i slave.
-
-W przykładzie nawiązujemy komunikację z urządzeniem o adresie `0x02` za pomocą protokołu **Modbus RTU**. W konfiguracji rejestr `0x10` jest ustawiany na wartość `1152`. Proces konfiguracji jest powtarzany, dopóki urządzenie nie udzieli odpowiedzi. W głównej pętli loop dokonuje się odczytu trzech rejestrów. Wartość `uint16` jest odczytywana z rejestru `0x14`, natomiast wartości `uint32` z rejestru `0x15` i `0x16`. Warto zauważyć, że protokół Modbus nie narzuca konkretnej kolejności bajtów dla zmiennych 32-bitowych, co może wymagać odwrócenia kolejności słów 16-bitowych, aby uzyskać prawidłową wartość. W trakcie komunikacji, `timeout` jest ustawiany na `1000`ms, a przerwa między odpowiedzią a kolejnym zapytaniem wynosi `500`ms.
-
-```c
-#include "uno.h"
-#include "modbus-master.h"
-
-int loop(void);
-
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[512];
-
-UART_t *rs485 = &RS1;
-
-#define ADDR 0x02
-
-int main(void)
-{
-  PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
-  thread(&loop, stack_plc, sizeof(stack_plc));
-  VRTS_Init();
-  while(1);
-}
-
-struct {
-  uint16_t uint16;
-  uint32_t uint32;
-} regmap;
-
-int loop(void)
-{
-  while(MODBUS_PresetRegister(rs485, ADDR, 0x10, 1152, 1000)) { // config
-    DBG_String("MODBUS no-respond");
-    delay(1000);
-  }
-  while(1) {
-    if(MODBUS_ReadHoldingRegisters(rs485, ADDR, 0x14, 3, (uint16_t *)&regmap, 1000)) {
-      DBG_String("MODBUS uint16:NULL uint32:NULL");
-      delay(1000);
-    }
-    else {
-      DBG_String("MODBUS uint16:");
-      DBG_uDec(regmap.uint16);
-      // regmap.uint32 = (regmap.uint32 >> 16) | (regmap.uint32 << 16); // swap if necessary
-      DBG_String(" uint32:");
-      DBG_uDec(regmap.uint32);
-      DBG_Enter();
-      delay(500);
-    }
-  }
-}
-```
-
-### Pomiar temperatury `RTD`
-
-W przykładzie przeprowadzany jest pomiar temperatury przy użyciu **4**-przewodowego czujnika rezystancyjnego **PT1000**. W funkcji `RTD_Loop` pomiar jest wykonywany `10` razy, a następnie uzyskane wartości są uśredniane i przeliczane na temperaturę. Odczyt temperatury odbywa się z poziomu głównej pętli `loop`.
-
-```c
-#include "uno.h"
-
-int loop(void);
-
-static uint32_t stack_plc[64];
-static uint32_t stack_rtd[64];
-static uint32_t stack_loop[512];
-
-int main(void)
-{
-  PLC_Init();
-  RTD.type = MAX31865_Type_PT1000;
-  RTD.wire = MAX31865_Wire_4;
-  RTD.oversampling = 10;
-  RTD_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
-  thread(&RTD_Loop, stack_plc, sizeof(stack_plc));
-  thread(&loop, stack_plc, sizeof(stack_plc));
-  VRTS_Init();
-  while(1);
-}
-
-int loop(void)
-{
-  while(1) {
-    float temperature = RTD_Temperature();
-    DBG_String("TEMP ");
-    DBG_Float(temperature, 3);
-    DBG_Char("C");
-    DBG_Enter();
-    delay(1000);
-  }
-}
-```

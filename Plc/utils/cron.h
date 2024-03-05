@@ -3,6 +3,7 @@
 
 #include "rtc.h"
 #include "new.h"
+#include "pwr.h"
 
 #ifndef CRON_TASK_LIMIT
   #define CRON_TASK_LIMIT 32
@@ -19,6 +20,7 @@ typedef struct {
   uint8_t minute;
 } CRON_t;
 
+bool CRON_Main(void);
 bool CRON_Task(void (*fnc)(void *), void *fnc_struct, uint8_t mo_day, uint8_t w_day, uint8_t h, uint8_t m);
 
 #endif

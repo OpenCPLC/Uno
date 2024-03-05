@@ -1,5 +1,5 @@
-#ifndef DOUT_H_
-#define DOUT_H_
+#ifndef DOUT_H_BKP
+#define DOUT_H_BKP
 
 /**
  * @file dout.h
@@ -14,20 +14,12 @@
 
 //-------------------------------------------------------------------------------------------------
 
-#define DOUT_RELAY_DELAY 200
-
 typedef struct {
-  bool relay;            // Czy wyjście jest przekaźnikowe RO
-  GPIO_t gpio;           // Wskaźnik na wyjście GPIO_t. Należy skonfigurować pola `port` i `pin`.
   PWM_t *pwm;            // Wskaźnik na kontroler PWM_t.
   TIM_Channel_e channel; // Kanał kontrolera PWM_t sterujący 
   EEPROM_t *eeprom;      // Wskaźnik na pamięć EEPROM_t do przechowywania wartości nieulotnych.
   uint32_t save;         // Określa, czy zachować stan wyjścia po resecie.
   uint32_t value;        // Wypełnienie [%] sygnału na wyjściu. Zaleca się ustawić funkcją `DOUT_Set`.
-  uint32_t cycles;       // Całkowita liczba przełączeń przekażnika.
-  bool pulse;            // Flaga informująca, czy przekażnik wykonuje impuls
-  uint64_t _stun;
-  uint16_t _pulse;
 } DOUT_t;
 
 float PWM_Frequency(PWM_t *pwm, float frequency);

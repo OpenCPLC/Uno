@@ -1,19 +1,18 @@
 #ifndef PLC_UNO_H_
 #define PLC_UNO_H_
 
-#include "relay.h"
-#include "din.h"
 #include "dout.h"
+#include "din.h"
 #include "ain.h"
 #include "max31865.h"
 #include "dbg.h"
 #include "bash.h"
 
 // Wyjścia cyfrowe przekaźnikowe (RO)
-extern RELAY_t RO1;
-extern RELAY_t RO2;
-extern RELAY_t RO3;
-extern RELAY_t RO4;
+extern DOUT_t RO1;
+extern DOUT_t RO2;
+extern DOUT_t RO3;
+extern DOUT_t RO4;
 
 //  Wyjścia cyfrowe tranzystorowe (TO)
 extern DOUT_t TO1;
@@ -49,8 +48,7 @@ extern UART_t RS1;
 extern UART_t RS2;
 
 extern MAX31865_t RTD;
-void RTD_Init(void);
-void RTD_Loop(void);
+void RTD_Main(void);
 float RTD_Temperature(void);
 
 //---------------------------------------------------------------------------------------------------------------------

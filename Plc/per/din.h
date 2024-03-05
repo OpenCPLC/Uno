@@ -15,6 +15,8 @@
 
 //-------------------------------------------------------------------------------------------------
 
+#define DIN_DEFAULT 0xFFFF
+
 typedef struct {
   GPIF_t gpif;       // Wskaźnik na wejście GPIF_t. Należy skonfigurować pola `gpio.port` i `gpio.pin`.
   EEPROM_t *eeprom;  // Wskaźnik na pamięć EEPROM_t do przechowywania wartości nieulotnych.
@@ -31,7 +33,7 @@ bool DIN_Edge(DIN_t *din);
 float DIN_Freq(DIN_t *din);
 float DIN_Fill(DIN_t *din);
 bool DIN_Init(DIN_t *din);
-void DIN_Settings(DIN_t *din, uint16_t filter_ms, uint16_t toggle_ms, uint16_t edge_ms);
+void DIN_Settings(DIN_t *din, uint16_t ton_ms, uint16_t toff_ms, uint16_t toggle_ms);
 
 //-------------------------------------------------------------------------------------------------
 #endif

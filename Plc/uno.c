@@ -1,26 +1,36 @@
 #include "uno.h"
 
+//------------------------------------------------------------------------------------------------- EEPROM
+
+#ifdef STM32G081xx
+  EEPROM_t io_eeprom[] = {
+    { .page_a = 60, .page_b = 61 },
+    { .page_a = 58, .page_b = 59 },
+    { .page_a = 56, .page_b = 57 },
+    { .page_a = 54, .page_b = 55 },
+  };
+#endif
+#ifdef STM32G0C1xx
+  EEPROM_t relay_eeprom[] = {
+    { .page_a = 252, .page_b = 253 },
+    { .page_a = 250, .page_b = 251 },
+    { .page_a = 248, .page_b = 249 },
+    { .page_a = 246, .page_b = 247 }
+  };
+#endif
+
 //------------------------------------------------------------------------------------------------- RELAY RO
 
-EEPROM_t relay_eeprom[] = {
-  { .page_a = 252, .page_b = 253 },
-  { .page_a = 250, .page_b = 251 },
-  { .page_a = 248, .page_b = 249 },
-  { .page_a = 246, .page_b = 247 }
-};
-
-RELAY_t RO1 = { .gpio = { .port = GPIOB, .pin = 7 }, .eeprom = &relay_eeprom[0], .save = true };
-RELAY_t RO2 = { .gpio = { .port = GPIOB, .pin = 6 }, .eeprom = &relay_eeprom[1], .save = true };
-RELAY_t RO3 = { .gpio = { .port = GPIOB, .pin = 5 }, .eeprom = &relay_eeprom[2], .save = true };
-RELAY_t RO4 = { .gpio = { .port = GPIOB, .pin = 4 }, .eeprom = &relay_eeprom[3], .save = true };
+DOUT_t RO1 = { .relay = true, .gpio = { .port = GPIOB, .pin = 7 }, .eeprom = &io_eeprom[0], .save = true };
+DOUT_t RO2 = { .relay = true, .gpio = { .port = GPIOB, .pin = 6 }, .eeprom = &io_eeprom[0], .save = true };
+DOUT_t RO3 = { .relay = true, .gpio = { .port = GPIOB, .pin = 5 }, .eeprom = &io_eeprom[1], .save = true };
+DOUT_t RO4 = { .relay = true, .gpio = { .port = GPIOB, .pin = 4 }, .eeprom = &io_eeprom[1], .save = true };
 
 //------------------------------------------------------------------------------------------------- DOUT TO
 
-EEPROM_t dout_eeprop = { .page_a = 244, . page_b = 245 };
-
 PWM_t to_pwm = {
   .reg = TIM1,
-  .prescaler = 49,
+  .prescaler = 46,
   .channel[TIM_CH1] = TIM1_CH1_PC8,
   .channel[TIM_CH2] = TIM1_CH2_PC9,
   .channel[TIM_CH3] = TIM1_CH3_PC10,
@@ -29,10 +39,10 @@ PWM_t to_pwm = {
   .center_aligned = true
 };
 
-DOUT_t TO1 = { .pwm = &to_pwm, .channel = TIM_CH4, .eeprom = &dout_eeprop, .save = false };
-DOUT_t TO2 = { .pwm = &to_pwm, .channel = TIM_CH3, .eeprom = &dout_eeprop, .save = false };
-DOUT_t TO3 = { .pwm = &to_pwm, .channel = TIM_CH2, .eeprom = &dout_eeprop, .save = false };
-DOUT_t TO4 = { .pwm = &to_pwm, .channel = TIM_CH1, .eeprom = &dout_eeprop, .save = false };
+DOUT_t TO1 = { .pwm = &to_pwm, .channel = TIM_CH4, .eeprom = &io_eeprom[2], .save = false };
+DOUT_t TO2 = { .pwm = &to_pwm, .channel = TIM_CH3, .eeprom = &io_eeprom[2], .save = false };
+DOUT_t TO3 = { .pwm = &to_pwm, .channel = TIM_CH2, .eeprom = &io_eeprom[2], .save = false };
+DOUT_t TO4 = { .pwm = &to_pwm, .channel = TIM_CH1, .eeprom = &io_eeprom[2], .save = false };
 
 void TO_Frequency(float frequency)
 {
@@ -43,14 +53,14 @@ void TO_Frequency(float frequency)
 
 PWM_t xo_pwm = {
   .reg = TIM2,
-  .prescaler = 49,
+  .prescaler = 460,
   .channel[TIM_CH1] = TIM2_CH1_PA15,
   .channel[TIM_CH2] = TIM2_CH2_PB3,
   .auto_reload = 1000,
 };
 
-DOUT_t XO1 = { .pwm = &xo_pwm, .channel = TIM_CH2, .eeprom = &dout_eeprop, .save = false };
-DOUT_t XO2 = { .pwm = &xo_pwm, .channel = TIM_CH1, .eeprom = &dout_eeprop, .save = false };
+DOUT_t XO1 = { .pwm = &xo_pwm, .channel = TIM_CH2, .eeprom = &io_eeprom[3], .save = false };
+DOUT_t XO2 = { .pwm = &xo_pwm, .channel = TIM_CH1, .eeprom = &io_eeprom[3], .save = false };
 
 void XO_Frequency(float frequency)
 {
@@ -59,7 +69,6 @@ void XO_Frequency(float frequency)
 
 //------------------------------------------------------------------------------------------------- DIN
 
-EEPROM_t din_eeprop = { .page_a = 242, . page_b = 243 };
 EXTI_t din_trig3, din_trig4;
 
 PWMI_t din_pwmi = {
@@ -70,10 +79,10 @@ PWMI_t din_pwmi = {
   .oversampling = 4
 };
 
-DIN_t DI1 = { .gpif = { .gpio = { .port = GPIOA, .pin = 6 } }, .eeprom = &din_eeprop };
-DIN_t DI2 = { .gpif = { .gpio = { .port = GPIOA, .pin = 7 } }, .eeprom = &din_eeprop };
-DIN_t DI3 = { .gpif = { .gpio = { .port = GPIOB, .pin = 0 } }, .eeprom = &din_eeprop };
-DIN_t DI4 = { .gpif = { .gpio = { .port = GPIOB, .pin = 1 } }, .eeprom = &din_eeprop };
+DIN_t DI1 = { .gpif = { .gpio = { .port = GPIOA, .pin = 6 } }, .eeprom = &io_eeprom[3] };
+DIN_t DI2 = { .gpif = { .gpio = { .port = GPIOA, .pin = 7 } }, .eeprom = &io_eeprom[3] };
+DIN_t DI3 = { .gpif = { .gpio = { .port = GPIOB, .pin = 0 } }, .eeprom = &io_eeprom[3] };
+DIN_t DI4 = { .gpif = { .gpio = { .port = GPIOB, .pin = 1 } }, .eeprom = &io_eeprom[3] };
 
 bool din_pwmi_init = false;
 
@@ -179,12 +188,19 @@ void PLC_Init(void)
   BASH_AddFile(&dbg_file);
   SYSTICK_Init(10);
   // Wyjścia cyfrowe przekaźnikowe (RO)
-  RELAY_Init(&RO1);
-  RELAY_Init(&RO2);
-  RELAY_Init(&RO3);
-  RELAY_Init(&RO4);
-  // Wyjścia cyfrowe tranzystorowe (TO) i triakowe (XO)
+  DOUT_Init(&RO1);
+  DOUT_Init(&RO2);
+  DOUT_Init(&RO3);
+  DOUT_Init(&RO4);
+  // Wyjścia cyfrowe tranzystorowe (TO)
+  DOUT_Init(&TO1);
+  DOUT_Init(&TO2);
+  DOUT_Init(&TO3);
+  DOUT_Init(&TO4);
   PWM_Init(&to_pwm);
+  // Wyjścia cyfrowe triakowe (XO)
+  DOUT_Init(&XO1);
+  DOUT_Init(&XO2);
   PWM_Init(&xo_pwm);
   // Wejścia cyfrowe (DI)
   if(DIN_Init(&DI1)) {
@@ -228,10 +244,18 @@ void PLC_Init(void)
 void PLC_Loop(void)
 {
   // Wyjścia przekaźnikowe (RO)
-  RELAY_Loop(&RO1);
-  RELAY_Loop(&RO2);
-  RELAY_Loop(&RO3);
-  RELAY_Loop(&RO4);
+  DOUT_Loop(&RO1);
+  DOUT_Loop(&RO2);
+  DOUT_Loop(&RO3);
+  DOUT_Loop(&RO4);
+  // Wyjścia cyfrowe tranzystorowe (TO)
+  DOUT_Loop(&TO1);
+  DOUT_Loop(&TO2);
+  DOUT_Loop(&TO3);
+  DOUT_Loop(&TO4);
+  // Wyjścia cyfrowe triakowe (XO)
+  DOUT_Loop(&XO1);
+  DOUT_Loop(&XO2);
   // Wejścia cyfrowe (DI)
   DIN_Loop(&DI1);
   DIN_Loop(&DI2);
@@ -295,15 +319,13 @@ MAX31865_t RTD = {
 
 //------------------------------------------------------------------------------------------------- Functions RTD
 
-void RTD_Init(void)
+void RTD_Main(void)
 {
   MAX31865_Init(&RTD);
-}
-
-void RTD_Loop(void)
-{
-  MAX31865_Loop(&RTD);
-  let();
+  while(1) {
+    MAX31865_Loop(&RTD);
+    let();
+  }
 }
 
 float RTD_Temperature(void)

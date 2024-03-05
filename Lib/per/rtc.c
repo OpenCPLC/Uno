@@ -11,8 +11,11 @@
 
 //------------------------------------------------------------------------------------------------- VAR
 
-volatile bool _alarm_flag[2] = { false, false };
-volatile bool _wakeup_timer_flag = false;
+volatile struct {
+  bool alarm_a;
+  bool alarm_b;
+  bool wakeup_timer;
+} rtc_flag;
 
 const uint8_t RTC_DAYS_IN_MONTH[2][12] = {
 	{ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },	// Not leap year
@@ -435,7 +438,7 @@ void RTC_Alarm_B_Disable(void)
 
 void RTC_WakeupTimer_Enable(uint32_t sec)
 {
-  _wakeup_timer_flag = false;
+  rtc_flag.wakeup_timer = false;
   RTC->WPR = 0xCA;
   RTC->WPR = 0x53; // Write access ON
   RTC->CR &= ~RTC_CR_WUTE;
@@ -520,46 +523,46 @@ bool RTC_Check_B(uint32_t offset_min_sec, uint32_t offset_max_sec)
 
 bool RTC_Event_A(void)
 {
-  if(_alarm_flag[RTC_ALARM_A]) {
-    _alarm_flag[RTC_ALARM_A] = false;
+  if(rtc_flag.alarm_a) {
+    rtc_flag.alarm_a = false;
     return true;
   } else return false;
 }
 
 bool RTC_Event_B(void)
 {
-  if(_alarm_flag[RTC_ALARM_B]) {
-    _alarm_flag[RTC_ALARM_B] = false;
+  if(rtc_flag.alarm_b) {
+    rtc_flag.alarm_b = false;
     return true;
   } else return false;
 }
 
 bool RTC_Event_WakeupTimer(void)
 {
-  if(_wakeup_timer_flag) {
-    _wakeup_timer_flag = false;
+  if(rtc_flag.wakeup_timer) {
+    rtc_flag.wakeup_timer = false;
     return true;
   }
   else return false;
 }
 
-void RTC_Force_A(void) { _alarm_flag[RTC_ALARM_A] = true; }
-void RTC_Force_B(void) { _alarm_flag[RTC_ALARM_B] = true; }
-void RTC_Force_WakeupTimer(void) { _wakeup_timer_flag = true; }
+void RTC_Force_A(void) { rtc_flag.alarm_a = true; }
+void RTC_Force_B(void) { rtc_flag.alarm_b = true; }
+void RTC_Force_WakeupTimer(void) { rtc_flag.wakeup_timer = true; }
 
 void RTC_STAMP_IRQHandler(void)
 {
 	if(RTC->SR & RTC_SR_ALRAF) {
 	  RTC->SCR |= RTC_SCR_CALRAF;
-	  _alarm_flag[RTC_ALARM_A] = true;
+	  rtc_flag.alarm_a = true;
 	}
 	if(RTC->SR & RTC_SR_ALRBF) {
 	  RTC->SCR |= RTC_SCR_CALRBF;
-	  _alarm_flag[RTC_ALARM_B] = true;
+	  rtc_flag.alarm_b = true;
 	}
 	if(RTC->SR & RTC_SR_WUTF) {
 	  RTC->SCR |= RTC_SCR_CWUTF;
-	  _wakeup_timer_flag = true;
+	  rtc_flag.wakeup_timer = true;
 	}
 	NVIC_ClearPendingIRQ(RTC_TAMP_IRQn);
 }

@@ -11,7 +11,7 @@ uint16_t DBG_ReadArray(uint8_t *array);
 uint16_t DBG_ReadSize(void);
 char *DBG_ReadString(void);
 
-uint8_t DBG_Array(const uint8_t *ary, uint16_t len);
+uint8_t DBG_Array(uint8_t *ary, uint16_t len);
 uint8_t DBG_Char(char data);
 uint8_t DBG_Char16(uint16_t data);
 uint8_t DBG_Char32(uint32_t data);

@@ -25,42 +25,79 @@
 // aloc i dloc nie potrzebne
 
 #include "uno.h"
-#include "cron.h"
 
-// TIM_t timer = ""
-// TIM7
-// TIM14
-// #define TIM15
-// #define TIM16
-// #define TIM17
+// uint8_t
 
-void WednesdayNight(void)
+int main(void)
 {
-
+  PLC_Init();
+  while(1) {
+    RELAY_Set(&RO1); // DOUT_Set(&TO1);
+    delay(1000);
+    RELAY_Rst(&RO1); // DOUT_Rst(&TO1);
+    delay(1000);
+    PLC_Loop();
+  }
 }
 
-void CheckInput(DIN_t *din)
-{
 
+#include "uno.h"
+
+static uint32_t stack_plc[64];
+static uint32_t stack_pwm[64];
+
+int main(void)
+{
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&pwm_control, stack_pwm, sizeof(stack_pwm));
+  VRTS_Init();
+  while(1);
 }
 
-void FirstDayMonth(void)
+void pwm_control(void)
 {
-  
+  TO_Frequency(200); // 200Hz
+  XO_Frequency(1);   // 1Hz
+  float value = 0;
+  while(1) {
+    DOUT_Duty(&TO1, value);
+    DOUT_Duty(&XO1, value);
+    delay(10);
+    value += 0.1;
+    if(value > 100) value = 0;
+  }
+}
+
+
+
+#include "uno.h"
+
+// uint8_t
+
+int main(void)
+{
+
+  DI1.gpif.ton_ms = 100;
+  DI1.gpif.toff_ms = 500;
+  PLC_Init();
+  while(1) {
+  }
 }
 
 #include "uno.h"
 
-int main(void)
+int main2(void)
 {
-  CRON_Task(&WednesdayNight, NULL, CRON_NULL, RTC_WEDNESDAY, 23, 00); // Wednesday 23:00
-  CRON_Task(&CheckInput,     &DI1, CRON_NULL, CRON_NULL,     06, 30); // Everyday  06:30
-  CRON_Task(&FirstDayMonth,  NULL, 1,         CRON_NULL,     17, 45); // Everyday  17:45
-  PLC_Init(); 
+  PLC_Init();
   while(1) {
-    PLC_Loop();
+    RELAY_Set(&RO1);
+    delay(1000);
+    RELAY_Rst(&RO1);
+    delay(1000);
   }
 }
+
 
 
 // int main2(void)

@@ -37,6 +37,7 @@ bool RELAY_State(RELAY_t *relay);
 bool RELAY_IsPulse(RELAY_t *relay);
 void RELAY_Init(RELAY_t *relay);
 bool RELAY_Loop(RELAY_t *relay);
+void RELAY_Settings(RELAY_t *relay, bool save);
 
 //-------------------------------------------------------------------------------------------------
 #endif

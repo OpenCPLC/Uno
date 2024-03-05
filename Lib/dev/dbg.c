@@ -34,7 +34,7 @@ char *DBG_ReadString(void)
 
 //-------------------------------------------------------------------------------------------------
 
-uint8_t DBG_Array(const uint8_t *ary, uint16_t len)
+uint8_t DBG_Array(uint8_t *ary, uint16_t len)
 {
   return FILE_Array(dbg_state.file, (uint8_t *)ary, len);
 }

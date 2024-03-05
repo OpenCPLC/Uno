@@ -87,21 +87,23 @@ bool GPIO_NotIn(GPIO_t *gpio);
 
 //------------------------------------------------------------------------------------------------- GPIF
 
-#define GPIF_FILTER_DELAULT 50
+#define GPIF_TON_DELAULT 100
+#define GPIF_TOFF_DELAULT 100
 #define GPIF_TOGGLE_DELAULT 500
-#define GPIF_EDGE_DELAULT 1000
+#define GPIF_TRESET 5000
 
 typedef struct {
   GPIO_t gpio;
   bool value;
   bool rais;
   bool fall;
-  uint32_t filter_ms;
+  uint32_t ton_ms;
+  uint32_t toff_ms;
   uint32_t toggle_ms;
-  uint32_t edge_ms;
-  uint64_t _filter_tick;
+  uint64_t _tio_tick;
+  uint64_t _res_rais_tick;
+  uint64_t _res_fall_tick;
   uint64_t _toggle_tick;
-  uint64_t _edge_tick;
 } GPIF_t;
 
 bool GPIF_Input(GPIF_t *gpif);

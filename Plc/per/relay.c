@@ -16,7 +16,7 @@ void RELAY_Set(RELAY_t *relay)
 {
   if(relay->value) return;
   relay->value = true;
-  if(relay->save) EEPROM_Write(&relay->eeprom, &relay->value);
+  if(relay->eeprom && relay->save) EEPROM_Write(&relay->eeprom, &relay->value);
 }
 
 /**
@@ -28,7 +28,7 @@ void RELAY_Rst(RELAY_t *relay)
 {
   if(!relay->value) return;
   relay->value = false;
-  if(relay->save) EEPROM_Write(&relay->eeprom, &relay->value);
+  if(relay->eeprom && relay->save) EEPROM_Write(&relay->eeprom, &relay->value);
 }
 
 /**
@@ -39,7 +39,7 @@ void RELAY_Rst(RELAY_t *relay)
 void RELAY_Tgl(RELAY_t *relay)
 {
   relay->value = !relay->value;
-  if(relay->save) EEPROM_Write(&relay->eeprom, &relay->value);
+  if(relay->eeprom && relay->save) EEPROM_Write(&relay->eeprom, &relay->value);
 }
 
 /**
@@ -94,53 +94,14 @@ bool RELAY_IsPulse(RELAY_t *relay)
  */
 void RELAY_Init(RELAY_t *relay)
 {
-  EEPROM_Init(&relay->eeprom);
-  EEPROM_Read(&relay->eeprom, &relay->save);
-  if(relay->save) EEPROM_Read(&relay->eeprom, &relay->value);
-  EEPROM_Read(&relay->eeprom, &relay->cycles);
+  if(relay->eeprom) {
+    EEPROM_Init(&relay->eeprom);
+    if(!relay->save) EEPROM_Read(&relay->eeprom, &relay->save);
+    if(relay->save) EEPROM_Read(&relay->eeprom, &relay->value);
+    EEPROM_Read(&relay->eeprom, &relay->cycles);
+  }
   relay->gpio.mode = GPIO_Mode_Output;
   GPIO_Init(&relay->gpio);
-}
-
-static inline void _RELAY_CyclesInc(RELAY_t *relay)
-{
-  relay->cycles++;
-  EEPROM_Write(&relay->eeprom, &relay->cycles);
-}
-
-/**
- * @brief Pętla obsługująca wyjście cyfrowe przekaźnikowe (RO).
- * Funkcję należy wywoływać w każdej iteracji pętli głównej lub dowolnego wątku.
- * Zalecane jest, aby była uruchamiana co najmniej raz na 100 ms.
- * @param relay Wskaźnik do struktury reprezentującej wyjście przekaźnikowe (RO).
- * @return Wartość `true` dla zwartego styku przekaźnika, `false` dla rozwartego.
- */
-bool RELAY_Loop(RELAY_t *relay)
-{
-  waitfor(&relay->_stun);
-  if(relay->_stun) return relay->gpio.set;
-  if(relay->_pulse) {
-    if(!relay->gpio.set) _RELAY_CyclesInc(relay);
-    GPIO_Tgl(&relay->gpio);
-    relay->_stun = gettick(relay->_pulse);
-    relay->_pulse = 0;
-    relay->pulse = true;
-    return relay->gpio.set;
-  }
-  relay->pulse = false;
-  if(relay->gpio.set != relay->value) {
-    if(relay->value) {
-      GPIO_Set(&relay->gpio);
-      relay->value = true;
-      _RELAY_CyclesInc(relay);
-    }
-    else {
-      GPIO_Rst(&relay->gpio);
-      relay->value = false;
-    }
-    relay->_stun = gettick(RELAY_SWITCH_DELAY);
-  }
-  return relay->gpio.set;
 }
 
 /**
@@ -151,6 +112,18 @@ bool RELAY_Loop(RELAY_t *relay)
 void RELAY_Config(RELAY_t *relay, bool save)
 {
   if(save != relay->save) {
+    EEPROM_Write(&relay->eeprom, &relay->save);
+  }
+}
+
+/**
+ * @brief Ustawia parametr `save` dla wyjścia cyfrowego przekaźnikowego (RO).
+ * @param relay Wskaźnik do struktury reprezentującej wyjście przekaźnikowe (RO).
+ * @param save Określa, czy zachować wartość wyjścia cyfrowego po resecie.
+ */
+void RELAY_Settings(RELAY_t *relay, bool save)
+{
+  if(relay->eeprom && save != relay->save) {
     EEPROM_Write(&relay->eeprom, &relay->save);
   }
 }
