@@ -24,7 +24,7 @@ float PWM_Frequency(PWM_t *pwm, float frequency)
   if(pwm->channel[TIM_CH2]) PWM_SetValue(pwm, TIM_CH2, 0);
   if(pwm->channel[TIM_CH3]) PWM_SetValue(pwm, TIM_CH3, 0);
   if(pwm->channel[TIM_CH4]) PWM_SetValue(pwm, TIM_CH4, 0);
-  float frequency = (float)SystemCoreClock / (pwm->prescaler + 1) / pwm->auto_reload / (pwm->center_aligned + 1);
+  frequency = (float)SystemCoreClock / (pwm->prescaler + 1) / pwm->auto_reload / (pwm->center_aligned + 1);
   return frequency;
 }
 
@@ -41,8 +41,8 @@ float DOUT_Duty(DOUT_t *dout, float duty)
   uint32_t old_value = dout->pwm->value[dout->channel];
   PWM_SetValue(dout->pwm, dout->channel, duty * dout->pwm->auto_reload / 100);
   dout->value = dout->pwm->value[dout->channel];
-  float duty = (float)dout->value * 100 / dout->pwm->auto_reload;
-  if(dout->eeprom && (old_value != dout->value) && dout->save) EEPROM_Write(&dout->eeprom, &dout->value);
+  duty = (float)dout->value * 100 / dout->pwm->auto_reload;
+  if(dout->eeprom && (old_value != dout->value) && dout->save) EEPROM_Write(dout->eeprom, &dout->value);
   return duty;
 }
 
@@ -62,12 +62,12 @@ void DOUT_Set(DOUT_t *dout)
     if(dout->value == dout->pwm->auto_reload) return;
     dout->value = dout->pwm->auto_reload;
     PWM_SetValue(dout->pwm, dout->channel, dout->value);
-    if(dout->eeprom && dout->save) EEPROM_Write(&dout->eeprom, &dout->value);
+    if(dout->eeprom && dout->save) EEPROM_Write(dout->eeprom, &dout->value);
   }
   else {
     if(dout->value) return;
     dout->value = true;
-    if(dout->eeprom && dout->save) EEPROM_Write(&dout->eeprom, &dout->value);
+    if(dout->eeprom && dout->save) EEPROM_Write(dout->eeprom, &dout->value);
   }
 }
 
@@ -85,12 +85,12 @@ void DOUT_Rst(DOUT_t *dout)
     if(dout->value == 0) return;
     dout->value = 0;
     PWM_SetValue(dout->pwm, dout->channel, dout->value);
-    if(dout->eeprom && dout->save) EEPROM_Write(&dout->eeprom, &dout->value);
+    if(dout->eeprom && dout->save) EEPROM_Write(dout->eeprom, &dout->value);
   }
   else {
     if(!dout->value) return;
     dout->value = false;
-    if(dout->eeprom && dout->save) EEPROM_Write(&dout->eeprom, &dout->value);
+    if(dout->eeprom && dout->save) EEPROM_Write(dout->eeprom, &dout->value);
   }
 }
 
@@ -107,7 +107,7 @@ void DOUT_Tgl(DOUT_t *dout)
   }
   else {
     dout->value = !dout->value;
-    if(dout->eeprom && dout->save) EEPROM_Write(&dout->eeprom, &dout->value);
+    if(dout->eeprom && dout->save) EEPROM_Write(dout->eeprom, &dout->value);
   }
 }
 
@@ -127,10 +127,13 @@ void DOUT_Preset(DOUT_t *dout, bool value)
  * W przypadku aktywnego trybu PWM, na czas `time_ms` wyjście zostanie wyłączone.
  * @param dout Wskaźnik do struktury reprezentującej wyjście cyfrowe.
  * @param time_ms Czas trwania impulsu w milisekundach.
+ * @return Impuls zostanie wykonany jeśli `true`
  */
-void RELAY_Pulse(DOUT_t *dout, uint16_t time_ms)
+bool DOUT_Pulse(DOUT_t *dout, uint16_t time_ms)
 {
+  if(dout->pulse) return false;
   dout->_pulse = time_ms;
+  return true;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -144,7 +147,7 @@ void RELAY_Pulse(DOUT_t *dout, uint16_t time_ms)
 uint32_t DOUT_State(DOUT_t *dout)
 {
   if(dout->pwm) return dout->pwm->value[dout->channel];
-  else dout->gpio.set;
+  else return dout->gpio.set;
 }
 
 /**
@@ -186,10 +189,10 @@ void DOUT_Init(DOUT_t *dout)
 {
   if(dout->eeprom)
   {
-    EEPROM_Init(&dout->eeprom);
-    if(!dout->save) EEPROM_Read(&dout->eeprom, &dout->save);
-    if(dout->save) EEPROM_Read(&dout->eeprom, &dout->value);
-    if(dout->relay) EEPROM_Read(&dout->eeprom, &dout->cycles);
+    EEPROM_Init(dout->eeprom);
+    if(!dout->save) EEPROM_Read(dout->eeprom, &dout->save);
+    if(dout->save) EEPROM_Read(dout->eeprom, &dout->value);
+    if(dout->relay) EEPROM_Read(dout->eeprom, &dout->cycles);
   }
   if(!dout->pwm) {
     dout->gpio.mode = GPIO_Mode_Output;
@@ -200,7 +203,7 @@ void DOUT_Init(DOUT_t *dout)
 static inline void DOUT_RelayCyclesInc(DOUT_t *dout)
 {
   dout->cycles++;
-  if(dout->eeprom) EEPROM_Write(&dout->eeprom, &dout->cycles);
+  if(dout->eeprom) EEPROM_Write(dout->eeprom, &dout->cycles);
 }
 
 /**
@@ -214,7 +217,7 @@ void DOUT_Loop(DOUT_t *dout)
   waitfor(&dout->_stun);
   if(dout->_stun) return;
   if(dout->_pulse) { // Gdy zostanie ustawiony tryb pulse
-    if(dout->relay && !RELAY_State(dout)) DOUT_RelayCyclesInc(dout);
+    if(dout->relay && !DOUT_State(dout)) DOUT_RelayCyclesInc(dout);
     if(dout->pwm) {
       uint32_t value = dout->value ? 0 : dout->pwm->auto_reload;
       PWM_SetValue(dout->pwm, dout->channel, value);
@@ -226,7 +229,7 @@ void DOUT_Loop(DOUT_t *dout)
     return;
   }
   dout->pulse = false;
-  if(RELAY_State(dout) != dout->value) {
+  if(DOUT_State(dout) != dout->value) {
     if(dout->pwm) PWM_SetValue(dout->pwm, dout->channel, dout->value);
     else {
       if(dout->value) {
@@ -241,7 +244,7 @@ void DOUT_Loop(DOUT_t *dout)
     }
     if(dout->relay) dout->_stun = gettick(DOUT_RELAY_DELAY);
   }
-  return dout->gpio.set;
+  return;
 }
 
 /**
@@ -252,7 +255,7 @@ void DOUT_Loop(DOUT_t *dout)
 void DOUT_Settings(DOUT_t *dout, bool save)
 {
   if(dout->eeprom && save != dout->save) {
-    EEPROM_Write(&dout->eeprom, &dout->save);
+    EEPROM_Write(dout->eeprom, &dout->save);
   }
 }
 

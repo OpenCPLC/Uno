@@ -1,6 +1,8 @@
-# ⌚ Time [➥](../readme.md)
+# ⌚ Time & Utils [➥](../readme.md)
 
 ## Synchronizacja procesu
+
+Zmienne nieulotrne
 
 Gdy nie jest wymagana duża precyzja...
 

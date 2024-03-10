@@ -36,8 +36,12 @@ void DOUT_Set(DOUT_t *dout);
 void DOUT_Rst(DOUT_t *dout);
 void DOUT_Tgl(DOUT_t *dout);
 void DOUT_Preset(DOUT_t *dout, bool value);
+bool DOUT_Pulse(DOUT_t *dout, uint16_t time_ms);
+uint32_t DOUT_State(DOUT_t *dout);
+bool DOUT_IsPulse(DOUT_t *relay);
 float DOUT_GetDuty(DOUT_t *dout);
 void DOUT_Init(DOUT_t *dout);
+void DOUT_Loop(DOUT_t *dout);
 void DOUT_Settings(DOUT_t *dout, bool save);
 
 //-------------------------------------------------------------------------------------------------

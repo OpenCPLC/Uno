@@ -88,7 +88,7 @@ static uint32_t _RCC_HSI(RCC_HSI_e frequency)
 	RCC->CR = (RCC->CR & 0xFFFFC7FF) | (frequency << RCC_CR_HSIDIV_Pos) | RCC_CR_HSION;
 	while (!(RCC->CR & RCC_CR_HSIRDY)) __NOP();
 	RCC->CFGR &= RCC_CFGR_SW;
-	while((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI) __NOP();
+	while((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSISYS) __NOP();
 	RCC->CR &= ~(RCC_CR_HSEON | RCC_CR_PLLON);
 	SystemCoreClockUpdate();
 	return SystemCoreClock;
@@ -99,9 +99,9 @@ static uint32_t _RCC_PLL(uint8_t m, uint8_t n, uint8_t r)
   if(m < 1) m = 1; else if(m > 8) m = 8; m--;
   if(n < 8) n = 8; else if(n > 86) n = 86;
   if(r < 2) r = 2; else if(r > 8) r = 8; r--;
-  if ((RCC->CFGR & RCC_CFGR_SWS) == RCC_CFGR_SWS_PLL) {
+  if ((RCC->CFGR & RCC_CFGR_SWS) == RCC_CFGR_SWS_PLLRCLK) {
     RCC->CFGR &= ~RCC_CFGR_SW;
-    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI) __NOP();
+    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSISYS) __NOP();
   }
   RCC->CR &= ~RCC_CR_PLLON;
   while((RCC->CR & RCC_CR_PLLRDY) != 0) __NOP();
@@ -111,7 +111,7 @@ static uint32_t _RCC_PLL(uint8_t m, uint8_t n, uint8_t r)
   RCC->CR |= RCC_CR_PLLON;
   while((RCC->CR & RCC_CR_PLLRDY) == 0) __NOP();
   RCC->CFGR |= RCC_CFGR_SW_1;
-  while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) __NOP();
+  while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLLRCLK) __NOP();
   SystemCoreClockUpdate();
   return SystemCoreClock;
 }

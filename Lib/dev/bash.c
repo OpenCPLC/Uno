@@ -117,7 +117,7 @@ static void BASH_File(char **argv, uint16_t argc, STREAM_t *stream)
     if(offset >= bash_state.cache->size) offset = 0;
     if(limit + offset > bash_state.cache->size) limit = bash_state.cache->size - offset;
     if(!bash_state.cache->mutex) {
-      DBG_SendArray(&bash_state.cache->buffer[offset], limit, &bash_state.cache->mutex, false);
+      DBG_SendFile(bash_state.cache);
     }
     else _BASH_AccessDenied(bash_state.cache);
     return;

@@ -5,7 +5,7 @@
 #include "int.h"
 #include "def.h"
 #include "i2c.h"
-#include "mem.h"
+#include "new.h"
 #include "main.h"
 
 //------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 {
   "configurations": [
     {
-      "name": "uno",
+      "name": "OpenCPLC",
       "includePath": [
         "${workspaceFolder}/**"
       ],

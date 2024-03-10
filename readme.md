@@ -7,8 +7,7 @@
 - 🧩 Examples - Przykłady
     - 1\. [General IO](./doc/guide-1-io.md) - 🕹️ Wyjścia i wejścia
     - 2\. [Communication](./doc/guide-2-com.md) - 🔗 Komunikacja RS485 i I2C
-    - 3\. [Time](./doc/guide-3-time.md) - ⌚ Kontrola i zarządzanie czasem
-    - 4\. [Bash](./doc/guide-4-bash.md) - ⌨️ Sterowanie komendami powłoki
+    - 3\. [Time & Utils](./doc/guide-3-time.md) - ⌚ Zarządzanie czasem i przydatne funkcje
 
 # 👋 OpenCPLC [➥](#-content)
 

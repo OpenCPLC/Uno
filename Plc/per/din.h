@@ -33,6 +33,7 @@ bool DIN_Edge(DIN_t *din);
 float DIN_Freq(DIN_t *din);
 float DIN_Fill(DIN_t *din);
 bool DIN_Init(DIN_t *din);
+bool DIN_Loop(DIN_t *din);
 void DIN_Settings(DIN_t *din, uint16_t ton_ms, uint16_t toff_ms, uint16_t toggle_ms);
 
 //-------------------------------------------------------------------------------------------------

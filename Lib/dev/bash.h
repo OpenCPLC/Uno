@@ -19,7 +19,9 @@
 
 //-------------------------------------------------------------------------------------------------
 
-void BASH_Init(FILE_t **files, void (*callback)(char **, uint16_t));
+void BASH_AddFile(FILE_t *file);
+void BASH_SetCallback(void (*callback)(char **, uint16_t));
+void BASH_SetFlashAutosave(void (*callback)(char **, uint16_t));
 uint8_t BASH_Loop(STREAM_t *stream);
 
 //-------------------------------------------------------------------------------------------------

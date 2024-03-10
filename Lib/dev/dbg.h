@@ -1,8 +1,8 @@
 #ifndef DBG_H_
 #define DBG_H_
 
-#include "uart.h"
 #include "main.h"
+#include "uart.h"
 
 //-------------------------------------------------------------------------------------------------
 
@@ -47,6 +47,9 @@ uint8_t DBG_ClearLastLine(void);
 uint8_t DBG_Clear(void);
 void DBG_PrintArray(FILE_t *file, uint16_t limit, uint16_t offset, void (*Print)(void *));
 void DBG_PrintArrayBash(FILE_t *file, char **argv, uint16_t argc, uint8_t limit_index, uint8_t offset_index, void (*Print)(void *));
+
+access_t DBG_Send(uint8_t *array, uint16_t length);
+access_t DBG_SendFile(FILE_t *file);
 
 //-------------------------------------------------------------------------------------------------
 #endif

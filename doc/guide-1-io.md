@@ -1,35 +1,119 @@
 # 🕹️ General IO [➥](../readme.md)
 
-### Wyjścia cyfrowe **`RO`**, **`TO`** i **`XO`**
+### Wyjścia cyfrowe
 
 Włączanie
+W
 
 ```c
 #include "uno.h"
 
 static uint32_t stack_plc[64];
-static uint32_t stack_blink[64];
+static uint32_t stack_loop[64];
 
 int main(void)
 {
   PLC_Init();
   thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
-  thread(&blink, stack_blink, sizeof(stack_blink));
+  thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
 }
 
-void blink(void)
+void loop(void)
 {
   while(1) {
-    RELAY_Set(&RO1); // DOUT_Set(&TO1);
+    DOUT_Set(&RO1);
     delay(1000);
-    RELAY_Rst(&RO1); // DOUT_Rst(&TO1);
+    DOUT_Set(&RO1);
+    delay(1000);
+    //
+  }
+}
+```
+
+Ten sam efekt możemy uzyskać zmieniając stan wyjścia 
+
+```c
+#include "uno.h"
+
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[64];
+
+int main(void)
+{
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
+}
+
+void loop(void)
+{
+  while(1) {
+    DOUT_Tgl(&RO1);
     delay(1000);
   }
 }
 ```
 
+Jak również stosując zmienną pomocniczą
+
+```c
+#include "uno.h"
+
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[64];
+
+int main(void)
+{
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
+}
+
+void loop(void)
+{
+  bool state = false;
+  while(1) {
+    DOUT_Preset(&RO1, state);
+    delay(1000);
+    state = !state;
+  }
+}
+```
+
+Pulse
+
+```c
+#include "uno.h"
+
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[64];
+
+int main(void)
+{
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
+}
+
+void loop(void)
+{
+  uint8_t x = 100;
+  while(1) {
+    if(x >= 100) {
+      DOUT_Pulse(&RO1, 1000);
+    }
+    delay(5)
+  }
+}
+```
 
 Płynna regulacja mocą
 
@@ -37,18 +121,18 @@ Płynna regulacja mocą
 #include "uno.h"
 
 static uint32_t stack_plc[64];
-static uint32_t stack_pwm[64];
+static uint32_t stack_loop[64];
 
 int main(void)
 {
   PLC_Init();
   thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
-  thread(&pwm_control, stack_pwm, sizeof(stack_pwm));
+  thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
 }
 
-void pwm_control(void)
+void loop(void)
 {
   TO_Frequency(200); // 200Hz
   XO_Frequency(1);   // 1Hz
@@ -63,11 +147,107 @@ void pwm_control(void)
 }
 ```
 
-
 ### Wejścia cyfrowe **`DI`**
 
+Detekcja stanu wyjścia oraz czasy tin tout
 
+```c
+#include "uno.h"
 
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[64];
+
+int main(void)
+{
+  DI1.gpif.ton_ms = 100;
+  DI1.gpif.toff_ms = 500;
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
+}
+
+void loop(void)
+{
+  while(1) {
+    if(DIN_Rais(&DI1)) {
+      DOUT_Set(&RO1);
+    }
+    if(DIN_Fall(&DI2)) {
+      DOUT_Rst(&RO1);
+    }
+    if(DIN_Edge(&DI3)) {
+      // DOUT_Tgl(&RO1);
+    }
+  }
+}
+```
+
+Detekcja zbocza
+
+```c
+#include "uno.h"
+
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[64];
+
+int main(void)
+{
+  DI1.gpif.ton_ms = 100;
+  DI1.gpif.toff_ms = 500;
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
+}
+
+void loop(void)
+{
+  DI1.gpif.toggle_ms = 2000;
+  PLC_Init();
+  while(1) {
+    if(DIN_Toggling(&DI1)) {
+      DOUT_Set(&RO1);
+    }
+    else {
+      DOUT_Rst(&RO1);
+    }
+  }
+}
+```
+
+Detekcja zmiany stanu
+
+```c
+#include "uno.h"
+
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[64];
+
+int main(void)
+{
+  DI1.gpif.toggle_ms = 2000;
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
+}
+
+void loop(void)
+{
+  while(1) {
+    if(DIN_Toggling(&DI1)) {
+      DOUT_Set(&RO1);
+    }
+    else {
+      DOUT_Rst(&RO1);
+    }
+  }
+}
+```
 
 
 ### Wejścia analogowe **`AI`**

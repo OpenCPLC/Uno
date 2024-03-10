@@ -3,7 +3,6 @@
 MODBUS_Error_e MODBUS_Loop(MODBUS_Slave_t *modbus)
 {
   uint16_t length;
-  UART_Loop(modbus->uart);
   length = UART_ReadSize(modbus->uart);
   if(!length) return MODBUS_Ok;
   uint8_t *buffer_rx = (uint8_t *)new(length);
@@ -132,6 +131,6 @@ MODBUS_Error_e MODBUS_Loop(MODBUS_Slave_t *modbus)
       break;
   }
   if(UART_SendFile(modbus->uart, modbus->file_tx)) return MODBUS_Error_Sending;
-  uint32_t wait_ms = UART_CalcTime(modbus->uart, modbus->file_tx->size) + 10;
+  // uint32_t wait_ms = UART_CalcTime(modbus->uart, modbus->file_tx->size) + 10;
   return MODBUS_Ok;
 }

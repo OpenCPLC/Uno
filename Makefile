@@ -1,20 +1,21 @@
-TARGET = uno
+TARGET = OpenCPLC
 
 DEBUG = 1
 
 OPT = -Og
 
-BUILD = Build
+BUILD = build
 
-C_SOURCES = Inc\int.c Inc\startup.c Inc\ST\syscalls.c Inc\ST\sysmem.c Inc\ST\system_stm32g0xx.c \
-Lib\dev\bash.c Lib\dev\dbg.c Lib\dev\stream.c Lib\mid\buff.c Lib\mid\eeprom.c Lib\mid\exbit.c \
-Lib\mid\exmath.c Lib\mid\exstring.c Lib\mid\file.c Lib\mid\mem.c Lib\mid\queue.c Lib\per\adc.c \
-Lib\per\crc.c Lib\per\flash.c Lib\per\gpio.c Lib\per\i2c-master.c Lib\per\i2c.c Lib\per\pwm.c \
-Lib\per\pwr.c Lib\per\rng.c Lib\per\rtc.c Lib\per\spi-master.c Lib\per\spi.c Lib\per\tim.c \
-Lib\per\uart.c Lib\sys\vrts.c Plc\brd\uno.c Plc\per\ain.c Plc\per\din.c Plc\per\dout.c \
-Plc\per\pwmi.c Plc\per\relay.c Src\main.c 
+C_SOURCES = inc/int.c inc/startup.c inc/ST/syscalls.c inc/ST/sysmem.c inc/ST/system_stm32g0xx.c \
+lib/dev/bash.c lib/dev/dbg.c lib/dev/stream.c lib/ext/buff.c lib/ext/eeprom.c lib/ext/exbit.c \
+lib/ext/exmath.c lib/ext/exstring.c lib/ext/file.c lib/per/adc.c lib/per/crc.c lib/per/flash.c \
+lib/per/gpio.c lib/per/i2c-master.c lib/per/i2c.c lib/per/pwm.c lib/per/pwr.c lib/per/rng.c \
+lib/per/rtc.c lib/per/spi-master.c lib/per/spi.c lib/per/tim.c lib/per/uart.c lib/sys/new.c \
+lib/sys/vrts.c plc/uno.c plc/com/modbus-master.c plc/com/modbus-slave.c plc/per/ain.c \
+plc/per/din.c plc/per/dout.c plc/per/max31865.c plc/per/pwmi.c plc/utils/cron.c plc/utils/timer.c \
+src/main.c 
 
-ASM_SOURCES = Lib\sys\vrts-pendsv.s 
+ASM_SOURCES = lib/sys/vrts-pendsv.s 
 
 PREFIX = arm-none-eabi-
 
@@ -37,14 +38,14 @@ CPU = -mcpu=cortex-m0plus
 # MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 MCU = $(CPU) -mthumb
 
-AS_DEFS = 
--DSTM32G081xx
+AS_DEFS = -DSTM32G081xx
 
 C_DEFS = -DSTM32G081xx
 
 ASM_INCLUDES =
 
-C_INCLUDES = Inc Inc\CMSIS Inc\ST Lib\dev Lib\mid Lib\per Lib\sys Plc\brd Plc\per Src 
+C_INCLUDES = -Iinc -Iinc/CMSIS -Iinc/ST -Ilib/dev -Ilib/ext -Ilib/per -Ilib/sys -Iplc -Iplc/com \
+-Iplc/per -Iplc/utils -Isrc 
 
 ASFLAGS = $(MCU) $(AS_DEFS) $(ASM_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
@@ -55,7 +56,7 @@ endif
 
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 
-LDSCRIPT = ./Src/memory.ld
+LDSCRIPT = src/mem.ld
 
 LIBS = -lc -lm -lnosys
 LIBDIR = 
@@ -88,7 +89,7 @@ $(BUILD):
 	mkdir $@
 
 clr:
-	rmdir /s /q $(BUILD)
+	cmd /c rmdir /s /q $(BUILD)
 
 run: all
 	openocd -f interface/stlink.cfg -f target/stm32g0x.cfg -c "program $(BUILD)/$(TARGET).elf verify reset exit"

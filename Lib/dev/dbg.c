@@ -1,4 +1,3 @@
-#include "main.h"
 #include "dbg.h"
 
 //-------------------------------------------------------------------------------------------------
@@ -253,7 +252,7 @@ access_t DBG_Send(uint8_t *array, uint16_t length)
   return UART_Send(dbg_state.uart, array, length);
 }
 
-access_t DBG_SendFile(UART_t *uart, FILE_t *file)
+access_t DBG_SendFile(FILE_t *file)
 {
   return UART_SendFile(dbg_state.uart, file);
 }
