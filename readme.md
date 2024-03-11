@@ -21,7 +21,7 @@ Zapotrzebowanie na automatyków było, jest i będzie bardzo duże. W przeszło�
 
 # 🥇 Uno [➥](#-content)
 
-Pierwszy moduł/sterownik z linii **OpenCPLC**. Ma cechować się wszechstronnością ze względu na różnorodność peryferiów.
+Pierwszy moduł/sterownik z linii **OpenCPLC** ma cechować się wszechstronnością ze względu na różnorodność peryferiów.
 Po zakupie urządzenie jest zaprogramowane jako moduł rozszerzeń do współpracy z zewnętrznym sterownikiem lub komputerem.
 Istnieje możliwość programowania urządzenia bezpośrednio, aby w rezultacie urządzenie będzie mogło działać jako sterownik **PLC**.
 Ten sterownik jest kompatybilny zarówno z systemami 24V, jak i 12V. Może płynnie sterować tymi napięciami z wyjść oraz odczytywać napięcie jako logiczną `1` na wejściach, co może wyróżniać ten produkt na rynku.
