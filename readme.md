@@ -61,9 +61,9 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
   - Przycisk _(np. do przywracania ustawień fabrycznych)_
   - Dioda LED ogólnego zastosowania _(info)_
 - Wskaźniki LED dla układów peryferyjnych.
-- Złącza o rozstawie 5.00mm, które są rozłączne. _(prostsza instalacja)_
-- Wszystkie złączy możliwie z inną liczbą wyprowadzeń. _(utrudniając błędne połączenie)_
-- Obudowa zapewniająca jak najlepszy dostęp do wyprowadzeń.
+- Złącza o rozstawie `5.00mm`, które są rozłączne. _(prostsza instalacja)_
+- Listwy z różną liczbą wyprowadzeń. _(utrudniając błędne połączenie)_
+- Orientacja urządzenia od frontu, zapewniająca jak najlepszy dostęp do wyprowadzeń z rozdzielnicy.
 
 # 🪜 SCL-Lader-C [➥](#-content)
 
