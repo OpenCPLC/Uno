@@ -65,7 +65,7 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 - Listwy z różną liczbą wyprowadzeń. _(utrudniając błędne połączenie)_
 - Orientacja urządzenia od frontu, zapewniająca jak najlepszy dostęp do wyprowadzeń z rozdzielnicy.
 
-# 🪜 SCL-Lader-C [➥](#-content)
+## 🪜 SCL-Lader-C [➥](#-content)
 
 Porównajmy implementacje systemu **start-stop** w języku **SCL**, **ladder** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku **C** wydaje Ci się bardziej zrozumiały to prawdopodobnie ta droga jest dla Ciebie:
 
