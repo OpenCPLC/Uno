@@ -2,7 +2,7 @@
 
 - 👋 [OpenCPLC](#-opencplc-) - Wstęp
 - 🥇 [Uno](#-opencplc-) - Nasz pierwszy sterownik
-- 🪜 [SCL-Lader-C](#-scl-lader-c) - Porównanie języków SCL, lader logic oraz C
+- 🪜 [SCL-Lader-C](#-scl-lader-c-) - Porównanie języków SCL, lader logic oraz C
 - ⚙️ [Essential-tools](#%EF%B8%8F-essential-tools-) - Konfiguracja środowiska
 - 🐞 [Programing-debugging](#-programing-debugging-) - Programowanie i debugowanie
 - 🧵 [Multi-thread](#-multi-thread-) - Programowanie wielowątkowe
@@ -11,7 +11,7 @@
     - 2\. [Communication](./doc/guide-2-com.md) - 🔗 Komunikacja RS485 i I2C
     - 3\. [Time & Utils](./doc/guide-3-time.md) - ⌚ Zarządzanie czasem i przydatne funkcje
 
-# 👋 OpenCPLC [➥](#-content)
+# 👋 OpenCPLC
 
 Projekt zapewnia warstwę pośrednią pomiędzy Twoją aplikacją, a peryferiami mikrokontrolera. Trochę podobnie jak w **Arduino**, jednak bardziej w kierunku automatyki. Bez włsnego IDE oraz angażowania C++.
 
