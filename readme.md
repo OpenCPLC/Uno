@@ -63,7 +63,7 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 - Wskaźniki LED dla układów peryferyjnych.
 - Złącza o rozstawie `5.00mm`, które są rozłączne. _(prostsza instalacja)_
 - Listwy z różną liczbą wyprowadzeń. _(utrudniając błędne połączenie)_
-- Orientacja urządzenia od frontu, zapewniająca jak najlepszy dostęp do wyprowadzeń z rozdzielnicy.
+- Orientacja urządzenia od frontu, zapewniająca jak najlepszy dostęp do wyprowadzeń z rozdzielnicy
 
 ## 🪜 SCL-Lader-C [➥](#-content)
 
@@ -187,12 +187,13 @@ Instalacja **Make** automatycznie utworzy zmienną systemową, jednak w przypadk
 Na zakończenie należy otworzyć konsolę i zweryfikować, czy wszystkie pakiety zostały zainstalowane poprawnie. Można to zrobić przy użyciu komendy `--version`.
 
 ```bash
+git --version
 arm-none-eabi-gcc --version
 openocd --version
 make --version
 ```
 
-Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na skrypt 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko wywołać skrypt z konsoli jako 🛡️administrator podając nazwę projektu `-n`.
+Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na skrypt 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`.
 
 ```bash
 ./wizard.exe -n [naza-projektu]
