@@ -6,7 +6,7 @@
 - ⚙️ [Essential-tools](#%EF%B8%8F-essential-tools-) - Konfiguracja środowiska
 - 🐞 [Programing-debugging](#-programing-debugging-) - Programowanie i debugowanie
 - 🧵 [Multi-thread](#-multi-thread-) - Programowanie wielowątkowe
-- 🧩 Examples - Przykłady
+- 🧩 Examples - Przykłady _(not ready yet)_
     - 1\. [General IO](./doc/guide-1-io.md) - 🕹️ Wyjścia i wejścia
     - 2\. [Communication](./doc/guide-2-com.md) - 🔗 Komunikacja RS485 i I2C
     - 3\. [Time & Utils](./doc/guide-3-time.md) - ⌚ Zarządzanie czasem i przydatne funkcje
