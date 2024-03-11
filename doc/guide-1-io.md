@@ -2,8 +2,7 @@
 
 ### Wyjścia cyfrowe
 
-Włączanie
-W
+Włączanie / wyłącznie wyjścia
 
 ```c
 #include "opencplc-uno.h"
@@ -25,7 +24,7 @@ void loop(void)
   while(1) {
     DOUT_Set(&RO1);
     delay(1000);
-    DOUT_Set(&RO1);
+    DOUT_Rst(&RO1);
     delay(1000);
     //
   }

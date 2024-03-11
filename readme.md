@@ -28,7 +28,7 @@ Ten sterownik jest kompatybilny zarówno z systemami 24V, jak i 12V. Może płyn
 
 | Face                         | View                         |
 | ---------------------------- | ---------------------------- |
-| ![Face](/img/uno-face.png) | ![View](/img/uno-view.png) |
+| ![Face](/img/uno-face.png)   | ![View](/img/uno-view.png)   |
 
 Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 
@@ -67,7 +67,7 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 
 ## 🪜 SCL-Lader-C [➥](#-content)
 
-Porównajmy implementacje systemu **start-stop** w języku **SCL**, **ladder** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku **C** wydaje Ci się bardziej zrozumiały to prawdopodobnie ta droga jest dla Ciebie:
+Porównajmy implementacje systemu **start-stop** w języku **ST**, **LAD** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku **C** wydaje Ci się bardziej zrozumiały to prawdopodobnie ta droga jest dla Ciebie:
 
 - System start-stop w SCL
 
@@ -84,9 +84,9 @@ start_button := I0.1
 stop_button := I0.2
 motor_running := Q0.1
 
-IF safety_signal AND start_button THEN
-  motor_running := TRUE;
-ELSIF NOT safety_signal THEN
+IF stop_button THEN
+  motor_running := FALSE;
+ELSIF (start_button OR motor_running) THEN
   motor_running := FALSE;
 END_IF
 
@@ -95,9 +95,13 @@ Q0.1 := motor_running
 END_PROGRAM
 ```
 
-- System start-stop w lader logic
+- System start-stop w LAD logic Classic
 
-![Lader](/img/lader.png)
+![LAD Classic](/img/lader.png)
+
+- System start-stop w LAD logic Set/Reset
+
+![LAD Classic](/img/lader_sr.png)
 
 - System start-stop w ANSI C _(mapowanie z użyciem zmiennych)_
 
