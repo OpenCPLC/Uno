@@ -102,7 +102,7 @@ END_PROGRAM
 - System start-stop w ANSI C _(mapowanie z użyciem zmiennych)_
 
 ```c
-#import "uno"
+#import "opencplc-uno"
 
 bool start_button = false;
 bool stop_button = false;
@@ -129,7 +129,7 @@ int main(void)
 - System start-stop w ANSI C _(mapowanie z użyciem wskaźników)_
 
 ```c
-#import "uno"
+#import "opencplc-uno"
 
 DIN_t *start_button = &DI1;
 DIN_t *stop_button = &DI2;
@@ -154,13 +154,16 @@ Nie zapominajmy, że język [C](https://pl.wikipedia.org/wiki/C_(j%C4%99zyk_prog
 
 ## ⚙️ Essential-tools [➥](#-content)
 
-Progamowanie sterownika **Uno** oraz całej linii **OpenCPLC** należy rozpoczą od sklonowania repozytorium, co jest rownoważne z skopiowaniem wszystkich plików projektowych. Potrzeby jest do tego [klient GIT](https://git-scm.com/download/win). Po jego instalacji wystarczy włączyć konsolę systemową i wpisać komendę:
+Progamowanie sterownika **Uno** oraz całej linii **OpenCPLC** należy rozpoczą od sklonowania repozytorium, co jest rownoważne z skopiowaniem wszystkich plików projektowych. Potrzeby jest do tego [klient GIT](https://git-scm.com/download/win). Po jego instalacji wystarczy włączyć konsolę systemową _(koniecznie w lokalizacji, gdzie chcemy, aby projekt został utworzony!)_ oraz wpisać komendę:
 
 ```bash
 git clone https://github.com/OpenCPLC/Uno
 ```
 
-Zalecamy pracować z [Visual Studio Code](https://code.visualstudio.com/), gdyż jest to bardzo popularne IDE i właśnie dla niego zapewniamy wsparcie. Te narzędzia są dość uniwersalne i duża szansa, że już jest znasz i wykorzystujesz, jeśli nie to napewno znajdziesz do nich wiele zastosować.
+W miejscy, gdzie została otworzona konsola stworzy się foldru `Uno`, który zawiera całość projektu. Aby praca z projektem była efektywniejsza zalecamy zainstalować IDE [Visual Studio Code](https://code.visualstudio.com/). Jest to popularne, otwartoźródłowy rozwiązania i właśnie dla niego zapewniamy wsparcie. Te narzędzia są dość uniwersalne i duża szansa, że już jest znasz i wykorzystujesz, jeśli nie to napewno znajdziesz do nich wiele zastosować. Dobrze podczas instalacji zaznaczyć dwa checkbox'y.
+
+- [x] Add "Open with Code" action to Windows Explorer file context menu
+- [x] Add "Open with Code" action to Windows Explorer directory context menu
 
 Do pracy ze sterownikami OpenCPLC wymagany jest również zestaw bardziej specjalistycznych narzędzi, identyczny z tym używanym do pracy z mikrokontrolerami **STM32**. W skład tego zestawu wchodzą:
 

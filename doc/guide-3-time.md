@@ -7,7 +7,7 @@ Zmienne nieulotrne
 Gdy nie jest wymagana duża precyzja...
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 #include "rng.h"
 
 void Task(void)
@@ -38,7 +38,7 @@ int main(void)
 Wykonywanie zadania z opóźnieniem
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 int main(void)
 {
@@ -67,7 +67,7 @@ int main(void)
 ### Harmonogram zadań CRON
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 #include "cron.h"
 
 void WednesdayNight(void)

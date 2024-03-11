@@ -1,5 +1,5 @@
-#ifndef PLC_UNO_H_
-#define PLC_UNO_H_
+#ifndef OPENCPLC_UNO_H_
+#define OPENCPLC_UNO_H_
 
 #include "dout.h"
 #include "din.h"
@@ -8,7 +8,7 @@
 #include "dbg.h"
 #include "bash.h"
 
-// Wyjścia cyfrowe przekaźnikowe (RO)
+// Wyjścia cyfrowe przekaźnikowse (RO)
 extern DOUT_t RO1;
 extern DOUT_t RO2;
 extern DOUT_t RO3;

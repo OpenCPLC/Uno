@@ -15,7 +15,7 @@
     {
       "name": "Debug",
       "cwd": "${workspaceRoot}",
-      "executable": "./build/OpenCPLC.elf",
+      "executable": "./build/uno.elf",
       "request": "launch",
       "type": "cortex-debug",
       "servertype": "openocd",

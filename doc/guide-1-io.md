@@ -6,7 +6,7 @@ Włączanie
 W
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 static uint32_t stack_plc[64];
 static uint32_t stack_loop[64];
@@ -35,7 +35,7 @@ void loop(void)
 Ten sam efekt możemy uzyskać zmieniając stan wyjścia 
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 static uint32_t stack_plc[64];
 static uint32_t stack_loop[64];
@@ -61,7 +61,7 @@ void loop(void)
 Jak również stosując zmienną pomocniczą
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 static uint32_t stack_plc[64];
 static uint32_t stack_loop[64];
@@ -89,7 +89,7 @@ void loop(void)
 Pulse
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 static uint32_t stack_plc[64];
 static uint32_t stack_loop[64];
@@ -118,7 +118,7 @@ void loop(void)
 Płynna regulacja mocą
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 static uint32_t stack_plc[64];
 static uint32_t stack_loop[64];
@@ -152,7 +152,7 @@ void loop(void)
 Detekcja stanu wyjścia oraz czasy tin tout
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 static uint32_t stack_plc[64];
 static uint32_t stack_loop[64];
@@ -187,7 +187,7 @@ void loop(void)
 Detekcja zbocza
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 static uint32_t stack_plc[64];
 static uint32_t stack_loop[64];
@@ -221,7 +221,7 @@ void loop(void)
 Detekcja zmiany stanu
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 static uint32_t stack_plc[64];
 static uint32_t stack_loop[64];
@@ -255,7 +255,7 @@ void loop(void)
 W sterowniku **Uno** mamy do dyspozycji 2 wejścia analogowe `AI1` i `AI2`. Wejście analogowe pozwala na pomiar wartości napięcia w zakresie **0-10V**, gdy pole type jest ustawione na `AIN_Type_Volts` _(domyślnie)_, lub prądu w zakresie **0-20mA**, gdy pole type jest ustawione na AIN_Type_mAmps. Funkcją, która zwraca nam zmierzoną wartość, jest `AIN_Value`.  W przykładzie pobierana jest wartość prądu, sprawdzane jest, czy nie jest ona mniejsza niż **2mA**, co wskazywałoby na brak podpiętego czujnika, a następnie prąd jest przeliczany na temperaturę.
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 AIN_t *analog_input = &AI1;
 
