@@ -33,7 +33,7 @@ Ten sterownik jest kompatybilny zarówno z systemami 24V, jak i 12V. Może płyn
 Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 
 - System nawadniania/naświetlania roślin
-- Regulator temperatury/natlenienia w akwarium 
+- Regulator temperatury/natlenienia w akwarium
 - Automatyczne drzwi
 - System monitoringu zużycia energii
 - Automatyczny podlewacz trawnika/szklarni
@@ -165,6 +165,10 @@ W miejscy, gdzie została otworzona konsola stworzy się foldru `Uno`, który za
 - [x] Add "Open with Code" action to Windows Explorer file context menu
 - [x] Add "Open with Code" action to Windows Explorer directory context menu
 
+Aby otworzyć projekt **VSCode** można skorzystać z menu kontekstowego:
+
+![VSCode](/img/open-with-code.png)
+
 Do pracy ze sterownikami OpenCPLC wymagany jest również zestaw bardziej specjalistycznych narzędzi, identyczny z tym używanym do pracy z mikrokontrolerami **STM32**. W skład tego zestawu wchodzą:
 
 - Pakiet narzędzi [**GNU Arm Embedded Toolchain**](https://developer.arm.com/downloads/-/gnu-rm): Obejmuje on między innymi kompilator.
@@ -210,6 +214,11 @@ Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością p
 
 ## 🐞 Programing-debugging [➥](#-content)
 
+Do programowania wykorzystujemy programator STLink. 
+
+
+
+
 Poruszyć temat magistrali SWD.
 Złącza do programowania IDC.
 Programatora.
@@ -221,7 +230,7 @@ W procesie tworzenia i testowania oprogramowania kluczową rolę odgrywa etap de
 ```c
 #include "uno.h"
 
-int main2(void)
+int main(void)
 {
   PLC_Init();
   while(1) {
@@ -244,5 +253,11 @@ int main2(void)
 
 ## 🧵 Multi-thread [➥](#-content)
 
-Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności.  Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami. Z poziomu aplikacji w funkcji głównej `main` przekazujemy funkcję wątków wraz z pamięcią podręczną `stack` _(za pomocą funkcji `thread`)_. Konieczne jest dość dokładne oszacowanie, ile pamięci będzie potrzebował dany wątek. Następnie wystarczy uruchomić system przełączania wątków `VRTS_Init`.
+Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności. Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami.
 
+Z poziomu aplikacji w funkcji głównej `main` przekazujemy funkcję wątków wraz z pamięcią podręczną `stack` _(za pomocą funkcji `thread`)_. Konieczne jest dość dokładne oszacowanie, ile pamięci będzie potrzebował dany wątek. Następnie wystarczy uruchomić system przełączania wątków `VRTS_Init`.
+```c
+
+
+
+```
