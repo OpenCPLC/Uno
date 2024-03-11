@@ -26,14 +26,14 @@ Po zakupie urządzenie jest zaprogramowane jako moduł rozszerzeń do współpra
 Istnieje możliwość programowania urządzenia bezpośrednio, aby w rezultacie urządzenie będzie mogło działać jako sterownik **PLC**.
 Ten sterownik jest kompatybilny zarówno z systemami 24V, jak i 12V. Może płynnie sterować tymi napięciami z wyjść oraz odczytywać napięcie jako logiczną `1` na wejściach, co może wyróżniać ten produkt na rynku.
 
-| Face                         | View                         |
-| ---------------------------- | ---------------------------- |
-| ![Face](/img/uno-face.png)   | ![View](/img/uno-view.png)   |
+| Face                       | View                       |
+| -------------------------- | -------------------------- |
+| ![Face](/img/uno-face.png) | ![View](/img/uno-view.png) |
 
 Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 
 - System nawadniania/naświetlania roślin
-- Regulator temperatury/natlenienia w akwarium 
+- Regulator temperatury/natlenienia w akwarium
 - Automatyczne drzwi
 - System monitoringu zużycia energii
 - Automatyczny podlewacz trawnika/szklarni
@@ -69,9 +69,9 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 
 Porównajmy implementacje systemu **start-stop** w języku **ST**, **LAD** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku **C** wydaje Ci się bardziej zrozumiały to prawdopodobnie ta droga jest dla Ciebie:
 
-- System start-stop w SCL
+- System start-stop w ST
 
-```scl
+```st
 PROGRAM main
 
 VAR
@@ -169,6 +169,16 @@ W miejscy, gdzie została otworzona konsola stworzy się foldru `Uno`, który za
 - [x] Add "Open with Code" action to Windows Explorer file context menu
 - [x] Add "Open with Code" action to Windows Explorer directory context menu
 
+Aby otworzyć projekt **VSCode** można skorzystać z menu kontekstowego:
+
+![VSCode](/img/open-with-code.png)
+
+Poza samym VSCode _(który póki co jest po prostu zaawansowanym edytorem tekstu)_ musimy zainstalować rozszerzenia, które uczynią z niego profesjonalne narzędzie do tworzenia, kompilowania i debugowania kodu w języku C.
+
+| C/C++                    | Cortex-Debug                      |
+| ------------------------ | --------------------------------- |
+| ![Ext-C](/img/ext-c.png) | ![Cortex-Debug](/img/ext-dbg.png) |
+
 Do pracy ze sterownikami OpenCPLC wymagany jest również zestaw bardziej specjalistycznych narzędzi, identyczny z tym używanym do pracy z mikrokontrolerami **STM32**. W skład tego zestawu wchodzą:
 
 - Pakiet narzędzi [**GNU Arm Embedded Toolchain**](https://developer.arm.com/downloads/-/gnu-rm): Obejmuje on między innymi kompilator.
@@ -200,7 +210,7 @@ openocd --version
 make --version
 ```
 
-Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na skrypt 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`.
+Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na skrypt 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`. (oczywiście nazwę należy wprowadzić bez )
 
 ```bash
 ./wizard.exe -n [naza-projektu]
@@ -214,8 +224,8 @@ Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością p
 
 ## 🐞 Programing-debugging [➥](#-content)
 
-Poruszyć temat magistrali SWD.
-Złącza do programowania IDC.
+Poruszyć temat magistrali **SWD** i programatora **STLink**.
+Złącza do programowania **IDC8**.
 Programatora.
 
 ### Strumień danych wyjściowych `DBG`
@@ -225,7 +235,7 @@ W procesie tworzenia i testowania oprogramowania kluczową rolę odgrywa etap de
 ```c
 #include "uno.h"
 
-int main2(void)
+int main(void)
 {
   PLC_Init();
   while(1) {
@@ -248,5 +258,12 @@ int main2(void)
 
 ## 🧵 Multi-thread [➥](#-content)
 
-Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności.  Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami. Z poziomu aplikacji w funkcji głównej `main` przekazujemy funkcję wątków wraz z pamięcią podręczną `stack` _(za pomocą funkcji `thread`)_. Konieczne jest dość dokładne oszacowanie, ile pamięci będzie potrzebował dany wątek. Następnie wystarczy uruchomić system przełączania wątków `VRTS_Init`.
+Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności. Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami.
 
+Z poziomu aplikacji w funkcji głównej `main` przekazujemy funkcję wątków wraz z pamięcią podręczną `stack` _(za pomocą funkcji `thread`)_. Konieczne jest dość dokładne oszacowanie, ile pamięci będzie potrzebował dany wątek. Następnie wystarczy uruchomić system przełączania wątków `VRTS_Init`.
+
+```c
+
+
+
+```
