@@ -2,7 +2,7 @@
 
 - 👋 [OpenCPLC](#-opencplc-) - Wstęp
 - 🥇 [Uno](#-opencplc-) - Nasz pierwszy sterownik
-- 🪜 [SCL-Lader-C](#-scl-lader-c-) - Porównanie języków SCL, lader logic oraz C
+- 🪜 [SCL-Lader-C](#-st-lad-c-) - Porównanie języków SCL, lader logic oraz C
 - ⚙️ [Essential-tools](#%EF%B8%8F-essential-tools-) - Konfiguracja środowiska
 - 🐞 [Programing-debugging](#-programing-debugging-) - Programowanie i debugowanie
 - 🧵 [Multi-thread](#-multi-thread-) - Programowanie wielowątkowe
@@ -65,7 +65,7 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 - Listwy z różną liczbą wyprowadzeń. _(utrudniając błędne połączenie)_
 - Orientacja urządzenia od frontu, zapewniająca jak najlepszy dostęp do wyprowadzeń z rozdzielnicy
 
-## 🪜 SCL-Lader-C [➥](#-content)
+## 🪜 ST-LAD-C [➥](#-content)
 
 Porównajmy implementacje systemu **start-stop** w języku **ST**, **LAD** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku **C** wydaje Ci się bardziej zrozumiały to prawdopodobnie ta droga jest dla Ciebie:
 
@@ -95,13 +95,11 @@ Q0.1 := motor_running
 END_PROGRAM
 ```
 
-- System start-stop w LAD logic Classic
+- System start-stop w LAD logic
 
-![LAD Classic](/img/lader.png)
-
-- System start-stop w LAD logic Set/Reset
-
-![LAD Classic](/img/lader_sr.png)
+| LAD Classic                    | LAD Set/Reset                       |
+| -------------------------- | -------------------------- |
+| ![LAD-Classic](/img/lader.png) | ![LAD-SetReset](/img/lader-sr.png) |
 
 - System start-stop w ANSI C _(mapowanie z użyciem zmiennych)_
 
