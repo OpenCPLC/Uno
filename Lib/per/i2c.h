@@ -7,12 +7,12 @@
 
 //-------------------------------------------------------------------------------------------------
 
-#if(ROOT_CLOCK_MHZ == 2)
+#if(SYS_CLOCK_MHZ == 2)
   #define I2C_TIMING_100KHz timing = 0x00000509, .filter = 0
-#elif(ROOT_CLOCK_MHZ == 16)
+#elif(SYS_CLOCK_MHZ == 16)
   #define I2C_TIMING_100kHz timing = 0x00503D5A, .filter = 0
   #define I2C_TIMING_400kHz timing = 0x0010061A, .filter = 0
-#elif(ROOT_CLOCK_MHZ == 48)
+#elif(SYS_CLOCK_MHZ == 48)
   #define I2C_TIMING_100KHz timing = 0x00C0D6FF, .filter = 0
   #define I2C_TIMING_400kHz timing = 0x00501855, .filter = 0
   #define I2C_TIMING_1MHz timing = 0x0020091C, .filter = 0

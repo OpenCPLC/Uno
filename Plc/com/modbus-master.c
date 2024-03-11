@@ -9,9 +9,9 @@ static MODBUS_Error_e MODBUS_SendRead(UART_t *uart, uint8_t addr, MODBUS_Fnc_e f
   UART_Send(uart, buffer, tx_length);
   uint32_t wait_ms;
   wait_ms = 2 * UART_CalcTime(uart, tx_length) + 10;
-  if(timeout(wait_ms, WAITFOR&UART_During, uart)) return MODBUS_Error_Sending;
+  if(timeout(wait_ms, WAIT_&UART_During, uart)) return MODBUS_Error_Sending;
   wait_ms = 2 * UART_CalcTime(uart, rx_length) + 10 + timeout_ms;
-  if(timeout(wait_ms, WAITFOR&UART_ReadSize, uart)) return MODBUS_Error_Timeout;
+  if(timeout(wait_ms, WAIT_&UART_ReadSize, uart)) return MODBUS_Error_Timeout;
   uint16_t size = UART_ReadSize(uart);
   if(size != rx_length) {
     UART_ReadSkip(uart);

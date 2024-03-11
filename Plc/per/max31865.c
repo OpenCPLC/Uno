@@ -49,9 +49,9 @@ void MAX31865_Init(MAX31865_t *rtd)
 
 static status_t MAX31865_ReadData(MAX31865_t *rtd, uint8_t *buffer)
 {
-  if(timeout(50, WAITFOR&GPIO_In, rtd->ready)) return ERR;
+  if(timeout(50, WAIT_&GPIO_In, rtd->ready)) return ERR;
   SPI_Master_ReadSequence(rtd->spi, MAX31865_Reg_Read_RTD_MSBs, buffer, 2);
-  if(timeout(50, WAITFOR&SPI_Master_IsFree, rtd->spi)) return ERR;
+  if(timeout(50, WAIT_&SPI_Master_IsFree, rtd->spi)) return ERR;
   return OK;
 }
 
@@ -71,7 +71,7 @@ status_t MAX31865_Loop(MAX31865_t *rtd)
   buffer[0] = MAX31865_Reg_Write_Configuration;
   buffer[1] = MAX31865_CFG_BIAS | (auto_conversion << 6) | (rtd->wire << 4) | MAX31865_CFG_FSCLR | rtd->reject;
   SPI_Master_Write(rtd->spi, buffer, 2);
-  if(timeout(50, WAITFOR&SPI_Master_IsFree, rtd->spi)) return ERR;
+  if(timeout(50, WAIT_&SPI_Master_IsFree, rtd->spi)) return ERR;
   delay(15);
   if(rtd->oversampling) {
     raw = 0;
@@ -84,7 +84,7 @@ status_t MAX31865_Loop(MAX31865_t *rtd)
     buffer[0] = MAX31865_Reg_Write_Configuration;
     buffer[1] = MAX31865_CFG_BIAS | MAX31865_CFG_SHOT | (rtd->wire << 4) | rtd->reject;
     SPI_Master_Write(rtd->spi, buffer, 2);
-    if(timeout(50, WAITFOR&SPI_Master_IsFree, rtd->spi)) return ERR;
+    if(timeout(50, WAIT_&SPI_Master_IsFree, rtd->spi)) return ERR;
     if(MAX31865_ReadData(rtd, buffer)) return ERR;
     raw = (float)(((uint16_t)buffer[0] << 8) | buffer[1]);
   }

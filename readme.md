@@ -1,6 +1,8 @@
 ## ⚓ Content
 
 - 👋 [OpenCPLC](#-opencplc-) - Wstęp
+- 🥇 [Uno](#-opencplc-) - Nasz pierwszy sterownik
+- 🪜 [SCL-Lader-C](#-scl-lader-c) - Porównanie języków SCL, lader logic oraz C
 - ⚙️ [Essential-tools](#%EF%B8%8F-essential-tools-) - Konfiguracja środowiska
 - 🐞 [Programing-debugging](#-programing-debugging-) - Programowanie i debugowanie
 - 🧵 [Multi-thread](#-multi-thread-) - Programowanie wielowątkowe
@@ -16,6 +18,51 @@ Projekt zapewnia warstwę pośrednią pomiędzy Twoją aplikacją, a peryferiami
 W świecie technologii, programowanie staje się coraz bardziej złożone _(często na życzenie samych programistów)_. Niekiedy poziom skomplikowania aplikacji jest nieproporcjonalny do problemu, który rozwiązuje lub wartości, jaką dostarcza. Chcemy, aby nasza biblioteka była możliwie prosta, interfejs intuicyjny, a nakład technologiczny minimalny. Wykorzystujemy dobrze znane narzędzia, takie jak [**Visual Studio Code**](https://code.visualstudio.com/), system kontroli wersji [**Git**](https://git-scm.com/) oraz język [**C**](https://www.learn-c.org/pl/), który pomimo swojego wieku nadal jest numerem jeden wśród programistów Embedded. Nic nie stoi więc na przeszkodzie, aby jego pojawiło się go trochę więcej w automatyce, co pozwoli iść branży z duchem IT!
 
 Zapotrzebowanie na automatyków było, jest i będzie bardzo duże. W przeszłości, kiedy programistów było niewiele, a za automatykę brali się elektrycy, zaprojektowanie języka, jakim jest ladder logic było strzałem w dziesiątkę, bo wykorzystywało logikę znaną z elektryki. Obecnie sytuacja jest odwrotna, a kod w języku C często jest bardziej czytelny dla absolwentów kierunków technicznych niż drzewo logiczne złożone z styków i cewek.
+
+# 🥇 Uno [➥](#-content)
+
+Pierwszy moduł/sterownik z linii **OpenCPLC**. Ma cechować się wszechstronnością ze względu na różnorodność peryferiów.
+Po zakupie urządzenie jest zaprogramowane jako moduł rozszerzeń do współpracy z zewnętrznym sterownikiem lub komputerem.
+Istnieje możliwość programowania urządzenia bezpośrednio, aby w rezultacie urządzenie będzie mogło działać jako sterownik **PLC**.
+Ten sterownik jest kompatybilny zarówno z systemami 24V, jak i 12V. Może płynnie sterować tymi napięciami z wyjść oraz odczytywać napięcie jako logiczną `1` na wejściach, co może wyróżniać ten produkt na rynku.
+
+| Face                         | View                         |
+| ---------------------------- | ---------------------------- |
+| ![Face](/img/uno-face.png) | ![View](/img/uno-view.png) |
+
+Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
+
+- System nawadniania/naświetlania roślin
+- Regulator temperatury/natlenienia w akwarium 
+- Automatyczne drzwi
+- System monitoringu zużycia energii
+- Automatyczny podlewacz trawnika/szklarni
+- Automatyczny regulator prędkości wentylatora
+- Inteligentny termostat - sterowanie piecem
+- Automatyczny system podawania karmy dla zwierząt
+- Inteligentny kurnik, symulujący krótszą dobę
+- Inkubator jajek utrzymujący odpowiednią temperaturę
+
+# Specyfikcja
+
+- Zasilanie **24V**/**12V**
+- Układy peryferyjne
+  - 4x`TO` - Wyjścia tranzystorowe _(Płynna regulacja obwodów prądu stałego DC)_
+  - 4x`RO` - Wyjścia przekaźnikowe 
+  - 2x`XO` - Wyjścia triakowe _(Płynna regulacja obwodów prądu przemiennego AC)_
+  - 1x`I2C` - Kanały dla czujników I2C/1WIRE
+  - 4x`DI` - Wejścia cyfrowe AC/DC _(W tym szybki licznik)_
+  - 1x`PT100` - Kanały pomiaru rezystancji
+  - 2x`AI` - Wejścia analogowe _(0-10V lub 0-20mA)_
+  - 2x`RS485` - Interfejs komunikacyjny _(Modbus RTU, BACnet MS/TP lub cBash)_
+  - Przycisk _(np. do przywracania ustawień fabrycznych)_
+  - Dioda LED ogólnego zastosowania _(info)_
+- Wskaźniki LED dla układów peryferyjnych.
+- Złącza o rozstawie 5.00mm, które są rozłączne. _(prostsza instalacja)_
+- Wszystkie złączy możliwie z inną liczbą wyprowadzeń. _(utrudniając błędne połączenie)_
+- Obudowa zapewniająca jak najlepszy dostęp do wyprowadzeń.
+
+# 🪜 SCL-Lader-C [➥](#-content)
 
 Porównajmy implementacje systemu **start-stop** w języku **SCL**, **ladder** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku **C** wydaje Ci się bardziej zrozumiały to prawdopodobnie ta droga jest dla Ciebie:
 

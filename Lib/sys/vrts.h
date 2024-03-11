@@ -15,7 +15,7 @@
   #define VRTS_SWITCHING 1
 #endif
 
-#define WAITFOR (bool (*)(void *))
+#define WAIT_ (bool (*)(void *))
 
 #define seconds(ms)  (1000 * ms)
 #define minutes(min) (60 * 1000 * min)
