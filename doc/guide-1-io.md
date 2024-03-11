@@ -2,8 +2,7 @@
 
 ### Wyjścia cyfrowe
 
-Włączanie
-W
+Włączanie / wyłącznie wyjścia
 
 ```c
 #include "opencplc-uno.h"
