@@ -24,7 +24,7 @@ Zapotrzebowanie na automatyków było, jest i będzie bardzo duże. W przeszło�
 Pierwszy moduł/sterownik z linii **OpenCPLC** ma cechować się wszechstronnością ze względu na różnorodność peryferiów.
 Po zakupie urządzenie jest zaprogramowane jako moduł rozszerzeń do współpracy z zewnętrznym sterownikiem lub komputerem.
 Istnieje możliwość programowania urządzenia bezpośrednio, aby w rezultacie urządzenie będzie mogło działać jako sterownik **PLC**.
-Ten sterownik jest kompatybilny zarówno z systemami 24V, jak i 12V. Może płynnie sterować tymi napięciami z wyjść oraz odczytywać napięcie jako logiczną `1` na wejściach, co może wyróżniać ten produkt na rynku.
+Ten sterownik jest kompatybilny zarówno z systemami 24V, jak i 12V, co może wyróżniać ten produkt na rynku. Może płynnie sterować tymi napięciami z wyjść oraz odczytywać napięcie jako logiczną `1` na wejściach.
 
 | Face                       | View                       |
 | -------------------------- | -------------------------- |
@@ -69,7 +69,7 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 
 Porównajmy implementacje systemu **start-stop** w języku **ST**, **LAD** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku **C** wydaje Ci się bardziej zrozumiały to prawdopodobnie ta droga jest dla Ciebie:
 
-- System start-stop w ST
+#### System start-stop w ST
 
 ```st
 PROGRAM main
@@ -95,13 +95,13 @@ Q0.1 := motor_running
 END_PROGRAM
 ```
 
-- System start-stop w LAD logic
+#### System start-stop w LAD logic
 
 | LAD Classic                    | LAD Set/Reset                       |
 | -------------------------- | -------------------------- |
 | ![LAD-Classic](/img/lader.png) | ![LAD-SetReset](/img/lader-sr.png) |
 
-- System start-stop w ANSI C _(mapowanie z użyciem zmiennych)_
+#### System start-stop w ANSI C _(mapowanie z użyciem zmiennych)_
 
 ```c
 #import "opencplc-uno"
@@ -128,7 +128,7 @@ int main(void)
 }
 ```
 
-- System start-stop w ANSI C _(mapowanie z użyciem wskaźników)_
+#### System start-stop w ANSI C _(mapowanie z użyciem wskaźników)_
 
 ```c
 #import "opencplc-uno"
@@ -192,7 +192,7 @@ choco install make
 
 Instalacja **Make** automatycznie utworzy zmienną systemową, jednak w przypadku pozostałych programów konieczne będzie ręczne ich utworzenie.
 
-🪟 Run » `sysdm.cpl` » Advanced » **Environment Variables**
+🪟 `Win` + `R` » `sysdm.cpl` » Advanced » **Environment Variables**
 
 - ARMGCC → `C:\OpenCPLC\ArmGCC\bin`
 - Path » `%ARMGCC%` oraz `C:\OpenCPLC\OpenOCD\bin`
@@ -208,7 +208,7 @@ openocd --version
 make --version
 ```
 
-Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na skrypt 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`. (oczywiście nazwę należy wprowadzić bez )
+Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na dołączone do projektu narzędzie 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`. (oczywiście nazwę należy wprowadzić bez )
 
 ```bash
 ./wizard.exe -n [naza-projektu]
