@@ -135,17 +135,17 @@ int main(void)
 
 DIN_t *start_button = &DI1;
 DIN_t *stop_button = &DI2;
-RELAY_t *motor_running = &RO1;
+DOUT_t *motor_running = &RO1;
 
 int main(void)
 {
   PLC_Init();
   while(1) {
     if(DIN_Rais(stop_button)) {
-      RELAY_Rst(motor_running);
+      DOUT_Rst(motor_running);
     }
     else if(DIN_Rais(start_button)) {
-      RELAY_Set(motor_running);
+      DOUT_Set(motor_running);
     }
     PLC_Loop();
   }
@@ -214,7 +214,7 @@ Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na dołączo
 ./wizard.exe -n [naza-projektu]
 ```
 
-Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością pamięci `-m`, wymuszenie innego poziomu optymalizacji `-o` oraz ponowne wygenerowanie niektórych plików konfiguracyjnych `-r`.
+Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością pamięci `-m`, wymuszenie innego poziomu optymalizacji `-o` oraz nadpisanie  plików konfiguracyjnych projektu `-r`.
 
 ```bash
 ./wizard.exe -n [naza-projektu] -m 128kB -o 0g -r
@@ -230,7 +230,7 @@ Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością p
 
 ### Strumień danych wyjściowych `DBG`
 
-W procesie tworzenia i testowania oprogramowania kluczową rolę odgrywa etap debugowania, który polega na identyfikowaniu, lokalizowaniu i eliminowaniu błędów w kodzie źródłowym. W tym celu przygotowano zestaw funkcji `DBG`, które wykorzystują interfejs UART do wypisywania zmiennych różnych typów.  To rozwiązanie jest zdecydowanie bardziej efektywne od korzystania z implementacji funkcji `sprintf`.
+W procesie tworzenia i testowania oprogramowania kluczową rolę odgrywa etap debugowania, który polega na identyfikowaniu, lokalizowaniu i eliminowaniu błędów w kodzie źródłowym. W tym celu przygotowano zestaw funkcji `DBG`, które wykorzystują interfejs UART do wypisywania zmiennych różnych typów. To rozwiązanie jest zdecydowanie bardziej efektywne od korzystania z implementacji funkcji `sprintf`.
 
 ```c
 #include "uno.h"
@@ -262,9 +262,9 @@ Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdz
 
 Aby lepiej to zobrazować, do [przykładu start-stop](#system-start-stop-ansi-c-mapowanie-z-użyciem-wskaźników) dodajmy miganie lampką, podłączoną do do wyjścia `TO1`, gdy silnik pracuje. W głównej funkcji `main` zainicjujemy peryferia sterownika za pomocą `PLC_Init` oraz włączymy zegar systemowy `SYSTICK_Init` o bazie czasowej `10ms`. Następnie przekazujemy funkcje dla trzech wątków:
 
-- `PLC_Loop` - Główna pętla sterownika
-- `start_stop` - Pętla obsługująca funkcję start-stop
-- `blinking` - Pętla odpowiedzialna za miganie lampki
+- `PLC_Loop` - główna pętla sterownika,
+- `start_stop` - pętla obsługująca funkcję start-stop,
+- `blinking` - pętla odpowiedzialna za miganie lampki.
 
 Dla każdego wątku konieczne jest zarezerwowanie stosu _(`stack1`, `stack2`, `stack3`)_. Ważne jest precyzyjne oszacowanie potrzebnej pamięci dla każdego wątku. Po tej operacji wystarczy uruchomić system przełączania wątków za pomocą `VRTS_Init`. Trochę dużo, ale dzięki takiemu podejściu mamy trzy główne pętle, z których każda odpowiada za inny aspekt funkcjonalny programu, co biędzie mocno się skalować, jak nasza aplikacja będzie rosła.
 
