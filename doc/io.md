@@ -252,6 +252,8 @@ void loop(void)
 
 W sterowniku **Uno** mamy do dyspozycji 2 wejścia analogowe `AI1` i `AI2`. Wejście analogowe pozwala na pomiar wartości napięcia w zakresie **0-10V**, gdy pole type jest ustawione na `AIN_Type_Volts` _(domyślnie)_, lub prądu w zakresie **0-20mA**, gdy pole type jest ustawione na AIN_Type_mAmps. Funkcją, która zwraca nam zmierzoną wartość, jest `AIN_Value`.  W przykładzie pobierana jest wartość prądu, sprawdzane jest, czy nie jest ona mniejsza niż **2mA**, co wskazywałoby na brak podpiętego czujnika, a następnie prąd jest przeliczany na temperaturę.
 
+Wersja 1. Podejście `Linear function`
+
 ```c
 #include "opencplc-uno.h"
 
@@ -276,6 +278,50 @@ int main(void)
       temperature = (a * current_mA) + b;
       // TODO: use temperature
     }
+    PLC_Loop();
+  }
+}
+```
+
+Wersja 2. Podejście `PLC style`
+
+```c
+#include "opencplc-uno.h"
+
+// Define the analog input pointer
+AIN_t *analog_input = &AI1;
+
+// Define temperature range constants
+#define TEMPERATURE_MIN  -60.0 // [°C]
+#define TEMPERATURE_MAX 100.0 // [°C]
+
+// Define the scaling parameters
+#define INPUT_MIN 4.0 // Minimum sensor input in mA
+#define INPUT_MAX 20.0 // Maximum sensor input in mA
+#define ERROR_THRESHOLD 2.0 // Error threshold in mA
+#define ERROR_VAL -273.0 // [°C]
+
+int main(void)
+{
+  // Set the analog input type
+  analog_input->type = AIN_Type_mAmps;
+
+  // Initialize the PLC
+  PLC_Init();
+
+  while(1) {
+    float_t current_mA = AIN_Value(analog_input);
+    float_t normalized_current = (current_mA - INPUT_MIN) / (INPUT_MAX - INPUT_MIN);
+    float_t temperature;
+    if (current_mA < ERROR_THRESHOLD) {
+      temperature = ERROR_VAL;
+      // Some other error handling
+    } else {
+      // Otherwise, calculate temperature based on the current value
+      temperature = TEMPERATURE_MIN + normalized_current * (TEMPERATURE_MAX - TEMPERATURE_MIN);
+      // TODO: use temperature
+    }
+    // Run the PLC loop
     PLC_Loop();
   }
 }
