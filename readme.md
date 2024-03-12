@@ -1,8 +1,8 @@
 ## ⚓ Content
 
 - 👋 [OpenCPLC](#-opencplc-) - Wstęp
-- 🥇 [Uno](#-opencplc-) - Nasz pierwszy sterownik
-- 🪜 [SCL-Lader-C](#-st-lad-c-) - Porównanie języków SCL, lader logic oraz C
+- 🥇 [Uno](#-uno-) - Nasz pierwszy sterownik
+- 🪜 [Code](#-code-) - Porównanie języków SCL, LAD oraz C
 - ⚙️ [Essential-tools](#%EF%B8%8F-essential-tools-) - Konfiguracja środowiska
 - 🐞 [Programing-debugging](#-programing-debugging-) - Programowanie i debugowanie
 - 🧵 [Multi-thread](#-multi-thread-) - Programowanie wielowątkowe
@@ -65,11 +65,11 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 - Listwy z różną liczbą wyprowadzeń. _(utrudniając błędne połączenie)_
 - Orientacja urządzenia od frontu, zapewniająca jak najlepszy dostęp do wyprowadzeń z rozdzielnicy
 
-## 🪜 ST-LAD-C [➥](#-content)
+## 🪜 Code [➥](#-content)
 
-Porównajmy implementacje systemu **start-stop** w języku **ST**, **LAD** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku **C** wydaje Ci się bardziej zrozumiały to prawdopodobnie ta droga jest dla Ciebie:
+Porównajmy implementacje systemu **start-stop** w języku **ST**, **LAD _(lader logic)_** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku C wydaje Ci się najbardziej przystępny i zrozumiały to prawdopodobnie ta droga jest dla Ciebie 😃
 
-#### System start-stop w ST
+#### System start-stop ST
 
 ```st
 PROGRAM main
@@ -95,16 +95,16 @@ Q0.1 := motor_running
 END_PROGRAM
 ```
 
-#### System start-stop w LAD logic
+#### System start-stop LAD
 
 | LAD Classic                    | LAD Set/Reset                       |
 | -------------------------- | -------------------------- |
 | ![LAD-Classic](/img/lader.png) | ![LAD-SetReset](/img/lader-sr.png) |
 
-#### System start-stop w ANSI C _(mapowanie z użyciem zmiennych)_
+#### System start-stop ANSI C _(mapowanie z użyciem zmiennych)_
 
 ```c
-#import "opencplc-uno"
+#import "opencplc-uno.h"
 
 bool start_button = false;
 bool stop_button = false;
@@ -128,10 +128,10 @@ int main(void)
 }
 ```
 
-#### System start-stop w ANSI C _(mapowanie z użyciem wskaźników)_
+#### System start-stop ANSI C _(mapowanie z użyciem wskaźników)_
 
 ```c
-#import "opencplc-uno"
+#import "opencplc-uno.h"
 
 DIN_t *start_button = &DI1;
 DIN_t *stop_button = &DI2;
@@ -222,9 +222,11 @@ Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością p
 
 ## 🐞 Programing-debugging [➥](#-content)
 
-Poruszyć temat magistrali **SWD** i programatora **STLink**.
-Złącza do programowania **IDC8**.
-Programatora.
+`TODO`:
+- Magistrala **SWD**
+- Złącze do programowania **IDC8**
+- Programator **STLink**
+- Kompilowanie `Make` i debuger `F5`
 
 ### Strumień danych wyjściowych `DBG`
 
@@ -258,10 +260,64 @@ int main(void)
 
 Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności. Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami.
 
-Z poziomu aplikacji w funkcji głównej `main` przekazujemy funkcję wątków wraz z pamięcią podręczną `stack` _(za pomocą funkcji `thread`)_. Konieczne jest dość dokładne oszacowanie, ile pamięci będzie potrzebował dany wątek. Następnie wystarczy uruchomić system przełączania wątków `VRTS_Init`.
+Aby lepiej to zobrazować, do [przykładu start-stop](#system-start-stop-ansi-c-mapowanie-z-użyciem-wskaźników) dodajmy miganie lampką, podłączoną do do wyjścia `TO1`, gdy silnik pracuje. W głównej funkcji `main` zainicjujemy peryferia sterownika za pomocą `PLC_Init` oraz włączymy zegar systemowy `SYSTICK_Init` o bazie czasowej `10ms`. Następnie przekazujemy funkcje dla trzech wątków:
+
+- `PLC_Loop` - Główna pętla sterownika
+- `start_stop` - Pętla obsługująca funkcję start-stop
+- `blinking` - Pętla odpowiedzialna za miganie lampki
+
+Dla każdego wątku konieczne jest zarezerwowanie stosu _(`stack1`, `stack2`, `stack3`)_. Ważne jest precyzyjne oszacowanie potrzebnej pamięci dla każdego wątku. Po tej operacji wystarczy uruchomić system przełączania wątków za pomocą `VRTS_Init`. Trochę dużo, ale dzięki takiemu podejściu mamy trzy główne pętle, z których każda odpowiada za inny aspekt funkcjonalny programu, co biędzie mocno się skalować, jak nasza aplikacja będzie rosła.
 
 ```c
+#include "opencplc-uno.h"
 
+static uint32_t stack1[64];
+static uint32_t stack2[64];
+static uint32_t stack3[64];
 
+int main(void)
+{
+  PLC_Init();
+  SYSTICK_Init(10);
+  thread(&PLC_Loop, stack1, sizeof(stack1));
+  thread(&start_stop, stack2, sizeof(stack2));
+  thread(&blinking, stack3, sizeof(stack3));
+  VRTS_Init();
+  while(1);
+}
 
+DIN_t *start_button = &DI1;
+DIN_t *stop_button = &DI2;
+DOUT_t *motor_running = &RO1;
+
+int start_stop(void)
+{
+  while(1) {
+    if(DIN_Rais(stop_button)) {
+      DOUT_Rst(motor_running);
+    }
+    else if(DIN_Rais(start_button)) {
+      DOUT_Set(motor_running);
+    }
+  }
+  let();
+}
+
+DOUT_t *blink_light = &TO1;
+
+void blinking(void)
+{
+  while(1) {
+    if(DOUT_State(motor_running)) {
+      DOUT_Set(blink_light);
+      delay(200);
+      DOUT_Rst(blink_light);
+      delay(200);
+    }
+    else {
+      DOUT_Rst(blink_light);
+      delay(200);
+    }
+  }
+}
 ```
