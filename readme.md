@@ -13,17 +13,17 @@
 
 # 👋 OpenCPLC
 
-Projekt zapewnia warstwę pośrednią pomiędzy Twoją aplikacją, a peryferiami mikrokontrolera. Trochę podobnie jak w **Arduino**, jednak bardziej w kierunku automatyki. Bez włsnego IDE oraz angażowania C++.
+Projekt zapewnia warstwę pośrednią pomiędzy Twoją aplikacją, a peryferiami mikrokontrolera. Trochę podobnie jak w **Arduino**, jednak bardziej w kierunku automatyki. Bez własnego IDE oraz angażowania C++.
 
-W świecie technologii, programowanie staje się coraz bardziej złożone _(często na życzenie samych programistów)_. Niekiedy poziom skomplikowania aplikacji jest nieproporcjonalny do problemu, który rozwiązuje lub wartości, jaką dostarcza. Chcemy, aby nasza biblioteka była możliwie prosta, interfejs intuicyjny, a nakład technologiczny minimalny. Wykorzystujemy dobrze znane narzędzia, takie jak [**Visual Studio Code**](https://code.visualstudio.com/), system kontroli wersji [**Git**](https://git-scm.com/) oraz język [**C**](https://www.learn-c.org/pl/), który pomimo swojego wieku nadal jest numerem jeden wśród programistów Embedded. Nic nie stoi więc na przeszkodzie, aby jego pojawiło się go trochę więcej w automatyce, co pozwoli iść branży z duchem IT!
+W świecie technologii, programowanie staje się coraz bardziej złożone _(często na życzenie samych programistów)_. Niekiedy poziom skomplikowania aplikacji jest nieproporcjonalny do problemu, który rozwiązuje lub wartości, jaką dostarcza. Chcemy, aby nasze biblioteki były możliwie proste, interfejs intuicyjny, a nakład technologiczny minimalny. Wykorzystujemy dobrze znane narzędzia, takie jak [**Visual Studio Code**](https://code.visualstudio.com/), system kontroli wersji [**Git**](https://git-scm.com/) oraz język [**C**](https://www.learn-c.org/pl/), który pomimo swojego wieku nadal jest numerem jeden wśród programistów Embedded. Nic nie stoi więc na przeszkodzie, aby pojawiło się go trochę więcej w automatyce, co pozwoli iść branży z duchem IT!
 
-Zapotrzebowanie na automatyków było, jest i będzie bardzo duże. W przeszłości, kiedy programistów było niewiele, a za automatykę brali się elektrycy, zaprojektowanie języka, jakim jest ladder logic było strzałem w dziesiątkę, bo wykorzystywało logikę znaną z elektryki. Obecnie sytuacja jest odwrotna, a kod w języku C często jest bardziej czytelny dla absolwentów kierunków technicznych niż drzewo logiczne złożone z styków i cewek.
+Zapotrzebowanie na automatyków było, jest i będzie bardzo duże. W przeszłości, kiedy programistów było niewiele, a za automatykę brali się elektrycy, zaprojektowanie języka, jakim jest ladder logic (LAD) było strzałem w dziesiątkę, bo wykorzystywało logikę znaną z elektryki. Obecnie sytuacja jest odwrotna, a kod w języku C często jest bardziej czytelny dla absolwentów kierunków technicznych niż drzewo logiczne złożone ze styków i cewek.
 
 ## 🥇 Uno [➥](#-content)
 
-Pierwszy moduł/sterownik z linii **OpenCPLC** ma cechować się wszechstronnością ze względu na różnorodność peryferiów.
+Pierwszy moduł/sterownik z linii **OpenCPLC** ma cechować się wszechstronnością ze względu na różnorodność peryferii.
 Po zakupie urządzenie jest zaprogramowane jako moduł rozszerzeń do współpracy z zewnętrznym sterownikiem lub komputerem.
-Istnieje możliwość programowania urządzenia bezpośrednio, aby w rezultacie urządzenie będzie mogło działać jako sterownik **PLC**.
+Istnieje możliwość programowania urządzenia bezpośrednio, aby w rezultacie urządzenie mogło działać jako sterownik **PLC**.
 Ten sterownik jest kompatybilny zarówno z systemami 24V, jak i 12V, co może wyróżniać ten produkt na rynku. Może płynnie sterować tymi napięciami z wyjść oraz odczytywać napięcie jako logiczną `1` na wejściach.
 
 | Face                       | View                       |
@@ -43,7 +43,7 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 - Inteligentny kurnik, symulujący krótszą dobę
 - Inkubator jajek utrzymujący odpowiednią temperaturę
 
-### Specyfikcja
+### Specyfikcaja
 
 - Zasilanie **24V**/**12V**
 - Mikrokontroler `STM32G0B1`
@@ -67,7 +67,7 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 
 ## 🪜 Code [➥](#-content)
 
-Porównajmy implementacje systemu **start-stop** w języku **ST**, **LAD _(lader logic)_** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku C wydaje Ci się najbardziej przystępny i zrozumiały to prawdopodobnie ta droga jest dla Ciebie 😃
+Porównajmy implementacje systemu **start-stop** w języku **ST**, **LAD _(ladder logic)_** oraz **ANSI C** z wykorzystaniem bibliotek OpenCPLC, biorąc pod uwagę zastosowanie dwóch różnych stylów mapowania zmiennych. Jeśli kod w języku C wydaje Ci się najbardziej przystępny i zrozumiały to prawdopodobnie ta droga jest dla Ciebie 😃
 
 #### System start-stop ST
 
@@ -87,7 +87,7 @@ motor_running := Q0.1
 IF stop_button THEN
   motor_running := FALSE;
 ELSIF (start_button OR motor_running) THEN
-  motor_running := FALSE;
+  motor_running := TRUE;
 END_IF
 
 Q0.1 := motor_running
@@ -156,13 +156,13 @@ Nie zapominajmy, że język [C](https://pl.wikipedia.org/wiki/C_(j%C4%99zyk_prog
 
 ## ⚙️ Essential-tools [➥](#-content)
 
-Progamowanie sterownika **Uno** oraz całej linii **OpenCPLC** należy rozpoczą od sklonowania repozytorium, co jest rownoważne z skopiowaniem wszystkich plików projektowych. Potrzeby jest do tego [klient GIT](https://git-scm.com/download/win). Po jego instalacji wystarczy włączyć konsolę systemową _(koniecznie w lokalizacji, gdzie chcemy, aby projekt został utworzony!)_ oraz wpisać komendę:
+Programowanie sterownika **Uno** oraz całej linii **OpenCPLC** należy rozpocząć od sklonowania repozytorium, co jest równoważne ze skopiowaniem wszystkich plików projektowych. Potrzeby jest do tego [klient GIT](https://git-scm.com/download/win). Po jego instalacji wystarczy włączyć konsolę systemową _(koniecznie w lokalizacji, gdzie chcemy, aby projekt został utworzony!)_ oraz wpisać komendę:
 
 ```bash
 git clone https://github.com/OpenCPLC/Uno
 ```
 
-W miejscy, gdzie została otworzona konsola stworzy się foldru `Uno`, który zawiera całość projektu. Aby praca z projektem była efektywniejsza zalecamy zainstalować IDE [Visual Studio Code](https://code.visualstudio.com/). Jest to popularne, otwartoźródłowy rozwiązania i właśnie dla niego zapewniamy wsparcie. Te narzędzia są dość uniwersalne i duża szansa, że już jest znasz i wykorzystujesz, jeśli nie to napewno znajdziesz do nich wiele zastosować. Dobrze podczas instalacji zaznaczyć dwa checkbox'y.
+W miejscu, gdzie została otwarta konsola stworzy się folder `Uno`, który zawiera całość projektu. Aby praca z projektem była efektywniejsza zalecamy zainstalować IDE [Visual Studio Code](https://code.visualstudio.com/). Jest to popularne, otwarto źródłowe rozwiązanie i właśnie dla niego zapewniamy wsparcie. Te narzędzia są dość uniwersalne i duża szansa, że już jest znasz i wykorzystujesz, jeśli nie to na pewno znajdziesz do nich wiele zastosowań. Dobrze podczas instalacji zaznaczyć dwa checkbox'y.
 
 - [x] Add "Open with Code" action to Windows Explorer file context menu
 - [x] Add "Open with Code" action to Windows Explorer directory context menu
@@ -199,7 +199,7 @@ Instalacja **Make** automatycznie utworzy zmienną systemową, jednak w przypadk
 
 ![Env](/img/env.png)
 
-Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na dołączone do projektu narzędzie 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`. _(oczywiście nazwę należy wprowadzić bez nawiasów `[]`)_
+Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na dołączone do projektu narzędzie 🔮`wizard.exe`🪄. Pozwoli ono zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`. _(oczywiście nazwę należy wprowadzić bez nawiasów `[]`)_
 
 ```bash
 ./wizard.exe -n [naza-projektu]
@@ -259,13 +259,13 @@ int main(void)
 
 Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności. Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami.
 
-Aby lepiej to zobrazować, do [przykładu start-stop](#system-start-stop-ansi-c-mapowanie-z-użyciem-wskaźników) dodajmy miganie lampką, podłączoną do do wyjścia `TO1`, gdy silnik pracuje. W głównej funkcji `main` zainicjujemy peryferia sterownika za pomocą `PLC_Init` oraz włączymy zegar systemowy `SYSTICK_Init` o bazie czasowej `10ms`. Następnie przekazujemy funkcje dla trzech wątków:
+Aby lepiej to zobrazować, do [przykładu start-stop](#system-start-stop-ansi-c-mapowanie-z-użyciem-wskaźników) dodajmy miganie lampką, podłączoną do wyjścia `TO1`, gdy silnik pracuje. W głównej funkcji `main` zainicjujemy peryferia sterownika za pomocą `PLC_Init` oraz włączymy zegar systemowy `SYSTICK_Init` o bazie czasowej `10ms`. Następnie przekazujemy funkcje dla trzech wątków:
 
 - `PLC_Loop` - główna pętla sterownika,
 - `start_stop` - pętla obsługująca funkcję start-stop,
 - `blinking` - pętla odpowiedzialna za miganie lampki.
 
-Dla każdego wątku konieczne jest zarezerwowanie stosu _(`stack1`, `stack2`, `stack3`)_. Ważne jest precyzyjne oszacowanie potrzebnej pamięci dla każdego wątku. Po tej operacji wystarczy uruchomić system przełączania wątków za pomocą `VRTS_Init`. Trochę dużo, ale dzięki takiemu podejściu mamy trzy główne pętle, z których każda odpowiada za inny aspekt funkcjonalny programu, co biędzie mocno się skalować, jak nasza aplikacja będzie rosła.
+Dla każdego wątku konieczne jest zarezerwowanie stosu _(`stack1`, `stack2`, `stack3`)_. Ważne jest precyzyjne oszacowanie potrzebnej pamięci dla każdego wątku. Po tej operacji wystarczy uruchomić system przełączania wątków za pomocą `VRTS_Init`. Trochę dużo, ale dzięki takiemu podejściu mamy trzy główne pętle, z których każda odpowiada za inny aspekt funkcjonalny programu, co będzie z łatwością się skalować, jak nasza aplikacja będzie rosła.
 
 ```c
 #include "opencplc-uno.h"
