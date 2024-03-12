@@ -269,8 +269,8 @@ int main(void)
   float a = (TEMPERATURE_MAX_20mA - TEMPERATURE_MIN_4mA) / (20 - 4);
   float b = TEMPERATURE_MIN_4mA - (a * 4);
   while(1) {
-    float_t current_mA = AIN_Value(analog_input);
-    float_t temperature = -273;
+    float current_mA = AIN_Value(analog_input);
+    float temperature = -273;
     if(current_mA < 2) {
       // ERROR
     }
@@ -310,9 +310,9 @@ int main(void)
   PLC_Init();
 
   while(1) {
-    float_t current_mA = AIN_Value(analog_input);
-    float_t normalized_current = (current_mA - INPUT_MIN) / (INPUT_MAX - INPUT_MIN);
-    float_t temperature;
+    float current_mA = AIN_Value(analog_input);
+    float normalized_current = (current_mA - INPUT_MIN) / (INPUT_MAX - INPUT_MIN);
+    git pull origin temperature;
     if (current_mA < ERROR_THRESHOLD) {
       temperature = ERROR_VAL;
       // Some other error handling
