@@ -199,15 +199,6 @@ Instalacja **Make** automatycznie utworzy zmienną systemową, jednak w przypadk
 
 ![Env](/img/env.png)
 
-Na zakończenie należy otworzyć konsolę i zweryfikować, czy wszystkie pakiety zostały zainstalowane poprawnie. Można to zrobić przy użyciu komendy `--version`.
-
-```bash
-git --version
-arm-none-eabi-gcc --version
-openocd --version
-make --version
-```
-
 Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na dołączone do projektu narzędzie 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`. _(oczywiście nazwę należy wprowadzić bez nawiasów `[]`)_
 
 ```bash
@@ -218,6 +209,14 @@ Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością p
 
 ```bash
 ./wizard.exe -n [naza-projektu] -m 128kB -o 0g -r
+```
+
+Na zakończenie należy otworzyć konsolę i zweryfikować, czy wszystkie pakiety zostały zainstalowane poprawnie. Można to zrobić przy użyciu komendy `--version`.
+
+```bash
+arm-none-eabi-gcc --version
+openocd --version
+make --version
 ```
 
 ## 🐞 Programing-debugging [➥](#-content)
