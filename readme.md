@@ -7,9 +7,9 @@
 - 🐞 [Programing-debugging](#-programing-debugging-) - Programowanie i debugowanie
 - 🧵 [Multi-thread](#-multi-thread-) - Programowanie wielowątkowe
 - 🧩 Examples - Przykłady _(not ready yet)_
-    - 1\. [General IO](./doc/guide-1-io.md) - 🕹️ Wyjścia i wejścia
-    - 2\. [Communication](./doc/guide-2-com.md) - 🔗 Komunikacja RS485 i I2C
-    - 3\. [Time & Utils](./doc/guide-3-time.md) - ⌚ Zarządzanie czasem i przydatne funkcje
+    - 1\. [General IO](./doc/io.md) - 🕹️ Wyjścia i wejścia
+    - 2\. [Communication](./doc/com.md) - 🔗 Komunikacja RS485 i I2C
+    - 3\. [Time & Utils](./doc/time.md) - ⌚ Zarządzanie czasem i przydatne funkcje
 
 # 👋 OpenCPLC
 
@@ -208,13 +208,13 @@ openocd --version
 make --version
 ```
 
-Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na dołączone do projektu narzędzie 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`. (oczywiście nazwę należy wprowadzić bez )
+Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na dołączone do projektu narzędzie 🔮`wizard.exe`🪄. Pozwoli on zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`. _(oczywiście nazwę należy wprowadzić bez nawiasów `[]`)_
 
 ```bash
 ./wizard.exe -n [naza-projektu]
 ```
 
-Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością pamięci `-m`, wymuszenie innego poziomu optymalizacji `-o` oraz ponowne wygenerowanie plików konfiguracyjnych `-r`.
+Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością pamięci `-m`, wymuszenie innego poziomu optymalizacji `-o` oraz ponowne wygenerowanie niektórych plików konfiguracyjnych `-r`.
 
 ```bash
 ./wizard.exe -n [naza-projektu] -m 128kB -o 0g -r
