@@ -65,7 +65,7 @@ Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
 - Listwy z różną liczbą wyprowadzeń. _(utrudniając błędne połączenie)_
 - Orientacja urządzenia od frontu, zapewniająca jak najlepszy dostęp do wyprowadzeń z rozdzielnicy
 
-![Vect](./img/uno-vect.png)
+![Vect](./img/uno-vect.svg)
 
 ## 🪜 Code [➥](#-content)
 
