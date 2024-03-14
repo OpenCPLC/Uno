@@ -312,7 +312,7 @@ int main(void)
   while(1) {
     float current_mA = AIN_Value(analog_input);
     float normalized_current = (current_mA - INPUT_MIN) / (INPUT_MAX - INPUT_MIN);
-    git pull origin temperature;
+    float temperature;
     if (current_mA < ERROR_THRESHOLD) {
       temperature = ERROR_VAL;
       // Some other error handling

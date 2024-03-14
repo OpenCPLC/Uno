@@ -74,6 +74,10 @@ EXTI_t din_trig3, din_trig4;
 PWMI_t din_pwmi = {
   .reg = TIM3,
   .prescaler = 49,
+  // .channel[TIM_CH1] = TIM3_CH1_PA6,
+  // .channel[TIM_CH2] = TIM3_CH2_PA7,
+  // .channel[TIM_CH3] = TIM3_CH3_PB0,
+  // .channel[TIM_CH4] = TIM3_CH4_PB1,
   .input_prescaler = PWMI_Prescaler_1,
   .filter = TIM_Filter_NoFilter,
   .oversampling = 4
