@@ -99,9 +99,9 @@ END_PROGRAM
 
 #### System start-stop LAD
 
-| LAD Classic                    | LAD Set/Reset                       |
-| -------------------------- | -------------------------- |
-| ![LAD-Classic](/img/lader.png) | ![LAD-SetReset](/img/lader-sr.png) |
+| LAD Classic                    | LAD Set/Reset                      |
+| ------------------------------ | ---------------------------------- |
+| ![LAD-Classic](/img/lader.svg) | ![LAD-SetReset](/img/lader-sr.svg) |
 
 #### System start-stop ANSI C _(mapowanie z użyciem zmiennych)_
 
