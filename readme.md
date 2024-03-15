@@ -101,7 +101,7 @@ END_PROGRAM
 
 | LAD Classic                    | LAD Set/Reset                      |
 | ------------------------------ | ---------------------------------- |
-| ![LAD-Classic](/img/lader.svg) | ![LAD-SetReset](/img/lader-sr.svg) |
+| ![LAD-Classic](/img/lader.png) | ![LAD-SetReset](/img/lader-sr.png) |
 
 #### System start-stop ANSI C _(mapowanie z użyciem zmiennych)_
 
