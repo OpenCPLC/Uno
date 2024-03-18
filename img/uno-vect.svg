@@ -1601,9 +1601,9 @@
   <text class="cls-11" transform="translate(945.94 846.21)"><tspan x="0" y="0">5</tspan></text>
   <text class="cls-11" transform="translate(945.94 914.27)"><tspan x="0" y="0">6</tspan></text>
   <rect class="cls-9" x="599.09" y="767.97" width="50" height="15" rx="2" ry="2" transform="translate(-151.38 1399.56) rotate(-90)"/>
-  <text class="cls-34" transform="translate(627.77 796.64) rotate(-90)"><tspan class="cls-62" x="0" y="0">UART2</tspan><tspan class="cls-84" x="30.24" y="0">TX</tspan></text>
+  <text class="cls-34" transform="translate(627.77 796.64) rotate(-90)"><tspan class="cls-62" x="0" y="0">UART3</tspan><tspan class="cls-84" x="30.24" y="0">TX</tspan></text>
   <rect class="cls-9" x="618.53" y="767.97" width="50" height="15" rx="2" ry="2" transform="translate(-131.94 1419) rotate(-90)"/>
-  <text class="cls-34" transform="translate(647.2 796.64) rotate(-90)"><tspan class="cls-62" x="0" y="0">UART2</tspan><tspan class="cls-84" x="30.24" y="0">RX</tspan></text>
+  <text class="cls-34" transform="translate(647.2 796.64) rotate(-90)"><tspan class="cls-62" x="0" y="0">UART3</tspan><tspan class="cls-84" x="30.24" y="0">RX</tspan></text>
   <path class="cls-1" d="M633.92,665.48c-5.01,0-9.08,4.06-9.08,9.08,0,5.01,4.06,9.08,9.08,9.08h37.12c5.01,0,9.08-4.06,9.08-9.08s-4.06-9.08-9.08-9.08h-37.12Z"/>
   <g>
     <g>
