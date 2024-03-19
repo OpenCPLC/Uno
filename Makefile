@@ -13,7 +13,7 @@ lib/ifc/spi-master.c lib/ifc/spi.c lib/ifc/uart.c lib/per/adc.c lib/per/crc.c li
 lib/per/gpio.c lib/per/pwm.c lib/per/pwr.c lib/per/rng.c lib/per/rtc.c lib/per/tim.c \
 lib/sys/new.c lib/sys/vrts.c plc/opencplc-uno.c plc/com/modbus-master.c plc/com/modbus-slave.c \
 plc/per/ain.c plc/per/din.c plc/per/dout.c plc/per/max31865.c plc/per/pwmi.c plc/utils/cron.c \
-plc/utils/timer.c src/main.c 
+plc/utils/timer.c src/main.c
 
 ASM_SOURCES = lib/sys/vrts-pendsv.s 
 
