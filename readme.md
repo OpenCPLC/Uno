@@ -30,7 +30,7 @@ Ten sterownik jest kompatybilny zarówno z systemami 24V, jak i 12V, co może wy
 | -------------------------- | -------------------------- |
 | ![Face](/img/uno-face.png) | ![View](/img/uno-view.png) |
 
-Sterownik dedykowany do małych i średnich projektów z zakresu automatyki:
+Sterownik dedykowany do małych i średnich projektów z zakresu automatyki, takich jak:
 
 - System nawadniania/naświetlania roślin
 - Regulator temperatury/natlenienia w akwarium

@@ -1,5 +1,5 @@
-#ifndef PER_PWM_H_
-#define PER_PWM_H_
+#ifndef PWM_H_
+#define PWM_H_
 
 #include "gpio.h"
 #include "tim.h"

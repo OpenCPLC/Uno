@@ -1,5 +1,5 @@
-#ifndef PER_SPI_MASTER_H_
-#define PER_SPI_MASTER_H_
+#ifndef SPI_MASTER_H_
+#define SPI_MASTER_H_
 
 #include "def.h"
 #include "spi.h"

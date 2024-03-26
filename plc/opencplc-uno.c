@@ -143,6 +143,14 @@ UART_t RS2 = {
   .gpio_direction = &rs2_gpio_direction
 };
 
+//------------------------------------------------------------------------------------------------- RGB+BTN
+
+GPIO_t rgb_red = { .port = GPIOA, .pin = 12, .mode = GPIO_Mode_Output };
+GPIO_t rgb_green = { .port = GPIOA, .pin = 11, .mode = GPIO_Mode_Output };
+GPIO_t rgb_blue = { .port = GPIOC, .pin = 7, .mode = GPIO_Mode_Output };
+
+DIN_t BTN = { .gpif = { .gpio = { .port = GPIOC, .pin = 13 } } };
+
 //------------------------------------------------------------------------------------------------- DBG+Bash
 
 uint8_t dbg_buff_buffer[2048];
@@ -191,6 +199,10 @@ void PLC_Init(void)
   BASH_AddFile(&cache_file);
   BASH_AddFile(&dbg_file);
   SYSTICK_Init(10);
+  GPIO_InitList(&rgb_red, &rgb_green, &rgb_blue, NULL);
+  DIN_Init(&BTN)
+  return; // TODO: Remove line
+
   // Wyjścia cyfrowe przekaźnikowe (RO)
   DOUT_Init(&RO1);
   DOUT_Init(&RO2);
@@ -247,6 +259,21 @@ void PLC_Init(void)
 
 void PLC_Loop(void)
 {
+  // Obsługa debugera i powłoki bash
+  BASH_Loop(&dbg_stream);
+  if(UART_IsFree(&dbg_uart)) {
+    clear();
+    if(dbg_file.size) {
+      uint8_t *buffer = (uint8_t *)new(dbg_file.size);
+      memcpy(buffer, dbg_file.buffer, dbg_file.size);
+      UART_Send(&dbg_uart, buffer, dbg_file.size);
+      FILE_Clear(&dbg_file);
+    }
+  }
+  DIN_Loop(&BTN);
+  let();
+  return; // TODO: Remove line
+
   // Wyjścia przekaźnikowe (RO)
   DOUT_Loop(&RO1);
   DOUT_Loop(&RO2);
@@ -275,17 +302,6 @@ void PLC_Loop(void)
     // DBG_uDec(ain_adc.overrun);
     // DBG_Enter();
     ain_adc.overrun = 0;
-  }
-  // Obsługa debugera i powłoki bash
-  BASH_Loop(&dbg_stream);
-  if(UART_IsFree(&dbg_uart)) {
-    clear();
-    if(dbg_file.size) {
-      uint8_t *buffer = (uint8_t *)new(dbg_file.size);
-      memcpy(buffer, dbg_file.buffer, dbg_file.size);
-      UART_Send(&dbg_uart, buffer, dbg_file.size);
-      FILE_Clear(&dbg_file);
-    }
   }
   // Przełączanie wątku
   let();

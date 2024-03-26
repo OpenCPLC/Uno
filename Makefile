@@ -8,12 +8,13 @@ BUILD = build
 
 C_SOURCES = inc/int.c inc/startup.c inc/ST/syscalls.c inc/ST/sysmem.c inc/ST/system_stm32g0xx.c \
 lib/dev/bash.c lib/dev/dbg.c lib/dev/stream.c lib/ext/buff.c lib/ext/eeprom.c lib/ext/exbit.c \
-lib/ext/exmath.c lib/ext/exstring.c lib/ext/file.c lib/ifc/i2c-master.c lib/ifc/i2c.c \
-lib/ifc/spi-master.c lib/ifc/spi.c lib/ifc/uart.c lib/per/adc.c lib/per/crc.c lib/per/flash.c \
-lib/per/gpio.c lib/per/pwm.c lib/per/pwr.c lib/per/rng.c lib/per/rtc.c lib/per/tim.c \
-lib/sys/new.c lib/sys/vrts.c plc/opencplc-uno.c plc/com/modbus-master.c plc/com/modbus-slave.c \
-plc/per/ain.c plc/per/din.c plc/per/dout.c plc/per/max31865.c plc/per/pwmi.c plc/utils/cron.c \
-plc/utils/timer.c src/main.c
+lib/ext/exmath.c lib/ext/exstring.c lib/ext/file.c lib/ext/var.c lib/ifc/i2c-master.c \
+lib/ifc/i2c-slave.c lib/ifc/i2c.c lib/ifc/spi-master.c lib/ifc/spi.c lib/ifc/uart.c \
+lib/per/adc.c lib/per/crc.c lib/per/flash.c lib/per/gpio.c lib/per/pwm.c lib/per/pwr.c \
+lib/per/rng.c lib/per/rtc.c lib/per/tim.c lib/sys/new.c lib/sys/vrts.c plc/opencplc-uno.c \
+plc/com/modbus-master.c plc/com/modbus-slave.c plc/per/ain.c plc/per/din.c plc/per/dout.c \
+plc/per/max31865.c plc/per/pwmi.c plc/per/rgb.c plc/utils/cron.c plc/utils/timer.c \
+src/main.c 
 
 ASM_SOURCES = lib/sys/vrts-pendsv.s 
 

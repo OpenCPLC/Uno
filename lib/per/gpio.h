@@ -1,5 +1,5 @@
-#ifndef PER_GPIO_H_
-#define PER_GPIO_H_
+#ifndef GPIO_H_
+#define GPIO_H_
 
 #include <stdbool.h>
 #include <stdlib.h>

@@ -1,5 +1,5 @@
-#ifndef LIB_BUFF_H_
-#define LIB_BUFF_H_
+#ifndef BUFF_H_
+#define BUFF_H_
 
 #include <stdbool.h>
 #include <stdint.h>

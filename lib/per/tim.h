@@ -1,5 +1,5 @@
-#ifndef PER_TIM_H_
-#define PER_TIM_H_
+#ifndef TIM_H_
+#define TIM_H_
 
 #include "gpio.h"
 

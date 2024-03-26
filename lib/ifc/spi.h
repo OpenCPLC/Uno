@@ -1,5 +1,5 @@
-#ifndef PER_SPI_H_
-#define PER_SPI_H_
+#ifndef SPI_H_
+#define SPI_H_
 
 #include "gpio.h"
 

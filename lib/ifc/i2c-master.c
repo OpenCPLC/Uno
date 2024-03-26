@@ -114,6 +114,7 @@ void I2C_Master_ReInit(I2C_Master_t *i2c)
 {
   i2c->reg->CR1 &= ~(I2C_CR1_PE);
   RCC_DisableI2C(i2c->reg);
+  // TODO: Reset GPIO
   I2C_Master_Init(i2c);
 }
 

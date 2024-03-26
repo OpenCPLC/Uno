@@ -1,5 +1,5 @@
-#ifndef PER_CRC_H_
-#define PER_CRC_H_
+#ifndef CRC_H_
+#define CRC_H_
 
 #include <stdint.h>
 #include <stdbool.h>

@@ -1,16 +1,24 @@
-// #include "vrts.h"
+#include "opencplc-uno.h"
 
-// #define delay_ms(ms) for(int _i = 3200 * ms; _i; _i--);
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[64];
 
-// int main(void)
-// {
-//   SYSTICK_Init(10);
-//   RCC->IOPENR |= RCC_IOPSMENR_GPIOASMEN;
-//   GPIOA->MODER = (GPIOA->MODER & ~(0x03 << (2 * 5))) | (0x01 << (2 * 5));
-//   while(1) {
-//     GPIOA->BSRR |= (1 << 5); // PA5 LED turn on
-//     delay_ms(100);
-//     GPIOA->BRR |= (1 << 5); // PA5 LED turn off
-//     delay_ms(100);
-//   }
-// }
+int main(void)
+{
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
+}
+
+void loop(void)
+{
+  while(1) {
+    DOUT_Set(&RO1);
+    delay(1000);
+    DOUT_Rst(&RO1);
+    delay(1000);
+    //
+  }
+}

@@ -1,18 +1,11 @@
-#include "main.h"
-
-#ifndef INCLUDE_RNG
-  #define INCLUDE_RNG 1
-#endif
-
-//-------------------------------------------------------------------------------------------------
-
-#ifndef PER_RNG_H_
-#define PER_RNG_H_
+#ifndef RNG_H_
+#define RNG_H_
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include "stm32g0xx.h"
+#include "main.h"
 
 typedef enum {
   RNG_Source_Void = 0,

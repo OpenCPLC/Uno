@@ -1,5 +1,5 @@
-#ifndef PER_I2C_MASTER_H_
-#define PER_I2C_MASTER_H_
+#ifndef I2C_MASTER_H_
+#define I2C_MASTER_H_
 
 #include <string.h>
 #include "int.h"

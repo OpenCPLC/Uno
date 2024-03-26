@@ -1,5 +1,5 @@
-#ifndef PER_PWR_H_
-#define PER_PWR_H_
+#ifndef PWR_H_
+#define PWR_H_
 
 #include <stdbool.h>
 #include "stm32g0xx.h"
