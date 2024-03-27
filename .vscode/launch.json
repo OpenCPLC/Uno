@@ -15,7 +15,7 @@
     {
       "name": "Debug",
       "cwd": "${workspaceRoot}",
-      "executable": "./build/uno.elf",
+      "executable": "./build/vrts-project.elf",
       "request": "launch",
       "type": "cortex-debug",
       "servertype": "openocd",

@@ -169,11 +169,11 @@ bool GPIF_Loop(GPIF_t *gpif)
       gpif->value = in;
       gpif->_toggle_tick = gettick(gpif->toggle_ms);
       if(gpif->value) {
-        gpif->_res_rais_tick = gettick(gpif->rais);
+        gpif->_res_rais_tick = gettick(GPIF_TRESET);
         gpif->rais = true;
       }
       else {
-        gpif->_res_fall_tick = gettick(gpif->rais);
+        gpif->_res_fall_tick = gettick(GPIF_TRESET);
         gpif->fall = true;
       }
     }

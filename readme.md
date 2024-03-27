@@ -338,3 +338,8 @@ void blinking(void)
   }
 }
 ```
+
+Podczas korzystania z VRTS należy uwzględnić dwie istotne kwestie:
+
+- Każdy wątek musi zawierać co najmniej jedną funkcję zwalniającą, taką jak `let` czy `delay`. W przeciwnym razie wątek zajmie rdzeń na stałe i uniemożliwi innym wątkom pracę.
+- Każdy wątek musi być wyposażony w nieskończoną pętlę, która zapobiegnie opuszczeniu funkcji wątku. Tak jak robi się to w funkcji głownej `main`.

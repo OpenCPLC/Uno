@@ -329,6 +329,7 @@ void loop(void)
       if(color > RGB_END_COLOR) color = RGB_Off;
       INFO_Set(color);
     }
+    let();
   }
 }
 

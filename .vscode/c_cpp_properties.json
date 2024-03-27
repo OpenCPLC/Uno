@@ -1,7 +1,7 @@
 {
   "configurations": [
     {
-      "name": "uno",
+      "name": "vrts-project",
       "includePath": [
         "${workspaceFolder}/**"
       ],

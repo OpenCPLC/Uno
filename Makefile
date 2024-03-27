@@ -1,4 +1,4 @@
-TARGET = uno
+TARGET = vrts-project
 
 DEBUG = 1
 
