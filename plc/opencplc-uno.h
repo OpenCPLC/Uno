@@ -7,6 +7,8 @@
 #include "max31865.h"
 #include "dbg.h"
 #include "bash.h"
+#include "rgb.h"
+#include "vrts.h"
 
 // Wyjścia cyfrowe przekaźnikowse (RO)
 extern DOUT_t RO1;
@@ -46,6 +48,16 @@ void PLC_Loop(void);
 
 extern UART_t RS1;
 extern UART_t RS2;
+
+// Dioda RGB i przycisk BTN
+extern RGB_t RGB;
+extern DIN_t BTN;
+void INFO_Set(RGB_e color);
+void INFO_Rst(void);
+void INFO_Blink_ON(uint16_t ms);
+void INFO_Blink_OFF(void);
+
+//---------------------------------------------------------------------------------------------------------------------
 
 extern MAX31865_t RTD;
 void RTD_Main(void);

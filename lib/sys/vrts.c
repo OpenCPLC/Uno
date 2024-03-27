@@ -1,4 +1,5 @@
 #include "vrts.h"
+#include "new.h"
 
 volatile uint64_t vrts_ticker;
 uint32_t vrts_ms;

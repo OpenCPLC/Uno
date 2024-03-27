@@ -2,6 +2,71 @@
 
 ### Wyjścia cyfrowe
 
+Ustawianie stanu diody informacyjnej `INFO`
+
+```c
+#include "opencplc-uno.h"
+
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[64];
+
+void loop(void)
+{
+  while(1) {
+    INFO_Set(RGB_Red);
+    delay(1000);
+    INFO_Set(RGB_Green);
+    delay(1000);
+    INFO_Set(RGB_Blue);
+    delay(1000);
+  }
+}
+
+int main(void)
+{
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
+}
+```
+
+Miganie diodą informacyjną `INFO`
+
+```c
+#include "opencplc-uno.h"
+
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[64];
+
+void loop(void)
+{
+  bool blink = true;
+  while(1) {
+    if(blink) INFO_Blink_ON(200);
+    else INFO_Blink_OFF();
+    INFO_Set(RGB_Red);
+    delay(3000);
+    INFO_Set(RGB_Green);
+    delay(3000);
+    INFO_Set(RGB_Blue);
+    delay(3000);
+    blink = !blink;
+  }
+}
+
+int main(void)
+{
+  PLC_Init();
+  
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
+}
+```
+
 Włączanie / wyłącznie wyjścia
 
 ```c
@@ -245,6 +310,36 @@ void loop(void)
       DOUT_Rst(&RO1);
     }
   }
+}
+```
+
+Obsługa przycisku
+
+```c
+#include "opencplc-uno.h"
+
+static uint32_t stack_plc[64];
+static uint32_t stack_loop[64];
+
+void loop(void)
+{
+  RGB_e color = RGB_Off;
+  while(1) {
+    if(DIN_Fall(&BTN)) {
+      color++;
+      if(color > RGB_END_COLOR) color = RGB_Off;
+      INFO_Set(color);
+    }
+  }
+}
+
+int main(void)
+{
+  PLC_Init();
+  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
 }
 ```
 

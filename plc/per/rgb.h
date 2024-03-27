@@ -3,6 +3,8 @@
 
 #include "gpio.h"
 
+//-------------------------------------------------------------------------------------------------
+
 typedef enum {
   RGB_Off = 0,
   RGB_Red = 1,
@@ -14,18 +16,24 @@ typedef enum {
   RGB_White = 7
 } RGB_e;
 
+#define RGB_END_COLOR RGB_White
+
 typedef struct {
-  GPIO_t *reg;
+  GPIO_t *red;
   GPIO_t *green;
   GPIO_t *blue;
-  RGB_e color;
-  bool isset;
+  RGB_e state;
+  uint16_t blink_ms;
+  uint64_t tick;
+  bool blink_on;
 } RGB_t;
 
 void RGB_Init(RGB_t *rgb);
 void RGB_Set(RGB_t *rgb, RGB_e color);
 void RGB_Rst(RGB_t *rgb);
 void RGB_Tgl(RGB_t *rgb);
+void RGB_Loop(RGB_t *rgb);
 
+//-------------------------------------------------------------------------------------------------
 
 #endif

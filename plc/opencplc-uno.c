@@ -145,11 +145,33 @@ UART_t RS2 = {
 
 //------------------------------------------------------------------------------------------------- RGB+BTN
 
-GPIO_t rgb_red = { .port = GPIOA, .pin = 12, .mode = GPIO_Mode_Output };
-GPIO_t rgb_green = { .port = GPIOA, .pin = 11, .mode = GPIO_Mode_Output };
-GPIO_t rgb_blue = { .port = GPIOC, .pin = 7, .mode = GPIO_Mode_Output };
+GPIO_t rgb_gpio_red = { .port = GPIOC, .pin = 7 };
+GPIO_t rgb_gpio_green = { .port = GPIOA, .pin = 11 };
+GPIO_t rgb_gpio_blue = { .port = GPIOA, .pin = 12 };
 
-DIN_t BTN = { .gpif = { .gpio = { .port = GPIOC, .pin = 13 } } };
+RGB_t RGB = { .red = &rgb_gpio_red, .green = &rgb_gpio_green, .blue = &rgb_gpio_blue };
+DIN_t BTN = { .gpif = { .gpio = { .port = GPIOC, .pin = 12 } } };
+
+void INFO_Set(RGB_e color)
+{
+  RGB_Set(&RGB, color);
+}
+
+void INFO_Rst(void)
+{
+  INFO_Set(RGB_Off);
+}
+
+void INFO_Blink_ON(uint16_t ms)
+{
+  RGB.blink_ms = ms;
+}
+
+void INFO_Blink_OFF(void)
+{
+  RGB.blink_ms = 0;
+  RGB_Set(&RGB, RGB.state);
+}
 
 //------------------------------------------------------------------------------------------------- DBG+Bash
 
@@ -192,17 +214,17 @@ STREAM_t dbg_stream = {
 void PLC_Init(void)
 {
   // Konfiguracja systemowa
-  SCB->VTOR = FLASH_BASE | 0x00000000U;
+  // SCB->VTOR = FLASH_BASE | 0x00000000U;
   RTC_Init();
   EEPROM_Cache(&cache_eeprom);
+  SYSTICK_Init(10);
+  RGB_Init(&RGB);
+  DIN_Init(&BTN);
+  return; // TODO: Remove line
+
   DBG_Init(&dbg_uart, &dbg_file);
   BASH_AddFile(&cache_file);
   BASH_AddFile(&dbg_file);
-  SYSTICK_Init(10);
-  GPIO_InitList(&rgb_red, &rgb_green, &rgb_blue, NULL);
-  DIN_Init(&BTN)
-  return; // TODO: Remove line
-
   // Wyjścia cyfrowe przekaźnikowe (RO)
   DOUT_Init(&RO1);
   DOUT_Init(&RO2);
@@ -259,52 +281,55 @@ void PLC_Init(void)
 
 void PLC_Loop(void)
 {
-  // Obsługa debugera i powłoki bash
-  BASH_Loop(&dbg_stream);
-  if(UART_IsFree(&dbg_uart)) {
-    clear();
-    if(dbg_file.size) {
-      uint8_t *buffer = (uint8_t *)new(dbg_file.size);
-      memcpy(buffer, dbg_file.buffer, dbg_file.size);
-      UART_Send(&dbg_uart, buffer, dbg_file.size);
-      FILE_Clear(&dbg_file);
-    }
+  while(1) {
+    DIN_Loop(&BTN);
+    RGB_Loop(&RGB);
+    let();
   }
-  DIN_Loop(&BTN);
-  let();
-  return; // TODO: Remove line
 
-  // Wyjścia przekaźnikowe (RO)
-  DOUT_Loop(&RO1);
-  DOUT_Loop(&RO2);
-  DOUT_Loop(&RO3);
-  DOUT_Loop(&RO4);
-  // Wyjścia cyfrowe tranzystorowe (TO)
-  DOUT_Loop(&TO1);
-  DOUT_Loop(&TO2);
-  DOUT_Loop(&TO3);
-  DOUT_Loop(&TO4);
-  // Wyjścia cyfrowe triakowe (XO)
-  DOUT_Loop(&XO1);
-  DOUT_Loop(&XO2);
-  // Wejścia cyfrowe (DI)
-  DIN_Loop(&DI1);
-  DIN_Loop(&DI2);
-  DIN_Loop(&DI3);
-  DIN_Loop(&DI4);
-  if(din_pwmi_init && PWMI_Loop(&din_pwmi)) {
-    // PWMI_Print(&fan_inputs);
-  }
-  // Wejścia analogowe (AI)
-  ADC_Measurements(&ain_adc);
-  if(ain_adc.overrun) {
-    // DBG_String("ADC overrun:");
-    // DBG_uDec(ain_adc.overrun);
-    // DBG_Enter();
-    ain_adc.overrun = 0;
-  }
-  // Przełączanie wątku
-  let();
+
+  // // Obsługa debugera i powłoki bash
+  // BASH_Loop(&dbg_stream);
+  // if(UART_IsFree(&dbg_uart)) {
+  //   clear();
+  //   if(dbg_file.size) {
+  //     uint8_t *buffer = (uint8_t *)new(dbg_file.size);
+  //     memcpy(buffer, dbg_file.buffer, dbg_file.size);
+  //     UART_Send(&dbg_uart, buffer, dbg_file.size);
+  //     FILE_Clear(&dbg_file);
+  //   }
+  // }
+  // // Wyjścia przekaźnikowe (RO)
+  // DOUT_Loop(&RO1);
+  // DOUT_Loop(&RO2);
+  // DOUT_Loop(&RO3);
+  // DOUT_Loop(&RO4);
+  // // Wyjścia cyfrowe tranzystorowe (TO)
+  // DOUT_Loop(&TO1);
+  // DOUT_Loop(&TO2);
+  // DOUT_Loop(&TO3);
+  // DOUT_Loop(&TO4);
+  // // Wyjścia cyfrowe triakowe (XO)
+  // DOUT_Loop(&XO1);
+  // DOUT_Loop(&XO2);
+  // // Wejścia cyfrowe (DI)
+  // DIN_Loop(&DI1);
+  // DIN_Loop(&DI2);
+  // DIN_Loop(&DI3);
+  // DIN_Loop(&DI4);
+  // if(din_pwmi_init && PWMI_Loop(&din_pwmi)) {
+  //   // PWMI_Print(&fan_inputs);
+  // }
+  // // Wejścia analogowe (AI)
+  // ADC_Measurements(&ain_adc);
+  // if(ain_adc.overrun) {
+  //   // DBG_String("ADC overrun:");
+  //   // DBG_uDec(ain_adc.overrun);
+  //   // DBG_Enter();
+  //   ain_adc.overrun = 0;
+  // }
+  // // Przełączanie wątku
+  // let();
 }
 
 //------------------------------------------------------------------------------------------------- RTD
