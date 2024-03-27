@@ -227,7 +227,7 @@ Narzędziem, które wykorzystujemy do programowania i debugowania, jest [STLINK-
 
 Aby zacząć programować mikrokontroler na płytce sterownika, trzeba podłączyć zasilanie `VCC` i `GND` od 12V do 24V oraz podłączyć z jednej strony programator przewodem SKEED do płytki, a z drugiej strony przewodem micro `USB` do komputera.
 
-![Vect](./img/uno-stlink-vect.png)
+![Stlink](./img/uno-stlink.png)
 
 Konieczna może okazać się instalacja [steronnika do programatora](https://www.st.com/en/development-tools/stsw-link009.html).
 
