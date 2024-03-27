@@ -223,11 +223,25 @@ make --version
 
 ## 🐞 Programing-debugging [➥](#-content)
 
-`TODO`:
-- Magistrala **SWD**
-- Złącze do programowania **IDC8**
-- Programator **STLink**
-- Kompilowanie `Make` i debuger `F5`
+Narzędziem, które wykorzystujemy do programowania i debugowania, jest [STLINK-V3MODS](https://www.st.com/en/development-tools/stlink-v3mods.html) zamontowany na przejściówce umożliwiającej podłączenie kabla [SKEED8](https://www.we-online.com/en/components/products/WST_IDC_PRE_PRESSED_CONNECTOR?sq=490107670812S#490107670812S). Niechętnie zastosowaliśmy własny standard, jednak firma **ST Microelectronics** ❤️ wykorzystuje złącze STDC14, które jest drogie i trudno dostępne, oraz złącze TC2050-IDC, które ogranicza interfejs komunikacji `UART`.
+
+Aby zacząć programować mikrokontroler na płytce sterownika, trzeba podłączyć zasilanie `VCC` i `GND` od 12V do 24V oraz podłączyć z jednej strony programator przewodem SKEED do płytki, a z drugiej strony przewodem micro `USB` do komputera.
+
+![Vect](./img/uno-stlink-vect.png)
+
+Konieczna może okazać się instalacja [steronnika do programatora](https://www.st.com/en/development-tools/stsw-link009.html).
+
+Gdy przeszliśmy kroki opisane w [rozdziale wyżej](#%EF%B8%8F-essential-tools-) to wszystko jest gotowe do pracy. Kompilacja i programowanie odbywa się przy użyciu komendy **`make`**
+
+```bash
+make # kompilacja programu
+make clr # usunięcie plików kompilacyjnych
+make run # kompilacja i wgranie programu
+```
+
+Aby debugować program, wystarczy nacisnąć `F5` w otwartym projekcie Visual Studio Code.
+
+Podczas kompilacji tworzy się folde `build`, a w nim plik o nazwie projektu z rozszerzeniem `.hex`. Na etapie produkcyjnym może być on wgrywany na mikrokontroler za pomocą narzędzia [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html).
 
 ### Strumień danych wyjściowych `DBG`
 
@@ -256,6 +270,8 @@ int main(void)
   }
 }
 ```
+
+Wiadomości, które tworzymy, są wysyłane do komputera za pomocą `UART`'a wbudowanego w programator. Z poziomu komputera będą widziane jako **serial port** _(`COM` na systemie Windows)_. Wiadomości możemy odebrać za pomocą dowolnego terminala obsługującego komunikację szeregową, takiego jak [Realterm](https://realterm.sourceforge.io/). Należy ustawić prędkość na **115200**bps, używając 8 bitów danych, 1 bitu stopu bez kontroli parzystości.
 
 ## 🧵 Multi-thread [➥](#-content)
 

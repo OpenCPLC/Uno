@@ -59,7 +59,6 @@ void loop(void)
 int main(void)
 {
   PLC_Init();
-  
   thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
