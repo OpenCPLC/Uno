@@ -244,13 +244,13 @@ void PLC_Init(void)
   DOUT_Init(&RO2);
   DOUT_Init(&RO3);
   DOUT_Init(&RO4);
-  return; // TODO: Remove line
   // Wyjścia cyfrowe tranzystorowe (TO)
   DOUT_Init(&TO1);
   DOUT_Init(&TO2);
   DOUT_Init(&TO3);
   DOUT_Init(&TO4);
   PWM_Init(&to_pwm);
+  return; // TODO: Remove line
   // Wyjścia cyfrowe triakowe (XO)
   DOUT_Init(&XO1);
   DOUT_Init(&XO2);
@@ -314,12 +314,13 @@ void PLC_Loop(void)
   DOUT_Loop(&RO2);
   DOUT_Loop(&RO3);
   DOUT_Loop(&RO4);
-  return; // TODO: Remove line
   // Wyjścia cyfrowe tranzystorowe (TO)
   DOUT_Loop(&TO1);
   DOUT_Loop(&TO2);
   DOUT_Loop(&TO3);
   DOUT_Loop(&TO4);
+  return; // TODO: Remove line
+
   // Wyjścia cyfrowe triakowe (XO)
   DOUT_Loop(&XO1);
   DOUT_Loop(&XO2);

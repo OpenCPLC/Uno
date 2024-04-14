@@ -2,9 +2,11 @@
 
 Do pracy ze sterownikami OpenCPLC wymagany jest również zestaw bardziej specjalistycznych narzędzi, identyczny z tym używanym do pracy z mikrokontrolerami **STM32**. W skład tego zestawu wchodzą:
 
-- Pakiet narzędzi [**GNU Arm Embedded Toolchain**](https://developer.arm.com/downloads/-/gnu-rm): Obejmuje on między innymi kompilator. Pakiet trzeba pobrać i zainstalować w lokalizacji `C:\OpenCPLC\ArmGCC`
-- On-Chip Debugger: [**OpenOCD** ](https://gnutoolchains.com/arm-eabi/openocd/) Umożliwia komunikację z mikrokontrolerem za pomocą programatora ST-Link. Pakiet trzeba pobrać, rozpakować i umieścić w lokalizacji `C:\OpenCPLC\OpenOCD`
-- Narzędzia do zarządzania procesem kompilacji programów, jakim jest [**Make**](https://www.gnu.org/software/make/) Aby zainstalować **Make**, można skorzystać z menedżera pakietów [**Chocolatey**](https://chocolatey.org/), który umożliwia prostą instalację wymaganych komponentów. Wystarczy otworzyć **PowerShell** jako 🛡️administrator i wywołać komendy:
+- Pakiet narzędzi [**GNU Arm Embedded Toolchain**](https://developer.arm.com/downloads/-/gnu-rm) - Obejmuje on między innymi kompilator. Pakiet trzeba pobrać i zainstalować w lokalizacji `C:\OpenCPLC\ArmGCC`
+- On-Chip Debugger - [**OpenOCD** ](https://gnutoolchains.com/arm-eabi/openocd/) Umożliwia komunikację z mikrokontrolerem za pomocą programatora ST-Link. Pakiet trzeba pobrać, rozpakować i umieścić w lokalizacji `C:\OpenCPLC\OpenOCD`
+- Narzędzia do zarządzania procesem kompilacji programów, jakim jest [**Make**](https://www.gnu.org/software/make/).
+
+Aby zainstalować **Make**, można skorzystać z menedżera pakietów [**Chocolatey**](https://chocolatey.org/), który umożliwia prostą instalację wymaganych komponentów. Wystarczy otworzyć **PowerShell** jako 🛡️administrator i wywołać komendy:
 
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
@@ -19,3 +21,11 @@ Instalacja **Make** automatycznie utworzy zmienną systemową, jednak w przypadk
 - Path » `%ARMGCC%` oraz `C:\OpenCPLC\OpenOCD\bin`
 
 ![Env](/img/env.png)
+
+Na zakończenie należy otworzyć konsolę i zweryfikować, czy wszystkie pakiety zostały zainstalowane poprawnie. Można to zrobić przy użyciu komendy `--version`.
+
+```bash
+arm-none-eabi-gcc --version
+openocd --version
+make --version
+```

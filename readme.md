@@ -131,6 +131,7 @@ int main(void)
 ```
 
 #### System start-stop ANSI C _(mapowanie z użyciem wskaźników)_
+
 ```c
 #import "opencplc-uno.h"
 
@@ -178,20 +179,19 @@ Poza samym VSCode _(który póki co jest po prostu zaawansowanym edytorem tekstu
 | ------------------------ | --------------------------------- |
 | ![Ext-C](/img/ext-c.png) | ![Cortex-Debug](/img/ext-dbg.png) |
 
-Najkrótszą drogą do uruchomienia pierwszego projektu jest uruchomienie aplikacji 🔮`wizard.exe`. Zainstaluje ona GNU Arm Embedded Toolchain, OpenOCD, Make oraz ustawi odpowiednio zmienne systemowe, a także stworzy pliki konfiguracyjne dla projektu. Jeżeli nie chcemy, aby ktoś grzebał w naszym systemie, możemy przygotować sobie [konfiguracje systomową ręcznie](./doc/custom-env.md). Niemniej, 🪄`wizard.exe` może okazać się pomocny, gdy będziemy chcieli, aby nowo dodane pliki zostały dołączone do projektu lub zmienić jego nazwę. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator, podając nazwę projektu `-n`. _(oczywiście, nazwę należy wprowadzić bez nawiasów `[]`)_
-
+Najkrótszą drogą do uruchomienia pierwszego projektu jest uruchomienie aplikacji 🔮`wizard.exe`. Zainstaluje ona **GNU Arm Embedded Toolchain**, **OpenOCD**, **Make** oraz ustawi odpowiednio zmienne systemowe, a także stworzy pliki konfiguracyjne dla projektu. Jeżeli nie chcemy, aby ktoś grzebał w naszym systemie, możemy przygotować sobie [konfiguracje ręcznie](./doc/custom-env.md). Niemniej, 🪄`wizard.exe` może okazać się pomocny, gdy będziemy chcieli, aby nowo dodane pliki zostały dołączone do projektu lub zmienić jego nazwę. Aby go uruchomić trzeba otworzyć konsolę jako 🛡️administrator w miejscu z projektem oraz wpisać:
 
 ```bash
 ./wizard.exe -n [naza-projektu]
 ```
 
-Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością pamięci `-m`, wymuszenie innego poziomu optymalizacji `-o` oraz nadpisanie  plików konfiguracyjnych projektu `-r`.
+Za flagą `-n` należy wprowadzić nazwę projektu _(oczywiście, nazwę należy wprowadzić bez nawiasów `[]`)_. Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością pamięci `-m`, wymuszenie innego [poziomu optymalizacji debugera](https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html) `-o` oraz nadpisanie  plików konfiguracyjnych projektu `-r`.
 
 ```bash
 ./wizard.exe -n [naza-projektu] -m 128kB -o 0g -r
 ```
 
-Na zakończenie należy otworzyć konsolę i zweryfikować, czy wszystkie pakiety zostały zainstalowane poprawnie. Można to zrobić przy użyciu komendy `--version`.
+Na zakończenie należy otworzyć ponownie konsolę i zweryfikować, czy wszystkie pakiety zostały zainstalowane poprawnie. Można to zrobić przy użyciu komendy `--version`.
 
 ```bash
 arm-none-eabi-gcc --version

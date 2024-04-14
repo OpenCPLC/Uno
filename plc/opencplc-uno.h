@@ -10,6 +10,7 @@
 #include "rgb.h"
 #include "vrts.h"
 #include "i2c-master.h"
+#include "main.h"
 
 #ifndef PLC_BOOTLOADER
   #define PLC_BOOTLOADER 0
