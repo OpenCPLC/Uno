@@ -6,7 +6,8 @@
 struct {
   FILE_t *file[BASH_FILE_LIMIT];
   uint8_t file_count;
-  void (*callback)(char **, uint16_t);
+  bool (*callback[BASH_FILE_CALLBACK])(char **, uint16_t);
+  uint8_t callback_count;
   bool flash_autosave;
   FILE_t *cache;
   FILE_t *src;
@@ -27,9 +28,10 @@ void BASH_AddFile(FILE_t *file)
   FILE_FlashLoad(file);
 }
 
-void BASH_SetCallback(void (*callback)(char **, uint16_t))
+void BASH_AddCallback(bool (*callback)(char **, uint16_t))
 {
-  bash_state.callback = callback;
+  bash_state.callback[bash_state.callback_count] = callback;
+  bash_state.callback_count++;
 }
 
 void BASH_SetFlashAutosave(void (*callback)(char **, uint16_t))
@@ -313,13 +315,13 @@ static void BASH_Pwr(char **argv, uint16_t argc)
 
 //------------------------------------------------------------------------------------------------- LOOP
 
-uint8_t BASH_Loop(STREAM_t *stream)
+bool BASH_Loop(STREAM_t *stream)
 {
   char **argv = NULL;
   uint16_t argc = STREAM_Read(stream, &argv);
-	if(argc) {
-		if(stream->mode == STREAM_Mode_Data) BASH_Data((uint8_t *)argv[0], argc, stream);
-		else {
+  if(argc) {
+    if(stream->mode == STREAM_Mode_Data) BASH_Data((uint8_t *)argv[0], argc, stream);
+    else {
       #if(BASH_DBG)
         if(!strcmp(argv[0], "ping") && argc == 1) {
           DBG_String("PING pong");
@@ -348,11 +350,15 @@ uint8_t BASH_Loop(STREAM_t *stream)
           DBG_Enter();
         }
       #endif
-      else if(bash_state.callback) bash_state.callback(argv, argc);
-		}
-		return 1;
-	}
-	return 0;
+      else {
+        for(uint8_t i = 0; i < bash_state.callback_count; i++) {
+          if(bash_state.callback[i](argv, argc)) break;
+        }
+      }
+    }
+    return true;
+  }
+  return false;
 }
 
 //-------------------------------------------------------------------------------------------------

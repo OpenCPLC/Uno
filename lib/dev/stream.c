@@ -26,23 +26,24 @@ uint16_t STREAM_Read(STREAM_t *stream, char ***argv)
       #if(STREAM_DBG)
         DBG_String(" mode:string");
       #endif
-      for(int i = 0; i < argc; i++) {
-        if(stream->modify == STREAM_Modify_Lowercase || stream->modify == STREAM_Modify_Uppercase) {
+      if(stream->modify == STREAM_Modify_Lowercase || stream->modify == STREAM_Modify_Uppercase) {
+        for(int i = 0; i < argc; i++) {
           if(stream->modify == STREAM_Modify_Lowercase) strtolower_this((*argv)[i]);
           else if(stream->modify == STREAM_Modify_Uppercase) strtoupper_this((*argv)[i]);
+          #if(STREAM_DBG)
+            DBG_String(" arg[");
+            DBG_Dec(i);
+            DBG_String("]:");
+            DBG_String((*argv)[i]);
+          #endif
         }
-        #if(STREAM_DBG)
-          DBG_String(" arg[");
-          DBG_Dec(i);
-          DBG_String("]:");
-          DBG_String((*argv)[i]);
-        #endif
       }
       #if(STREAM_DBG)
         DBG_Enter();
       #endif
       return (uint8_t)argc;
-    } else {
+    }
+    else {
       #if(STREAM_DBG)
         DBG_String(" mode:file\r\n");
       #endif

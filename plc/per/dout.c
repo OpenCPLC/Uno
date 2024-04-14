@@ -4,8 +4,14 @@
  */
 
 #include "dout.h"
+#include "dbg.h"
 
 //-------------------------------------------------------------------------------------------------
+
+float PWM_GetFrequency(PWM_t *pwm)
+{
+  return (float)SystemCoreClock / (pwm->prescaler + 1) / pwm->auto_reload / (pwm->center_aligned + 1);
+}
 
 /**
  * @brief Ustawia częstotliwość dla sygnału PWM.
@@ -24,8 +30,7 @@ float PWM_Frequency(PWM_t *pwm, float frequency)
   if(pwm->channel[TIM_CH2]) PWM_SetValue(pwm, TIM_CH2, 0);
   if(pwm->channel[TIM_CH3]) PWM_SetValue(pwm, TIM_CH3, 0);
   if(pwm->channel[TIM_CH4]) PWM_SetValue(pwm, TIM_CH4, 0);
-  frequency = (float)SystemCoreClock / (pwm->prescaler + 1) / pwm->auto_reload / (pwm->center_aligned + 1);
-  return frequency;
+  return PWM_GetFrequency(pwm);
 }
 
 /**
@@ -155,9 +160,9 @@ uint32_t DOUT_State(DOUT_t *dout)
  * @param dout Wskaźnik do struktury reprezentującej wyjście cyfrowe.
  * @return Wartość `true` dla trwającego impulsu, `false` w przeciwnym razie.
  */
-bool DOUT_IsPulse(DOUT_t *relay)
+bool DOUT_IsPulse(DOUT_t *dout)
 {
-  return relay->pulse;
+  return dout->pulse;
 }
 
 /**
@@ -173,12 +178,6 @@ float DOUT_GetDuty(DOUT_t *dout)
 }
 
 //-------------------------------------------------------------------------------------------------
-
-
-/**
- * @brief Inicjalizuje określone wyjście cyfrowe przekaźnikowe (RO).
- * @param relay Wskaźnik do struktury reprezentującej wejście przekaźnikowe (RO).
- */
 
 /**
  * @brief Inicjalizuje określone wyjście cyfrowe.
@@ -257,6 +256,115 @@ void DOUT_Settings(DOUT_t *dout, bool save)
   if(dout->eeprom && save != dout->save) {
     EEPROM_Write(dout->eeprom, &dout->save);
   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void DOUT_Print(DOUT_t *dout)
+{
+  DBG_String(dout->name);
+  if(dout->pwm) {
+    float duty = DOUT_GetDuty(dout);
+    DBG_String(" duty:"); DBG_Float(duty, 2); DBG_Char('%');
+    float freq = PWM_GetFrequency(dout->pwm);
+    DBG_String(" freq:"); DBG_Float(freq, 0); DBG_String("Hz");
+  }
+  else {
+    if(DOUT_State(dout)) DBG_String(" on");
+    else DBG_String(" off");
+    if(DOUT_IsPulse(dout)) DBG_Char('*');
+    if(dout->relay) {
+      DBG_String(" cycles:");
+      DBG_uDec(dout->cycles);
+    }
+  }
+  DBG_Enter();
+}
+
+DOUT_t **dout_list;
+uint8_t dout_count;
+
+void DOUT_BashInit(DOUT_t *douts[])
+{
+  dout_list = douts;
+  while(douts) {    
+    dout_count++;
+    douts++;
+  }
+}
+
+bool DOUT_Bash(char **argv, uint16_t argc)
+{
+  if(!dout_list) return false;
+  if(strcmp(argv[0], "dout")) return false;
+  DOUT_t *dout = NULL;
+  uint8_t index = 255;
+  if(argc >= 3) {
+    if(str2nbr_valid(argv[1])) {
+      index = str2nbr(argv[1]);
+      if(index >= dout_count) return false;
+      dout += index;
+    }
+    else {
+      dout = *dout_list;
+      uint8_t i;
+      while(dout) {
+        if(!strcmp(argv[1], strtolower(dout->name))) {
+          index = i;
+          break;
+        }
+        dout++;
+        i++;
+      }
+    }
+    if(!dout) return false;
+    char *str;
+    switch(hash(argv[2])) {
+      case DOUT_Hash_Set:
+      case DOUT_Hash_On:
+      case DOUT_Hash_Enable:
+        DOUT_Set(dout);
+        break;
+      case DOUT_Hash_Rst:
+      case DOUT_Hash_Reset:
+      case DOUT_Hash_Off:
+      case DOUT_Hash_Disable:
+        DOUT_Rst(dout);
+        break;
+      case DOUT_Hash_Tgl:
+      case DOUT_Hash_Toggle:
+      case DOUT_Hash_Sw:
+      case DOUT_Hash_Switch:
+        DOUT_Tgl(dout);
+        break;
+      case DOUT_Hash_Pulse:
+      case DOUT_Hash_Impulse:
+      case DOUT_Hash_Burst:
+        if(argc < 4) return false;
+        str = argv[3];
+        if(!str2nbr_valid(str)) return false;
+        uint16_t pulse = str2nbr(str);
+        DOUT_Pulse(dout, pulse);
+        break;
+      case DOUT_Hash_Duty:
+      case DOUT_Hash_Fill:
+        if(argc < 4) return false;
+        str = argv[3];
+        if(!str2float_valid(str)) return false;
+        float duty = str2float(str);
+        DOUT_Duty(dout, duty);
+        break;
+    }
+  }
+  dout = *dout_list;
+  DBG_String("DOUT:");
+  DBG_Enter();
+  while(dout) {    
+    DBG_String("  ");
+    DOUT_Print(dout);
+    dout++;
+  }
+  return true;
 }
 
 //-------------------------------------------------------------------------------------------------

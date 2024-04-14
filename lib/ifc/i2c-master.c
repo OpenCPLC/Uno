@@ -5,7 +5,7 @@
 static inline void I2C_Master_ReadEV(I2C_Master_t *i2c)
 {
   i2c->busy = 0;
-  I2C_Master_Read(i2c, i2c->address, i2c->rx_location, i2c->size);
+  I2C_Master_JustRead(i2c, i2c->address, i2c->rx_location, i2c->size);
   i2c->size = 0;
 }
 
@@ -112,10 +112,12 @@ void I2C_Master_Init(I2C_Master_t *i2c)
 
 void I2C_Master_ReInit(I2C_Master_t *i2c)
 {
+  i2c->busy = true;
   i2c->reg->CR1 &= ~(I2C_CR1_PE);
   RCC_DisableI2C(i2c->reg);
   // TODO: Reset GPIO
   I2C_Master_Init(i2c);
+  i2c->busy = false;
 }
 
 //------------------------------------------------------------------------------------------------- BASIC
@@ -130,7 +132,7 @@ bool I2C_Master_IsFree(I2C_Master_t *i2c)
   return !(i2c->busy);
 }
 
-access_t I2C_Master_Write(I2C_Master_t *i2c, uint8_t addr, uint8_t *ary, uint16_t n)
+access_t I2C_Master_JustWrite(I2C_Master_t *i2c, uint8_t addr, uint8_t *ary, uint16_t n)
 {
 	if(i2c->busy) return BUSY;
   #if(I2C_DMA_TX)
@@ -150,7 +152,7 @@ access_t I2C_Master_Write(I2C_Master_t *i2c, uint8_t addr, uint8_t *ary, uint16_
   return FREE;
 }
 
-access_t I2C_Master_Read(I2C_Master_t *i2c, uint8_t addr, uint8_t *ary, uint16_t n)
+access_t I2C_Master_JustRead(I2C_Master_t *i2c, uint8_t addr, uint8_t *ary, uint16_t n)
 {
 	if(i2c->busy) return BUSY;
   #if(I2C_DMA_RX)
@@ -171,16 +173,16 @@ access_t I2C_Master_Read(I2C_Master_t *i2c, uint8_t addr, uint8_t *ary, uint16_t
 
 //-------------------------------------------------------------------------------------------------
 
-access_t I2C_Master_WriteSequence(I2C_Master_t *i2c, uint8_t addr, uint8_t reg, uint8_t *ary, uint16_t n)
+access_t I2C_Master_Write(I2C_Master_t *i2c, uint8_t addr, uint8_t reg, uint8_t *ary, uint16_t n)
 {
 	if(i2c->busy) return BUSY;
 	i2c->tx_buffer = aloc(n + 1);
   i2c->tx_buffer[0] = reg;
   memcpy(&i2c->tx_buffer[1], ary, n);
-  return I2C_Master_Write(i2c, addr, i2c->tx_buffer, n + 1);
+  return I2C_Master_JustRead(i2c, addr, i2c->tx_buffer, n + 1);
 }
 
-access_t I2C_Master_ReadSequence(I2C_Master_t *i2c, uint8_t addr, uint8_t reg, uint8_t *ary, uint16_t n)
+access_t I2C_Master_Read(I2C_Master_t *i2c, uint8_t addr, uint8_t reg, uint8_t *ary, uint16_t n)
 {
   if(i2c->busy) return BUSY;
   i2c->address = addr;
@@ -202,7 +204,7 @@ access_t I2C_Master_WriteRead(I2C_Master_t *i2c, uint8_t addr, uint8_t *write_ar
   i2c->address = addr;
   i2c->rx_location = read_ary;
   i2c->size = read_n;
-  return I2C_Master_Write(i2c, addr, write_ary, write_n);
+  return I2C_Master_JustRead(i2c, addr, write_ary, write_n);
 }
 
 //-------------------------------------------------------------------------------------------------

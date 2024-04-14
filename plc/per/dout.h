@@ -11,13 +11,38 @@
 #include "eeprom.h"
 #include "pwm.h"
 #include "vrts.h"
+#include "exstring.h"
+#include "main.h"
 
 //-------------------------------------------------------------------------------------------------
 
-#define DOUT_RELAY_DELAY 200
+#ifndef DOUT_RELAY_DELAY
+  #define DOUT_RELAY_DELAY 200
+#endif
+
+typedef enum {
+  DOUT_Hash_Dout = 2090192161,
+  DOUT_Hash_Set = 193505681,
+  DOUT_Hash_On = 5863682,
+  DOUT_Hash_Enable = 4218778540,
+  DOUT_Hash_Rst = 193505054,
+  DOUT_Hash_Reset = 273105544,
+  DOUT_Hash_Off = 193501344,
+  DOUT_Hash_Disable = 314893497,
+  DOUT_Hash_Tgl = 193506828,
+  DOUT_Hash_Toggle = 512249127,
+  DOUT_Hash_Sw = 5863823,
+  DOUT_Hash_Switch = 482686839,
+  DOUT_Hash_Pulse = 271301518,
+  DOUT_Hash_Impulse = 2630979716,
+  DOUT_Hash_Burst = 254705173,
+  DOUT_Hash_Duty = 2090198667,
+  DOUT_Hash_Fill = 2090257196
+} DOUT_Hash_e;
 
 typedef struct {
   bool relay;            // Czy wyjście jest przekaźnikowe RO
+  char *name;            // Nazwa wyświetlana podczas zapytań `bash`
   GPIO_t gpio;           // Wskaźnik na wyjście GPIO_t. Należy skonfigurować pola `port` i `pin`.
   PWM_t *pwm;            // Wskaźnik na kontroler PWM_t.
   TIM_Channel_e channel; // Kanał kontrolera PWM_t sterujący 
@@ -43,6 +68,10 @@ float DOUT_GetDuty(DOUT_t *dout);
 void DOUT_Init(DOUT_t *dout);
 void DOUT_Loop(DOUT_t *dout);
 void DOUT_Settings(DOUT_t *dout, bool save);
+
+void DOUT_Print(DOUT_t *dout);
+void DOUT_BashInit(DOUT_t *douts[]);
+bool DOUT_Bash(char **argv, uint16_t argc);
 
 //-------------------------------------------------------------------------------------------------
 #endif

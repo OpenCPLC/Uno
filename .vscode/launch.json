@@ -15,16 +15,16 @@
     {
       "name": "Debug",
       "cwd": "${workspaceRoot}",
-      "executable": "./build/vrts-project.elf",
+      "executable": "./build/uno.elf",
       "request": "launch",
       "type": "cortex-debug",
       "servertype": "openocd",
-      "device": "STM32G081RB",
+      "device": "STM32G0C1RE",
       "configFiles": [
         "interface/stlink.cfg",
         "target/stm32g0x.cfg"
       ],
-      "svdFile": "./inc/ST/stm32g081.svd",
+      "svdFile": "./inc/ST/stm32g0C1.svd",
       "preLaunchTask": "make"
     }
   ]

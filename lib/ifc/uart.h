@@ -68,8 +68,6 @@ typedef struct {
   DMA_Channel_TypeDef *_tx_dma;
   DMAMUX_Channel_TypeDef *_tx_dmamux;
   uint8_t prefix;
-  volatile bool _todo_dma;
-  volatile bool _todo_tc;
   bool _busy_tx;
   bool _busy_tc;
 } UART_t;

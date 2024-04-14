@@ -7,7 +7,7 @@ static void UART_InterruptDMA(UART_t *uart)
   if(DMA1->ISR & (2 << (4 * (uart->dma_channel - 1)))) {
     DMA1->IFCR |= (2 << (4 * (uart->dma_channel - 1)));
     uart->reg->CR1 |= USART_CR1_TCIE;
-    uart->_todo_dma = true;
+    uart->_busy_tx = false;
   }
 }
 
@@ -23,7 +23,7 @@ static void UART_InterruptEV(UART_t *uart)
   if((uart->reg->CR1 & USART_CR1_TCIE) && (uart->reg->ISR & USART_ISR_TC)) {
     uart->reg->CR1 &= ~USART_CR1_TCIE;
     uart->reg->ICR |= USART_ICR_TCCF;
-    uart->_todo_tc = true;
+    uart->_busy_tc = false;
   }
   if(uart->reg->ISR & USART_ISR_RTOF) {
     uart->reg->ICR |= USART_ICR_RTOCF;

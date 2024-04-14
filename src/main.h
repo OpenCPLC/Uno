@@ -4,3 +4,4 @@
  */
 
 #define VRTS_SWITCHING 1
+#define SYS_CLOCK_MHZ 16

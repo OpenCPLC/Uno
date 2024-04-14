@@ -9,20 +9,24 @@
   #define BASH_FILE_LIMIT 12
 #endif
 
+#ifndef BASH_FILE_CALLBACK
+  #define BASH_FILE_CALLBACK 12
+#endif
+
 #ifndef BASH_DBG
   #define BASH_DBG 1
 #endif
 
 #ifndef BASH_RTC
-  #define BASH_RTC 0
+  #define BASH_RTC 1
 #endif
 
 //-------------------------------------------------------------------------------------------------
 
 void BASH_AddFile(FILE_t *file);
-void BASH_SetCallback(void (*callback)(char **, uint16_t));
+void BASH_AddCallback(bool (*callback)(char **, uint16_t));
 void BASH_SetFlashAutosave(void (*callback)(char **, uint16_t));
-uint8_t BASH_Loop(STREAM_t *stream);
+bool BASH_Loop(STREAM_t *stream);
 
 //-------------------------------------------------------------------------------------------------
 #endif

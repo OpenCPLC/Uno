@@ -23,8 +23,8 @@ const uint8_t RTC_DAYS_IN_MONTH[2][12] = {
 };
 
 const uint32_t alarm_mask[2] = { RTC_CR_ALRAE, RTC_CR_ALRBE };
-const char *rtc_weak_day_string[8] = { "\0", "Mon\0", "Tue\0", "Wed\0", "Thu\0", "Fri\0", "Sat\0", "Sun\0" };
-// const char *rtc_weak_day_string[8] = { "\0", "Monday\0", "Tuesday\0", "Wednesday\0", "Thursday\0", "Friday\0", "Saturday\0", "Sunday\0" };
+const char *rtc_weak_day_string[8] = { "", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+// const char *rtc_weak_day_string[8] = { "", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
 const RTC_Datetime_t rtc_datetime_empty = {0, 0, 0, 0, 0, 0, 0, 0};
 bool rtc_ready;
 

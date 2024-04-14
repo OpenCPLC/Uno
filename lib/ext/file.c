@@ -189,9 +189,9 @@ status_t FILE_Date(FILE_t *file, RTC_Datetime_t *datetime)
 {
   if(FILE_String(file, "20")) return ERR;
   if(FILE_Int(file, datetime->year, 10, false, 2, 2)) return ERR;
-  if(FILE_Char(file, '-')) return 1;
+  if(FILE_Char(file, '-')) return ERR;
   if(FILE_Int(file, datetime->month, 10, false, 2, 2)) return ERR;
-  if(FILE_Char(file, '-')) return 1;
+  if(FILE_Char(file, '-')) return ERR;
   if(FILE_Int(file, datetime->month_day, 10, false, 2, 2)) return ERR;
   return OK;
 }
@@ -199,9 +199,9 @@ status_t FILE_Date(FILE_t *file, RTC_Datetime_t *datetime)
 status_t FILE_Time(FILE_t *file, RTC_Datetime_t *datetime)
 {
   if(FILE_Int(file, datetime->hour, 10, false, 2, 2)) return ERR;
-  if(FILE_Char(file, ':')) return 1;
+  if(FILE_Char(file, ':')) return ERR;
   if(FILE_Int(file, datetime->minute, 10, false, 2, 2)) return ERR;
-  if(FILE_Char(file, ':')) return 1;
+  if(FILE_Char(file, ':')) return ERR;
   if(FILE_Int(file, datetime->second, 10, false, 2, 2)) return ERR;
   return OK;
 }

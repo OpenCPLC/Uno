@@ -2,22 +2,27 @@
 
 ### Wyjścia cyfrowe
 
-Ustawianie stanu diody informacyjnej `INFO`
+Do informowania urzytkownika o statisie urządzenia oraz
+wskazywaniu na błędy 
+
+
+
+Ustawianie stanu diody informacyjnej
 
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 void loop(void)
 {
   while(1) {
-    INFO_Set(RGB_Red);
+    LED_Set(RGB_Red);
     delay(1000);
-    INFO_Set(RGB_Green);
+    LED_Set(RGB_Green);
     delay(1000);
-    INFO_Set(RGB_Blue);
+    LED_Set(RGB_Blue);
     delay(1000);
   }
 }
@@ -25,20 +30,20 @@ void loop(void)
 int main(void)
 {
   PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
 }
 ```
 
-Miganie diodą informacyjną `INFO`
+Miganie diodą informacyjną
 
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 void loop(void)
 {
@@ -46,11 +51,11 @@ void loop(void)
   while(1) {
     if(blink) INFO_Blink_ON(200);
     else INFO_Blink_OFF();
-    INFO_Set(RGB_Red);
+    LED_Set(RGB_Red);
     delay(3000);
-    INFO_Set(RGB_Green);
+    LED_Set(RGB_Green);
     delay(3000);
-    INFO_Set(RGB_Blue);
+    LED_Set(RGB_Blue);
     delay(3000);
     blink = !blink;
   }
@@ -59,7 +64,7 @@ void loop(void)
 int main(void)
 {
   PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
@@ -71,27 +76,26 @@ Włączanie / wyłącznie wyjścia
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
-
-int main(void)
-{
-  PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
-  thread(&loop, stack_loop, sizeof(stack_loop));
-  VRTS_Init();
-  while(1);
-}
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 void loop(void)
 {
   while(1) {
     DOUT_Set(&RO1);
-    delay(1000);
+    delay(3000);
     DOUT_Rst(&RO1);
-    delay(1000);
-    //
+    delay(3000);
   }
+}
+
+int main(void)
+{
+  PLC_Init();
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
 }
 ```
 
@@ -100,13 +104,13 @@ Ten sam efekt możemy uzyskać zmieniając stan wyjścia
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 int main(void)
 {
   PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
@@ -126,13 +130,13 @@ Jak również stosując zmienną pomocniczą
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 int main(void)
 {
   PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
@@ -154,13 +158,13 @@ Pulse
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 int main(void)
 {
   PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
@@ -183,13 +187,13 @@ Płynna regulacja mocą
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 int main(void)
 {
   PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
@@ -217,15 +221,15 @@ Detekcja stanu wyjścia oraz czasy tin tout
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 int main(void)
 {
   DI1.gpif.ton_ms = 100;
   DI1.gpif.toff_ms = 500;
   PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
@@ -252,15 +256,15 @@ Detekcja zbocza
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 int main(void)
 {
   DI1.gpif.ton_ms = 100;
   DI1.gpif.toff_ms = 500;
   PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
@@ -286,14 +290,14 @@ Detekcja zmiany stanu
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 int main(void)
 {
   DI1.gpif.toggle_ms = 2000;
   PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
@@ -317,8 +321,8 @@ Obsługa przycisku
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[64];
-static uint32_t stack_loop[64];
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 void loop(void)
 {
@@ -327,7 +331,7 @@ void loop(void)
     if(DIN_Fall(&BTN)) {
       color++;
       if(color > RGB_END_COLOR) color = RGB_Off;
-      INFO_Set(color);
+      LED_Set(color);
     }
     let();
   }
@@ -336,7 +340,7 @@ void loop(void)
 int main(void)
 {
   PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);

@@ -1,4 +1,4 @@
-TARGET = vrts-project
+TARGET = uno
 
 DEBUG = 1
 
@@ -39,9 +39,9 @@ CPU = -mcpu=cortex-m0plus
 # MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 MCU = $(CPU) -mthumb
 
-AS_DEFS = -DSTM32G081xx
+AS_DEFS = -DSTM32G0C1xx
 
-C_DEFS = -DSTM32G081xx
+C_DEFS = -DSTM32G0C1xx
 
 ASM_INCLUDES =
 

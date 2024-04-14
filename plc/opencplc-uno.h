@@ -9,6 +9,11 @@
 #include "bash.h"
 #include "rgb.h"
 #include "vrts.h"
+#include "i2c-master.h"
+
+#ifndef PLC_BOOTLOADER
+  #define PLC_BOOTLOADER 0
+#endif
 
 // Wyjścia cyfrowe przekaźnikowse (RO)
 extern DOUT_t RO1;
@@ -41,21 +46,23 @@ extern AIN_t AI2;
 // Functions
 void PLC_Init(void);
 void PLC_Loop(void);
+void PLC_Thread(void);
 
 #ifndef PLC_RS485_BUFFER_SIZE
   #define PLC_RS485_BUFFER_SIZE 1000
 #endif
 
+// RS485
 extern UART_t RS1;
 extern UART_t RS2;
+
+// I2C
+bool I2C_Read(uint8_t addr, uint8_t reg, uint8_t *ary, uint16_t n);
+bool I2C_Write(uint8_t addr, uint8_t reg, uint8_t *ary, uint16_t n);
 
 // Dioda RGB i przycisk BTN
 extern RGB_t RGB;
 extern DIN_t BTN;
-void INFO_Set(RGB_e color);
-void INFO_Rst(void);
-void INFO_Blink_ON(uint16_t ms);
-void INFO_Blink_OFF(void);
 
 //---------------------------------------------------------------------------------------------------------------------
 

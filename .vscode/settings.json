@@ -4,6 +4,5 @@
   },
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  "editor.mouseWheelZoom": true,
-  "C_Cpp.errorSquiggles": "disabled"
+  "editor.mouseWheelZoom": true
 }

@@ -248,25 +248,26 @@ Podczas kompilacji tworzy się folde `build`, a w nim plik o nazwie projektu z r
 W procesie tworzenia i testowania oprogramowania kluczową rolę odgrywa etap debugowania, który polega na identyfikowaniu, lokalizowaniu i eliminowaniu błędów w kodzie źródłowym. W tym celu przygotowano zestaw funkcji `DBG`, które wykorzystują interfejs UART do wypisywania zmiennych różnych typów. To rozwiązanie jest zdecydowanie bardziej efektywne od korzystania z implementacji funkcji `sprintf`.
 
 ```c
-#include "uno.h"
+#include "opencplc-uno.h"
 
 int main(void)
 {
   PLC_Init();
   while(1) {
     char *text = "text";
-    DBG_String("DBG string "); DBG_String(text); DBG_Enter();
-    DBG_String("DBG char "); DBG_Char('$'); DBG_Enter();
+    DBG_String("String "); DBG_String(text); DBG_Enter();
+    DBG_String("Char   "); DBG_Char('$'); DBG_Enter();
     uint8_t array[] = { 49, 50, 51 };
-    DBG_String("DBG array "); DBG_Array(array, sizeof(array)); DBG_Enter();
-    DBG_String("DBG udec "); DBG_Dec(-69); DBG_Enter();
-    DBG_String("DBG dec "); DBG_uDec(46); DBG_Enter();
-    DBG_String("DBG float "); DBG_Float(21.37, 2); DBG_Enter();
-    DBG_String("DBG hex "); DBG_Hex8(0xF1); DBG_Enter();
-    DBG_String("DBG bin "); DBG_Bin8(0b11001010); DBG_Enter();
-    DBG_String("DBG now "); DBG_Now();
+    DBG_String("Array  "); DBG_Array(array, sizeof(array)); DBG_Enter();
+    DBG_String("uDec   "); DBG_Dec(-69); DBG_Enter();
+    DBG_String("Dec    "); DBG_uDec(48); DBG_Enter();
+    DBG_String("Float  "); DBG_Float(21.37, 2); DBG_Enter();
+    DBG_String("Hex    0x"); DBG_Hex8(0x6D); DBG_Enter();
+    DBG_String("Bin    0b"); DBG_Bin8(0b11001010); DBG_Enter();
+    DBG_String("Now    "); DBG_Now(); DBG_Enter();
+    DBG_Enter();
     PLC_Loop();
-    delay(seconds(2));
+    delay(1000);
   }
 }
 ```
@@ -275,11 +276,11 @@ Wiadomości, które tworzymy, są wysyłane do komputera za pomocą `UART`'a wbu
 
 ## 🧵 Multi-thread [➥](#-content)
 
-Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrym praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności. Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako **master** wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia **slave**, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami.
+Podczas implementacji operacji/funkcji blokujących w projekcie, czyli tych, gdzie rozpoczynamy pewne zadanie i oczekujemy na jego zakończenie, korzystanie z programowania wielowątkowego jest dobrą praktyką. W projekcie został zaimplementowany system zwalnia wątków [**VRTS**](https://github.com/Xaeian/VRTS). Pozwala to na tworzenie czytelnego kodu, gdzie w każdym wątku możemy obsłużyć różne funkcjonalności. Taką funkcjonalnością może być obsługa komunikacji **RS485**, gdzie jako master wysyłamy ramkę nadawczą, oczekujemy na odpowiedź urządzenia slave, a następnie analizujemy ją. Warto, aby w trakcie oczekiwania procesor zajmował się innymi zadaniami.
 
-Aby lepiej to zobrazować, do [przykładu start-stop](#system-start-stop-ansi-c-mapowanie-z-użyciem-wskaźników) dodajmy miganie lampką, podłączoną do wyjścia `TO1`, gdy silnik pracuje. W głównej funkcji `main` zainicjujemy peryferia sterownika za pomocą `PLC_Init` oraz włączymy zegar systemowy `SYSTICK_Init` o bazie czasowej `10ms`. Następnie przekazujemy funkcje dla trzech wątków:
+Aby lepiej to zobrazować, do [przykładu start-stop](#system-start-stop-ansi-c-mapowanie-z-użyciem-wskaźników) dodajmy miganie lampką, podłączoną do wyjścia `TO1`, gdy silnik pracuje. W głównej funkcji `main` zainicjujemy peryferia sterownika za pomocą `PLC_Init`. Następnie przekazujemy funkcje dla trzech wątków:
 
-- `PLC_Loop` - główna pętla sterownika,
+- `PLC_Thread` - główna pętla sterownika,
 - `start_stop` - pętla obsługująca funkcję start-stop,
 - `blinking` - pętla odpowiedzialna za miganie lampki.
 
@@ -295,8 +296,7 @@ static uint32_t stack3[64];
 int main(void)
 {
   PLC_Init();
-  SYSTICK_Init(10);
-  thread(&PLC_Loop, stack1, sizeof(stack1));
+  thread(&PLC_Thread, stack1, sizeof(stack1));
   thread(&start_stop, stack2, sizeof(stack2));
   thread(&blinking, stack3, sizeof(stack3));
   VRTS_Init();
@@ -343,3 +343,5 @@ Podczas korzystania z VRTS należy uwzględnić dwie istotne kwestie:
 
 - Każdy wątek musi zawierać co najmniej jedną funkcję zwalniającą, taką jak `let` czy `delay`. W przeciwnym razie wątek zajmie rdzeń na stałe i uniemożliwi innym wątkom pracę.
 - Każdy wątek musi być wyposażony w nieskończoną pętlę, która zapobiegnie opuszczeniu funkcji wątku. Tak jak robi się to w funkcji głownej `main`.
+
+Gdy zdecydujemy się nie korzystać z wielowątkowości _(np. ramach testów pojedyńczego wątku)_ trzeba, w pliku [`main.h`](./src/mem.ld), ustawić definicję `VRTS_SWITCHING` na `0`

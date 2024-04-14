@@ -1,7 +1,7 @@
 {
   "configurations": [
     {
-      "name": "vrts-project",
+      "name": "uno",
       "includePath": [
         "${workspaceFolder}/**"
       ],
@@ -9,7 +9,7 @@
         "_DEBUG",
         "UNICODE",
         "_UNICODE",
-        "STM32G081xx"
+        "STM32G0C1xx"
       ],
       "cStandard": "c11",
       "cppStandard": "c++17",

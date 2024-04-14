@@ -8,7 +8,7 @@
 uint16_t new_size;
 
 void *aloc_var[ALOC_COUNT_LIMIT];
-uint16_t aloc_size[ALOC_COUNT_LIMIT];\
+uint16_t aloc_size[ALOC_COUNT_LIMIT];
 
 //-------------------------------------------------------------------------------------------------
 
@@ -22,6 +22,8 @@ void *new_static(size_t size)
 void NEW_Init(uint8_t thread_nbr)
 {
   NEW_t *new_stack = new_static(sizeof(NEW_t));
+  new_stack->count = 0;
+  new_stack->size = 0;
   new_stacks[thread_nbr] = new_stack;
 }
 #endif

@@ -2,6 +2,7 @@
 #define RGB_H_
 
 #include "gpio.h"
+#include "exstring.h"
 
 //-------------------------------------------------------------------------------------------------
 
@@ -34,6 +35,27 @@ void RGB_Rst(RGB_t *rgb);
 void RGB_Tgl(RGB_t *rgb);
 void RGB_Loop(RGB_t *rgb);
 
-//-------------------------------------------------------------------------------------------------
+typedef enum {
+  RGB_Hash_Led = 193498042,
+  RGB_Hash_Rgb = 193504640,
+  RGB_Hash_Blink = 254371765,
+  RGB_Hash_On = 5863682,
+  RGB_Hash_Off = 193501344,
+  RGB_Hash_Red = 193504576,
+  RGB_Hash_Green = 260512342,
+  RGB_Hash_Blue = 2090117005,
+  RGB_Hash_Yellow = 696252129,
+  RGB_Hash_Cyan = 2090166448,
+  RGB_Hash_Magenta = 3021013506,
+  RGB_Hash_White = 279132550
+} RGB_Hash_e;
 
+void LED_Focus(RGB_t *rgb);
+void LED_Set(RGB_e color);
+void LED_Rst(void);
+void LED_Blink_ON(uint16_t ms);
+void LED_Blink_OFF(void);
+bool LED_Bash(char **argv, uint16_t argc);
+
+//-------------------------------------------------------------------------------------------------
 #endif

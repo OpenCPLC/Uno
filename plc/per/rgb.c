@@ -1,8 +1,8 @@
 #include "rgb.h"
-
-//-------------------------------------------------------------------------------------------------
+#include "dbg.h"
 
 const char *rgb_color_name[] = { "off", "red", "green", "blue", "yellow", "cyan", "magenta", "white" };
+RGB_t *rgb_focus;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -12,8 +12,6 @@ static void RGB_SetGreen(RGB_t *rgb) { if(rgb->green) GPIO_Set(rgb->green); }
 static void RGB_RstGreen(RGB_t *rgb) { if(rgb->green) GPIO_Rst(rgb->green); }
 static void RGB_SetBlue(RGB_t *rgb) { if(rgb->blue) GPIO_Set(rgb->blue); }
 static void RGB_RstBlue(RGB_t *rgb) { if(rgb->blue) GPIO_Rst(rgb->blue); }
-
-//-------------------------------------------------------------------------------------------------
 
 void RGB_Init(RGB_t *rgb)
 {
@@ -30,9 +28,8 @@ void RGB_Init(RGB_t *rgb)
     GPIO_Init(rgb->blue);
   }
   RGB_Set(rgb, rgb->state);
+  rgb_focus = rgb;
 }
-
-//-------------------------------------------------------------------------------------------------
 
 static void RGB_Preset(RGB_t *rgb, RGB_e color)
 {
@@ -77,6 +74,77 @@ void RGB_Loop(RGB_t *rgb)
       rgb->tick = gettick(rgb->blink_ms);
     }
   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void LED_Focus(RGB_t *rgb)
+{
+  rgb_focus = rgb;
+}
+
+void LED_Set(RGB_e color)
+{
+  if(!rgb_focus) return;
+  RGB_Set(rgb_focus, color);
+}
+
+void LED_Rst(void)
+{
+  LED_Set(RGB_Off);
+}
+
+void LED_Blink_ON(uint16_t ms)
+{
+  if(!rgb_focus) return;
+  rgb_focus->blink_ms = ms;
+}
+
+void LED_Blink_OFF(void)
+{
+  if(!rgb_focus) return;
+  rgb_focus->blink_ms = 0;
+  LED_Set(rgb_focus->state);
+}
+
+bool LED_Bash(char **argv, uint16_t argc)
+{
+  if(!rgb_focus) return false;
+  RGB_Hash_e sw = hash(argv[0]);
+  if(sw != RGB_Hash_Rgb && sw != RGB_Hash_Led) return false;
+  if(argc > 1) {
+    switch(hash(argv[1])) {
+      case RGB_Hash_Blink:
+        if(argc > 2) {
+          sw = hash(argv[2]);
+          if(sw == RGB_Hash_On && argc == 4) {
+            char *str = argv[3];
+            bool ok = str2nbr_valid(str);
+            if(!ok) return false;
+            uint16_t blink_ms = str2nbr(str);
+            LED_Blink_ON(blink_ms);
+          }
+          else if(sw == RGB_Hash_Off && argc == 3) {
+            LED_Blink_OFF();
+          }
+        }
+        break;
+      case RGB_Hash_Off: LED_Set(RGB_Off); break;
+      case RGB_Hash_Red: LED_Set(RGB_Red); break;
+      case RGB_Hash_Green: LED_Set(RGB_Green); break;
+      case RGB_Hash_Blue: LED_Set(RGB_Blue); break;
+      case RGB_Hash_Yellow: LED_Set(RGB_Yellow); break;
+      case RGB_Hash_Cyan: LED_Set(RGB_Cyan); break;
+      case RGB_Hash_Magenta: LED_Set(RGB_Magenta); break;
+      case RGB_Hash_White: LED_Set(RGB_White); break;
+    }
+  }
+  DBG_String("RGB "); DBG_String((char *)rgb_color_name[rgb_focus->state]);
+  if(rgb_focus->state && rgb_focus->blink_ms) {
+    DBG_String(" blink:"); DBG_uDec(rgb_focus->blink_ms); DBG_String("ms"); 
+  }
+  DBG_Enter();
+  return true;
 }
 
 //-------------------------------------------------------------------------------------------------
