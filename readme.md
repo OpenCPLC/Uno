@@ -7,9 +7,9 @@
 - 🐞 [Programing-debugging](#-programing-debugging-) - Programowanie i debugowanie
 - 🧵 [Multi-thread](#-multi-thread-) - Programowanie wielowątkowe
 - 🧩 Examples - Przykłady _(not ready yet)_
-    - 1\. [General IO](./doc/io.md) - 🕹️ Wyjścia i wejścia
-    - 2\. [Communication](./doc/com.md) - 🔗 Komunikacja RS485 i I2C
-    - 3\. [Time & Utils](./doc/time.md) - ⌚ Zarządzanie czasem i przydatne funkcje
+    - 1\. [General IO](./doc/guide-io.md) - 🕹️ Wyjścia i wejścia
+    - 2\. [Communication](./doc/guide-com.md) - 🔗 Komunikacja RS485 i I2C
+    - 3\. [Time & Utils](./doc/guide-time.md) - ⌚ Zarządzanie czasem i przydatne funkcje
 
 # 👋 OpenCPLC
 
@@ -131,7 +131,6 @@ int main(void)
 ```
 
 #### System start-stop ANSI C _(mapowanie z użyciem wskaźników)_
-
 ```c
 #import "opencplc-uno.h"
 
@@ -179,29 +178,8 @@ Poza samym VSCode _(który póki co jest po prostu zaawansowanym edytorem tekstu
 | ------------------------ | --------------------------------- |
 | ![Ext-C](/img/ext-c.png) | ![Cortex-Debug](/img/ext-dbg.png) |
 
-Do pracy ze sterownikami OpenCPLC wymagany jest również zestaw bardziej specjalistycznych narzędzi, identyczny z tym używanym do pracy z mikrokontrolerami **STM32**. W skład tego zestawu wchodzą:
+Najkrótszą drogą do uruchomienia pierwszego projektu jest uruchomienie aplikacji 🔮`wizard.exe`. Zainstaluje ona GNU Arm Embedded Toolchain, OpenOCD, Make oraz ustawi odpowiednio zmienne systemowe, a także stworzy pliki konfiguracyjne dla projektu. Jeżeli nie chcemy, aby ktoś grzebał w naszym systemie, możemy przygotować sobie [konfiguracje systomową ręcznie](./doc/custom-env.md). Niemniej, 🪄`wizard.exe` może okazać się pomocny, gdy będziemy chcieli, aby nowo dodane pliki zostały dołączone do projektu lub zmienić jego nazwę. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator, podając nazwę projektu `-n`. _(oczywiście, nazwę należy wprowadzić bez nawiasów `[]`)_
 
-- Pakiet narzędzi [**GNU Arm Embedded Toolchain**](https://developer.arm.com/downloads/-/gnu-rm): Obejmuje on między innymi kompilator.
-- On-Chip Debugger: [**OpenOCD** ](https://gnutoolchains.com/arm-eabi/openocd/) Umożliwia komunikację z mikrokontrolerem za pomocą programatora ST-Link.
-- Narzędzia do zarządzania procesem kompilacji programów, jakim jest [**Make**](https://www.gnu.org/software/make/)
-
-Aby zainstalować **Make**, można skorzystać z menedżera pakietów [**Chocolatey**](https://chocolatey.org/), który umożliwia prostą instalację wymaganych komponentów. Wystarczy otworzyć **PowerShell** jako 🛡️administrator i wywołać komendy:
-
-```
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-choco install make
-```
-
-Instalacja **Make** automatycznie utworzy zmienną systemową, jednak w przypadku pozostałych programów konieczne będzie ręczne ich utworzenie.
-
-🪟 `Win` + `R` » `sysdm.cpl` » Advanced » **Environment Variables**
-
-- ARMGCC → `C:\OpenCPLC\ArmGCC\bin`
-- Path » `%ARMGCC%` oraz `C:\OpenCPLC\OpenOCD\bin`
-
-![Env](/img/env.png)
-
-Gdy zmienne systemowe to dla nas czarna magia to możemy zdać się na dołączone do projektu narzędzie 🔮`wizard.exe`🪄. Pozwoli ono zainstalować GNU Arm Embedded Toolchain, OpenOCD oraz Make, jeżeli tego nie zrobiliśmy ręcznie. Ustawi odpowiednio zmienne systemowe oraz stworzy pliki konfiguracyjne dla projektu. Trzeba tylko otworzyć konsolę w miejscu z projektem oraz wywołać skrypt za jej pomocą jako 🛡️administrator podając nazwę projektu `-n`. _(oczywiście nazwę należy wprowadzić bez nawiasów `[]`)_
 
 ```bash
 ./wizard.exe -n [naza-projektu]
@@ -229,7 +207,7 @@ Aby zacząć programować mikrokontroler na płytce sterownika, trzeba podłącz
 
 ![Stlink](./img/uno-stlink.png)
 
-Konieczna może okazać się instalacja [steronnika do programatora](https://www.st.com/en/development-tools/stsw-link009.html).
+Konieczna może okazać się instalacja [sterownika do programatora](https://www.st.com/en/development-tools/stsw-link009.html).
 
 Gdy przeszliśmy kroki opisane w [rozdziale wyżej](#%EF%B8%8F-essential-tools-) to wszystko jest gotowe do pracy. Kompilacja i programowanie odbywa się przy użyciu komendy **`make`**
 
@@ -272,7 +250,7 @@ int main(void)
 }
 ```
 
-Wiadomości, które tworzymy, są wysyłane do komputera za pomocą `UART`'a wbudowanego w programator. Z poziomu komputera będą widziane jako **serial port** _(`COM` na systemie Windows)_. Wiadomości możemy odebrać za pomocą dowolnego terminala obsługującego komunikację szeregową, takiego jak [Realterm](https://realterm.sourceforge.io/). Należy ustawić prędkość na **115200**bps, używając 8 bitów danych, 1 bitu stopu bez kontroli parzystości.
+Wiadomości, które tworzymy, są wysyłane do komputera za pomocą `UART`'a wbudowanego w programator. Z poziomu komputera będą widziane jako **serial port** _(`COM` na systemie Windows)_. Wiadomości możemy odebrać za pomocą dowolnego terminala obsługującego komunikację szeregową, takiego jak [Realterm](https://realterm.sourceforge.io/) - _[download](https://sqrt.pl/doc/Realterm-3.0.1.45.exe)_. Należy ustawić prędkość na **115200**bps, używając 8 bitów danych, 1 bitu stopu bez kontroli parzystości.
 
 ## 🧵 Multi-thread [➥](#-content)
 

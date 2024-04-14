@@ -49,8 +49,8 @@ void loop(void)
 {
   bool blink = true;
   while(1) {
-    if(blink) INFO_Blink_ON(200);
-    else INFO_Blink_OFF();
+    if(blink) LED_Blink_ON(200);
+    else LED_Blink_OFF();
     LED_Set(RGB_Red);
     delay(3000);
     LED_Set(RGB_Green);
