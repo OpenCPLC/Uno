@@ -1,75 +1,99 @@
 # 🕹️ General IO [➥](../readme.md)
 
-### Wyjścia cyfrowe
-
-Do informowania urzytkownika o statisie urządzenia oraz
-wskazywaniu na błędy 
-
-
-
-Ustawianie stanu diody informacyjnej
+W przykładach zostanie przedstawiona tylko obsługa pętli `loop`, pomijając `#include`, deklaracje stosów pamięci `stack` oraz funkcji `main`, która inicjuje wątki, ponieważ w każdym z przykładów te fragmenty będą identyczne.
 
 ```c
+// Import podstawowych funkcji sterownika.
 #include "opencplc-uno.h"
 
+// Stos pamięci dla wątku PLC
 static uint32_t stack_plc[256];
+// Stos pamięci dla funkcji loop
 static uint32_t stack_loop[256];
 
 void loop(void)
 {
-  while(1) {
-    LED_Set(RGB_Red);
-    delay(1000);
-    LED_Set(RGB_Green);
-    delay(1000);
-    LED_Set(RGB_Blue);
-    delay(1000);
-  }
+  // TODO: Przykład
 }
 
 int main(void)
 {
-  PLC_Init();
+  // Inicjacja sterownika
+  PLC_Init(); 
+  // Dodanie wątku sterownika
   thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
+  // Dodanie funkcji loop jako wątek
   thread(&loop, stack_loop, sizeof(stack_loop));
+  // Włączenie systemy przełączania wątków VRTS
   VRTS_Init();
+  // W to miejsce program nigdy nie powinien dojść
   while(1);
 }
 ```
 
-Miganie diodą informacyjną
+### Wyjścia cyfrowe
+
+W pierwszych krokach zwarto uruchomić program, który nie wymaga podłączania żadnych urządzeń zewnętrznych. [Programem takim jest sterowanie diodą **LED**](example/io-dout-led.c). Może ona informować użytkownika o stanie urządzenia oraz występujących błędach. Wywołując funkcję `LED_Set`, należy przekazać kolor, który chcemy ustawić _(`RGB_Red`, `RGB_Green`, `RGB_Blue`, `RGB_Yellow`, `RGB_Cyan`, `RGB_Magenta`,  `RGB_White`)_. Funkcją `LED_Rst` wyłączamy diodę.
 
 ```c
-#include "opencplc-uno.h"
-
-static uint32_t stack_plc[256];
-static uint32_t stack_loop[256];
-
 void loop(void)
 {
+  while(1) {
+    // Ustawienie diody informacyjnej, aby świeciła na czerwono
+    LED_Set(RGB_Red);
+    delay(1000); // Odczekaj 1s
+    // Ustawienie diody informacyjnej, aby świeciła na zielono
+    LED_Set(RGB_Green);
+    delay(1000); // Odczekaj 1s
+    // Ustawienie diody informacyjnej, aby świeciła na niebiesko
+    LED_Set(RGB_Blue);
+    delay(1000); // Odczekaj 1s
+    // Wyłącz diodę
+    LED_Rst();
+    delay(1000); // Odczekaj 1s
+  }
+}
+```
+
+Ponieważ oko ludzkie lepiej reaguje na zmiany obrazu, popularną praktyką jest [miganie lampkami informacyjnymi](example/io-dout-blink.c), co pozwala lepiej zwrócić uwagę na ewentualne błędy. Miganie można aktywować za pomocą funkcji `LED_Blink_ON`, przekazując czas w **ms** między zmianami stanu diody. Miganie można w każdej chwili wyłączyć za pomocą funkcji `LED_Blink_OFF`.
+
+
+```c
+void loop(void)
+{
+  // Zmienna pomocnicza przechowująca stan, określająca czy dioda ma migać
+  // dla wartości `true`, czy świecić ciągłym światłem dla wartości `false`.
   bool blink = true;
   while(1) {
-    if(blink) LED_Blink_ON(200);
-    else LED_Blink_OFF();
+    if(blink) {
+      // Włączenie migania z częstotliwością zmiany stanu diody wynoszącą 200ms
+      LED_Blink_ON(200); 
+    }
+    else {
+      // Wyłączenie migania diody (dioda będzie świecić ciągłym światłem)
+      LED_Blink_OFF();
+    }
+    // Ustawienie diody informacyjnej, na kolor czerwony
     LED_Set(RGB_Red);
-    delay(3000);
+    delay(3000); // Odczekaj 3s
+    // Ustawienie diody informacyjnej, na kolor zielony
     LED_Set(RGB_Green);
-    delay(3000);
+    delay(3000); // Odczekaj 3s
+    // Ustawienie diody informacyjnej, na kolor niebieski
     LED_Set(RGB_Blue);
-    delay(3000);
+    delay(3000); // Odczekaj 3s  
+    // Zmiana trybu z migania na świecenie i odwrotnie
     blink = !blink;
   }
 }
-
-int main(void)
-{
-  PLC_Init();
-  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
-  thread(&loop, stack_loop, sizeof(stack_loop));
-  VRTS_Init();
-  while(1);
-}
 ```
+
+Wyjścia przekażnikowe
+
+Wyjścia tranzystorowe sterują napięciem takim samym, jakie jest dostarczone do zasilania płytki.
+
+
+
 
 Włączanie / wyłącznie wyjścia
 
@@ -216,7 +240,14 @@ void loop(void)
 
 ### Wejścia cyfrowe **`DI`**
 
-Detekcja stanu wyjścia oraz czasy tin tout
+Wejścia cyfrowe nieco odbiegają od standardów automatyki, umożliwiając traktowanie sygnału **12V** jako logicznej `1`. Głównie w celu obsługi pojazdów przemysłowych, takich jak podnośniki, koparki i dźwigi.
+
+| Standard   | logiczne `0` |  stan nieustalony  | logincza `1`  |
+| :--------- | :----------- | :----------------- | :------------ |
+| Automatyka | poniżej `5V` | od `5VDC` do `15V` | powyżej `15V` |
+| OpenCPLC   | poniżej `4V` | od `4VDC` do `9V`  | powyżej `9V`  |
+
+Podstawową funkcją, która informuje nas o stanie wyjścia, jest `DIN_State`. Zwraca wartość `1`|`true`, jeśli sygnał występuje, oraz wartość `0`|`false`, jeśli nie występuje.
 
 ```c
 #include "opencplc-uno.h"
@@ -224,16 +255,41 @@ Detekcja stanu wyjścia oraz czasy tin tout
 static uint32_t stack_plc[256];
 static uint32_t stack_loop[256];
 
+void loop(void)
+{
+  while(1) {
+    if(DIN_State(&DI1)) {
+      DOUT_Set(&RO1);
+    }
+    else {
+      DOUT_Rst(&RO1);
+    }
+  }
+}
+
 int main(void)
 {
-  DI1.gpif.ton_ms = 100;
-  DI1.gpif.toff_ms = 500;
   PLC_Init();
   thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
   thread(&loop, stack_loop, sizeof(stack_loop));
   VRTS_Init();
   while(1);
 }
+```
+
+Jednak w praktyce 
+
+
+
+<!-- Poza tym odstępstwem  -->
+
+Detekcja stanu wyjścia oraz czasy tin tout
+
+```c
+#include "opencplc-uno.h"
+
+static uint32_t stack_plc[256];
+static uint32_t stack_loop[256];
 
 void loop(void)
 {
@@ -248,6 +304,17 @@ void loop(void)
       // DOUT_Tgl(&RO1);
     }
   }
+}
+
+int main(void)
+{
+  DI1.gpif.ton_ms = 100;
+  DI1.gpif.toff_ms = 500;
+  PLC_Init();
+  thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
+  thread(&loop, stack_loop, sizeof(stack_loop));
+  VRTS_Init();
+  while(1);
 }
 ```
 

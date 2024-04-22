@@ -13,10 +13,11 @@ typedef struct {
   I2C_SCL_e scl_pin;
   I2C_SDA_e sda_pin;
   uint8_t addr;
-  uint8_t *regsmap;
+  uint8_t *regmap;
   bool *write_mask;
+  bool update_global_flag;
   bool *update_flag;
-  uint16_t regsmap_size;
+  uint16_t regmap_size;
   uint16_t i;
   bool sequence;
   bool pull_up;
@@ -39,7 +40,7 @@ typedef struct {
   // uint16_t size;
 } I2C_Slave_t;
 
-
-
+bool I2C_Slave_IsUpdate(I2C_Slave_t *i2c);
+void I2C_Slave_Init(I2C_Slave_t *i2c);
 
 #endif

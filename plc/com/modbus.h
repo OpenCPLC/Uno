@@ -14,8 +14,7 @@ typedef enum {
   MODBUS_Error_Start,
   MODBUS_Error_Index,
   MODBUS_Error_Count,
-  MODBUS_Error_Value,
-  MODBUS_Error_BufferSize
+  MODBUS_Error_Value
 } MODBUS_Error_e;
 
 typedef enum {

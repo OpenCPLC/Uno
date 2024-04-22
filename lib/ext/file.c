@@ -293,7 +293,6 @@ status_t FILE_ClearLastLine(FILE_t *file)
 }
 
 //-------------------------------------------------------------------------------------------------
-#if(INCLUDE_CRC)
 
 status_t FILE_Crc(FILE_t *file, const CRC_t *crc)
 {
@@ -310,7 +309,6 @@ status_t FILE_CrcError(FILE_t *file, const CRC_t *crc)
   return OK;
 }
 
-#endif
 //------------------------------------------------------------------------------------------------- Save/Load/Copy
 
 status_t FILE_Clear(FILE_t *file)

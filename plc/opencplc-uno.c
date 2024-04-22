@@ -83,10 +83,10 @@ PWMI_t din_pwmi = {
   .oversampling = 4
 };
 
-DIN_t DI1 = { .name = "DI1", .gpif = { .gpio = { .port = GPIOA, .pin = 6 } }, .eeprom = &io_eeprom[3] };
-DIN_t DI2 = { .name = "DI2", .gpif = { .gpio = { .port = GPIOA, .pin = 7 } }, .eeprom = &io_eeprom[3] };
-DIN_t DI3 = { .name = "DI3", .gpif = { .gpio = { .port = GPIOB, .pin = 0 } }, .eeprom = &io_eeprom[3] };
-DIN_t DI4 = { .name = "DI4", .gpif = { .gpio = { .port = GPIOB, .pin = 1 } }, .eeprom = &io_eeprom[3] };
+DIN_t DI1 = { .name = "DI1", .gpif = { .gpio = { .port = GPIOA, .pin = 6, .reverse = true } }, .eeprom = &io_eeprom[3] };
+DIN_t DI2 = { .name = "DI2", .gpif = { .gpio = { .port = GPIOA, .pin = 7, .reverse = true } }, .eeprom = &io_eeprom[3] };
+DIN_t DI3 = { .name = "DI3", .gpif = { .gpio = { .port = GPIOB, .pin = 0, .reverse = true } }, .eeprom = &io_eeprom[3] };
+DIN_t DI4 = { .name = "DI4", .gpif = { .gpio = { .port = GPIOB, .pin = 1, .reverse = true } }, .eeprom = &io_eeprom[3] };
 
 bool din_pwmi_init = false;
 
@@ -250,7 +250,6 @@ void PLC_Init(void)
   DOUT_Init(&TO3);
   DOUT_Init(&TO4);
   PWM_Init(&to_pwm);
-  return; // TODO: Remove line
   // Wyjścia cyfrowe triakowe (XO)
   DOUT_Init(&XO1);
   DOUT_Init(&XO2);
@@ -285,6 +284,7 @@ void PLC_Init(void)
   if(din_pwmi_init) {
     PWMI_Init(&din_pwmi);
   }
+  return; // TODO: Remove line
   // Wejścia analogowe (AI)
   ADC_Init(&ain_adc);
   ADC_Measurements(&ain_adc);
@@ -319,8 +319,6 @@ void PLC_Loop(void)
   DOUT_Loop(&TO2);
   DOUT_Loop(&TO3);
   DOUT_Loop(&TO4);
-  return; // TODO: Remove line
-
   // Wyjścia cyfrowe triakowe (XO)
   DOUT_Loop(&XO1);
   DOUT_Loop(&XO2);
@@ -332,6 +330,7 @@ void PLC_Loop(void)
   if(din_pwmi_init && PWMI_Loop(&din_pwmi)) {
     // PWMI_Print(&fan_inputs);
   }
+  return; // TODO: Remove line
   // Wejścia analogowe (AI)
   ADC_Measurements(&ain_adc);
   if(ain_adc.overrun) {

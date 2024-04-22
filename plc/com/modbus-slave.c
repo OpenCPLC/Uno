@@ -2,135 +2,165 @@
 
 MODBUS_Error_e MODBUS_Loop(MODBUS_Slave_t *modbus)
 {
-  uint16_t length;
-  length = UART_ReadSize(modbus->uart);
-  if(!length) return MODBUS_Ok;
-  uint8_t *buffer_rx = (uint8_t *)new(length);
-  length = UART_ReadArray(modbus->uart, buffer_rx);
-  if(length <= 5) return MODBUS_Error_MinLength;
+  uint16_t size_rx = UART_ReadSize(modbus->uart);
+  if(!size_rx) return MODBUS_Ok;
+  uint8_t *buffer_rx = (uint8_t *)new(size_rx);
+  size_rx = UART_ReadArray(modbus->uart, buffer_rx);
+  if(size_rx <= 5) return MODBUS_Error_MinLength;
   if(buffer_rx[0] != modbus->address) return MODBUS_Error_Adrress;
-  if(CRC_Error(&crc16_modbus, buffer_rx, length)) return MODBUS_Error_Crc;
+  if(CRC_Error(&crc16_modbus, buffer_rx, size_rx)) return MODBUS_Error_Crc;
   if(UART_IsBusy(modbus->uart)) return MODBUS_Error_Uart;
-  uint16_t reg, start, count;
+  uint16_t reg, start, count, value;
   uint8_t bit;
-  FILE_Clear(modbus->file_tx);
+  uint8_t *buffer_tx = NULL;
+  uint16_t size_tx = 0;
   MODBUS_Fnc_e function_code = (MODBUS_Fnc_e)buffer_rx[1];
   switch(function_code) {
+  //---------------------------------------------------------------------------------------------
     case MODBUS_Fnc_ReadBits:
     case MODBUS_Fnc_ReadOuts:
-      // TODO: określ długość odpowiedzi
-      if((length < 8) || (length % 4)) return MODBUS_Error_Length;
-      FILE_Char(modbus->file_tx, buffer_rx[0]);
-      FILE_Char(modbus->file_tx, buffer_rx[1]);
-      FILE_Char(modbus->file_tx, 0);
-      for(uint16_t j = 0; j < ((length - 4) / 4); j++) {
-        start = (buffer_rx[(j * 4) + 2] << 8) | (buffer_rx[(j * 4) + 3]);
-        count = (buffer_rx[(j * 4) + 4] << 8) | (buffer_rx[(j * 4) + 5]);
-        reg = start / 16;
-        bit = start % 16;
-        uint16_t icount = count / 8;
-        if(count % 8) icount++;
-        uint16_t high, low;
-        for(uint16_t i = 0; i < icount; i++) {
-          if(reg < modbus->limit) {
-            high = modbus->memory[reg] >> bit;
-            if(reg + 1 < modbus->limit) low = modbus->memory[reg + 1] << (16 - bit);
-            else low = 0;
-          }
-          else {
-            high = 0;
-            low = 0;
-          }
-          if(FILE_Char(modbus->file_tx, high | low)) return MODBUS_Error_BufferSize;
-          bit += 8;
-          if(bit > 15) {
-            bit -= 16;
-            reg++;
-          }
+      if(size_rx != 8) return MODBUS_Error_Length;
+      start = (buffer_rx[2] << 8) | buffer_rx[3];
+      count = (buffer_rx[4] << 8) | buffer_rx[5];
+      size_tx = ((count + 7) / 8) + 3;
+      buffer_tx = new(size_tx);
+      buffer_tx[0] = buffer_rx[0];
+      buffer_tx[1] = buffer_rx[1];
+      buffer_tx[2] = size_tx - 3;
+      reg = start / 16;
+      bit = start % 16;
+      uint16_t rcount = count / 8;
+      if(count % 8) rcount++;
+      uint16_t high, low;
+      for(uint16_t i = 0; i < rcount; i++) {
+        if(reg < modbus->regmap_size) {
+          high = modbus->regmap[reg] >> bit;
+          if(reg + 1 < modbus->regmap_size) low = modbus->regmap[reg + 1] << (16 - bit);
+          else low = 0;
+        }
+        else {
+          high = 0;
+          low = 0;
+        }
+        buffer_tx[i + 3] = high | low;
+        bit += 8;
+        if(bit > 15) {
+          bit -= 16;
+          reg++;
         }
       }
-      modbus->file_tx->buffer[2] = modbus->file_tx->size - 3;
-      if(FILE_Crc(modbus->file_tx, &crc16_modbus)) return MODBUS_Error_BufferSize;
-      if(modbus->Read) modbus->Read(function_code);
       break;
+    //---------------------------------------------------------------------------------------------
     case MODBUS_Fnc_ReadHoldingRegisters:
     case MODBUS_Fnc_ReadInputRegisters:
-      if((length < 8) || (length % 4)) return MODBUS_Error_Length;
-      FILE_Char(modbus->file_tx, buffer_rx[0]);
-      FILE_Char(modbus->file_tx, buffer_rx[1]);
-      FILE_Char(modbus->file_tx, 0);
-      for(uint16_t j = 0; j < ((length - 4) / 4); j++) {
-        start = (buffer_rx[(j * 4) + 2] << 8) | (buffer_rx[(j * 4) + 3]);
-        count = (buffer_rx[(j * 4) + 4] << 8) | (buffer_rx[(j * 4) + 5]);
-        uint16_t value;
-        for(uint16_t i = 0; i < count; i++) {
-          if(start + i < modbus->limit) value = modbus->memory[start + i];
-          else value = 0;
-          FILE_Char16(modbus->file_tx, value);
+      if(size_rx != 8) return MODBUS_Error_Length;
+      start = (buffer_rx[2] << 8) | buffer_rx[3];
+      count = (buffer_rx[4] << 8) | buffer_rx[5];
+      size_tx = 2 * count + 3;
+      buffer_tx = new(size_tx);
+      buffer_tx[0] = buffer_rx[0];
+      buffer_tx[1] = buffer_rx[1];
+      buffer_tx[2] = size_tx - 3;
+      for(uint16_t i = 0; i < count; i++) {
+        if(start + i < modbus->regmap_size) value = modbus->regmap[start + i];
+        else value = 0;
+        buffer_tx[3 + (i * 2)] = (uint8_t)(value >> 8);
+        buffer_tx[3 + (i * 2) + 1] = (uint8_t)value;
+      }
+      break;
+    //---------------------------------------------------------------------------------------------
+    case MODBUS_Fnc_PresetBit:
+      if(size_rx != 8) return MODBUS_Error_Length;
+      size_tx = 6;
+      buffer_tx = new(size_tx);
+      for(uint16_t i = 0; i < size_tx; i++) buffer_tx[i] = buffer_rx[i];
+      start = (buffer_rx[2] << 8) | (buffer_rx[3]);
+      reg = start / 16;
+      bit = start % 16;
+      value = buffer_rx[4] ? modbus->regmap[reg] | (1 << bit) : modbus->regmap[reg] & ~(1 << bit);
+      if(reg < modbus->regmap_size && modbus->write_mask[reg] && modbus->regmap[reg] != value) {
+        modbus->regmap[reg] = value;
+        modbus->update_flag[reg] = true;
+        modbus->update_global_flag = true;
+      }
+      break;
+    //---------------------------------------------------------------------------------------------
+    case MODBUS_Fnc_PresetRegister:
+      if(size_rx != 8) return MODBUS_Error_Length;
+      size_tx = 6;
+      buffer_tx = new(size_tx);
+      for(uint16_t i = 0; i < size_tx; i++) buffer_tx[i] = buffer_rx[i];
+      reg = (buffer_rx[2] << 8) | (buffer_rx[3]);
+      value = (buffer_rx[4] << 8) | (buffer_rx[5]);
+      if(reg < modbus->regmap_size && modbus->write_mask[reg] && modbus->regmap[reg] != value) {
+        modbus->regmap[reg] = value;
+        modbus->update_flag[reg] = true;
+        modbus->update_global_flag = true;
+      }
+      break;
+    //---------------------------------------------------------------------------------------------
+    case MODBUS_Fnc_WriteBits:
+      if(size_rx < 10 || (size_rx != buffer_rx[6] + 9)) return MODBUS_Error_Length;
+      size_tx = 6;
+      buffer_tx = new(size_tx);
+      for(uint16_t i = 0; i < size_tx; i++) buffer_tx[i] = buffer_rx[i];
+      start = (buffer_rx[2] << 8) | (buffer_rx[3]);
+      count = (buffer_rx[4] << 8) | (buffer_rx[5]);
+      reg = start / 16;
+      bit = start % 16;
+      uint16_t wcount = (count + bit) / 16;
+      uint16_t ibit = (count + bit) % 16;
+      if(ibit) wcount++;
+      buffer_rx[7 + buffer_rx[6]] = 0;
+      buffer_rx[6] = (uint8_t)(modbus->regmap[reg] >> 8);
+      for(uint16_t i = 0; i < wcount; i++) {
+        value = (buffer_rx[6 + (2 * i)] & (0xFF >> (8 - bit))) | (buffer_rx[7 + (2 * i)] << bit) | (buffer_rx[8 + (2 * i)] << (bit + 8));
+        if(i == wcount - 1) value = (value & (0xFFFF >> (16 - ibit))) | (modbus->regmap[reg + i] & (0xFFFF << ibit));
+        if(reg + i < modbus->regmap_size && modbus->write_mask[reg + i] && modbus->regmap[reg + i] != value) {
+          modbus->regmap[reg + i] = value;
+          modbus->update_flag[reg + i] = true;
+          modbus->update_global_flag = true;
         }
       }
-      modbus->file_tx->buffer[2] = modbus->file_tx->size - 3;
-      if(FILE_Crc(modbus->file_tx, &crc16_modbus)) return MODBUS_Error_BufferSize;
-      if(modbus->Read) modbus->Read(function_code);
       break;
-    case MODBUS_Fnc_PresetBit:
-      if(length != 8) return MODBUS_Error_Length;
-      for(uint16_t i = 0; i < 6; i++) FILE_Char(modbus->file_tx, buffer_rx[i]);
-      start = (buffer_rx[2] << 8) | (buffer_rx[3]);
-      reg = start / 16;
-      bit = start % 16;
-      if(reg < modbus->limit) {
-        if(buffer_rx[4]) modbus->memory[reg] |= (1 << bit);
-        else modbus->memory[reg] &= ~(1 << bit);
-      }
-      if(FILE_Crc(modbus->file_tx, &crc16_modbus)) return MODBUS_Error_BufferSize;
-      if(modbus->Write) modbus->Write(function_code, reg, 1);
-      break;
-    case MODBUS_Fnc_PresetRegister:
-      if(length != 8) return MODBUS_Error_Length;
-      for(uint16_t i = 0; i < 6; i++) FILE_Char(modbus->file_tx, buffer_rx[i]);
-      reg = (buffer_rx[2] << 8) | (buffer_rx[3]);
-      if(reg < modbus->limit) modbus->memory[reg] = (buffer_rx[4] << 8) | (buffer_rx[5]);
-      if(FILE_Crc(modbus->file_tx, &crc16_modbus)) return MODBUS_Error_BufferSize;
-      if(modbus->Write) modbus->Write(function_code, reg, 1);
-      break;
-    case MODBUS_Fnc_WriteBits:
-      if(length < 10 || (length != buffer_rx[6] + 9)) return MODBUS_Error_Length;
-      for(uint16_t i = 0; i < 6; i++) FILE_Char(modbus->file_tx, buffer_rx[i]);
-      start = (buffer_rx[2] << 8) | (buffer_rx[3]);
-      count = (buffer_rx[4] << 8) | (buffer_rx[5]);
-      reg = start / 16;
-      bit = start % 16;
-      uint16_t icount = (count + bit) / 16;
-      uint16_t ibit = (count + bit) % 16;
-      if(ibit) icount++;
-      buffer_rx[7 + buffer_rx[6]] = 0;
-      buffer_rx[6] = (uint8_t)(modbus->memory[reg] >> 8);
-      uint16_t tmp;
-      for(uint16_t i = 0; i < icount; i++) {
-        tmp = (buffer_rx[6 + (2 * i)] & (0xFF >> (8 - bit))) | (buffer_rx[7 + (2 * i)] << bit) | (buffer_rx[8 + (2 * i)] << (bit + 8));
-        if(i == icount - 1) tmp = (tmp & (0xFFFF >> (16 - ibit))) | (modbus->memory[reg + i] & (0xFFFF << ibit));
-        if(reg + i < modbus->limit) modbus->memory[reg + i] = tmp;
-      }
-      if(FILE_Crc(modbus->file_tx, &crc16_modbus)) return MODBUS_Error_BufferSize;
-      if(modbus->Write) modbus->Write(function_code, reg, icount);
-      break;
+    //---------------------------------------------------------------------------------------------
     case MODBUS_Fnc_WriteRegisters:
-      count = (buffer_rx[4] << 8) | (buffer_rx[5]);
-      if(length < 11 || !(length % 2) || count != (length - 9) / 2 || count != buffer_rx[6] / 2) return MODBUS_Error_Length;
-      for(uint16_t i = 0; i < 6; i++) FILE_Char(modbus->file_tx, buffer_rx[i]);
-      start = (buffer_rx[2] << 8) | (buffer_rx[3]);
+    count = (buffer_rx[4] << 8) | buffer_rx[5];
+      if(size_rx < 11 || !(size_rx % 2) || (count != (size_rx - 9) / 2) || count != buffer_rx[6] / 2) return MODBUS_Error_Length;
+      size_tx = 6;
+      buffer_tx = new(size_tx);
+      for(uint16_t i = 0; i < size_tx; i++) buffer_tx[i] = buffer_rx[i];
+      start = (buffer_rx[2] << 8) | buffer_rx[3];
       for(uint16_t i = 0; i < count; i++) {
-        if(start + i < modbus->limit) modbus->memory[start + i] = (buffer_rx[7 + (2 * i)] << 8) | (buffer_rx[8 + (2 * i)]);
+        value = (buffer_rx[7 + (2 * i)] << 8) | buffer_rx[8 + (2 * i)];
+        if(start + i < modbus->regmap_size && modbus->write_mask[start + i] && modbus->regmap[start + i] != value) {
+          modbus->regmap[start + i] = value;
+          modbus->update_flag[start + i] = true;
+          modbus->update_global_flag = true;
+        }
       }
-      if(FILE_Crc(modbus->file_tx, &crc16_modbus)) return MODBUS_Error_BufferSize;
-      if(modbus->Write) modbus->Write(function_code, start, count);
       break;
+    //---------------------------------------------------------------------------------------------
     default:
-      if(FILE_Array(modbus->file_tx, buffer_rx, length)) return MODBUS_Error_BufferSize;
+      size_tx = size_rx;
+      buffer_tx = new(size_tx);
+      for(uint16_t i = 0; i < size_tx; i++) buffer_tx[i] = buffer_rx[i];
       break;
   }
-  if(UART_SendFile(modbus->uart, modbus->file_tx)) return MODBUS_Error_Sending;
-  // uint32_t wait_ms = UART_CalcTime(modbus->uart, modbus->file_tx->size) + 10;
+  if(size_tx) {
+    size_tx = CRC_Append(&crc16_modbus, buffer_tx, size_tx);
+    if(UART_Send(modbus->uart, buffer_tx, size_tx)) return MODBUS_Error_Sending;
+  }
   return MODBUS_Ok;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool MODBUS_IsUpdate(MODBUS_Slave_t *modbus)
+{
+  if(modbus->update_global_flag) {
+    modbus->update_global_flag = false;
+    return true;
+  }
+  return false;
 }

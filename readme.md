@@ -185,7 +185,7 @@ Najkrótszą drogą do uruchomienia pierwszego projektu jest uruchomienie aplika
 ./wizard.exe -n [naza-projektu]
 ```
 
-Za flagą `-n` należy wprowadzić nazwę projektu _(oczywiście, nazwę należy wprowadzić bez nawiasów `[]`)_. Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością pamięci `-m`, wymuszenie innego [poziomu optymalizacji debugera](https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html) `-o` oraz nadpisanie  plików konfiguracyjnych projektu `-r`.
+Za flagą `-n` należy wprowadzić nazwę projektu _(oczywiście, nazwę należy wprowadzić bez nawiasów `[]`)_. Wizard umożliwia także wykorzystanie wersji sterownika z mniejszą ilością pamięci `-m`, wymuszenie innego [poziomu optymalizacji debugera](https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html) `-o` oraz nadpisanie plików konfiguracyjnych projektu `-r`.
 
 ```bash
 ./wizard.exe -n [naza-projektu] -m 128kB -o 0g -r
@@ -201,7 +201,7 @@ make --version
 
 ## 🐞 Programing-debugging [➥](#-content)
 
-Narzędziem, które wykorzystujemy do programowania i debugowania, jest [STLINK-V3MODS](https://www.st.com/en/development-tools/stlink-v3mods.html) zamontowany na przejściówce umożliwiającej podłączenie kabla [SKEED8](https://www.we-online.com/en/components/products/WST_IDC_PRE_PRESSED_CONNECTOR?sq=490107670812S#490107670812S). Niechętnie zastosowaliśmy własny standard, jednak firma **ST Microelectronics** ❤️ wykorzystuje złącze STDC14, które jest drogie i trudno dostępne, oraz złącze TC2050-IDC, które ogranicza interfejs komunikacji `UART`.
+Narzędziem, które wykorzystujemy do programowania i debugowania, jest [STLINK-V3MODS](https://www.st.com/en/development-tools/stlink-v3mods.html) zamontowany na przejściówce umożliwiającej podłączenie kabla [SKEED8](https://www.we-online.com/en/components/products/WST_IDC_PRE_PRESSED_CONNECTOR?sq=490107670812S#490107670812S). Niechętnie zastosowaliśmy własny standard, jednak firma **ST Microelectronics** ❤️ wykorzystuje złącze STDC14, które jest drogie i trudno dostępne, oraz złącze TC2050-IDC, które okraja stlink o interfejs komunikacji `UART`.
 
 Aby zacząć programować mikrokontroler na płytce sterownika, trzeba podłączyć zasilanie `VCC` i `GND` od 12V do 24V oraz podłączyć z jednej strony programator przewodem SKEED do płytki, a z drugiej strony przewodem micro `USB` do komputera.
 

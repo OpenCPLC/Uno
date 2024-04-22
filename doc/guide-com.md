@@ -1,8 +1,10 @@
 # 🔗 Communication [➥](../readme.md)
 
-### Komunikacja `RS485`
+## Komunikacja `RS485`
 
 W sterowniku **Uno** dostępne są dwa interfejsy **RS485**: `RS1` oraz `RS2`. Wsparcie obejmuje protokoły **Modbus RTU** oraz **BACnet** w trybach master i slave.
+
+### Modbus Master 
 
 W przykładzie nawiązujemy komunikację z urządzeniem o adresie `0x02` za pomocą protokołu **Modbus RTU**. W konfiguracji rejestr `0x10` jest ustawiany na wartość `1152`. Proces konfiguracji jest powtarzany, dopóki urządzenie nie udzieli odpowiedzi. W głównej pętli loop dokonuje się odczytu trzech rejestrów. Wartość `uint16` jest odczytywana z rejestru `0x14`, natomiast wartości `uint32` z rejestru `0x15` i `0x16`. Warto zauważyć, że protokół Modbus nie narzuca konkretnej kolejności bajtów dla zmiennych 32-bitowych, co może wymagać odwrócenia kolejności słów 16-bitowych, aby uzyskać prawidłową wartość. W trakcie komunikacji, `timeout` jest ustawiany na `1000`ms, a przerwa między odpowiedzią a kolejnym zapytaniem wynosi `500`ms.
 
@@ -12,7 +14,7 @@ W przykładzie nawiązujemy komunikację z urządzeniem o adresie `0x02` za pomo
 
 int loop(void);
 
-static uint32_t stack_plc[64];
+static uint32_t stack_plc[256];
 static uint32_t stack_app[512];
 
 UART_t *rs485 = &RS1;
@@ -57,7 +59,105 @@ int app(void)
 }
 ```
 
-### Komunikacja `I2C`
+### Modbus Slave
+
+W konfiguracji **Modbus** w trybie **Slave** należy stworzyć strukturę `MODBUS_Slave_t` oraz ustawić w niej:
+
+- `uart` - wskaźnik na wykorzystywany interfejs **UART**,
+- `address` - adres urządzenia Modbus,
+- `regmap` - tablicę stanowiącą pamięć Modbus z domyślnymi/początkowymi wartościami,
+- `regmap_size` - wielkość tablicy/pamięci `regmap`,
+- `write_mask` - tablicę z wartościami `true` dla rejestrów, które mogą zostać nadpisane _(`RW`)_,
+- `update_flag` - deklaracja pustej tablicy o długości `regmap_size`, w której będą automatycznie wskazywane rejestry, które zostały zaktualizowane/nadpisane.
+
+Tablice regmap, write_mask i update_flag muszą mieć taką samą długość wynoszącą regmap_size i są powiązane ze sobą indeksem tablicy. Zatem o tym, czy wartość `regmap[index]` będzie można nadpisać, decyduje maska `write_mask[index]`. Gdy wartość zostanie nadpisana, wartość `update_flag[index]` zostanie ustawiona na true. Dodatkowo warto stworzyć sobie zmienną wyliczeniową `enum` z nazwami rejestrów powiązanymi z ich numerami.
+
+[W przykładzie](./example/rs485-modbus-slave.c) urządzeniu slave został nadany adres `0x12`. Urządzenie udostępnia `3` rejestry: `DigitalInputs`, `HexConfig` i `DecConfig`. Rejestry `HexConfig` oraz `DecConfig` mogą zostać nadpisane.
+
+```c
+#define MODBUS_ADDR 0x12 // Adres urządzenia Modbus slave
+#define MODBUS_REG_COUNT 3 // Ilość rejestrów Modbus
+
+// Stworzenie mapy rejestrów Modbusa
+typedef enum {
+  MODBUS_Reg_DigitalInputs,
+  MODBUS_Reg_HexConfig,
+  MODBUS_Reg_DecConfig,
+} MODBUS_Reg_e;
+
+// Deklaracja pamięci dla rejestrów Modbusa Slave
+uint16_t modbus_memory[MODBUS_REG_COUNT];
+// Deklaracja tablic pomocniczych dla Modbusa Slave
+bool modbus_write[MODBUS_REG_COUNT];
+bool modbus_update[MODBUS_REG_COUNT];
+
+void init(void)
+{
+  // Ustawienie wartości początkowej rejestru `DigitalInputs`
+  modbus_memory[MODBUS_Reg_DigitalInputs] = 0b1100101011110000;
+  // Ustawienie wartości początkowej rejestru `HexConfig`
+  modbus_memory[MODBUS_Reg_HexConfig] = 0x69CF;
+  // Umożliwienie nadpisania/aktualizacji wartości rejestru `HexConfig`
+  modbus_write[MODBUS_Reg_HexConfig] = true;
+  // Ustawienie wartości początkowej rejestru `DecConfig`
+  modbus_memory[MODBUS_Reg_DecConfig] = 2137;
+  // Umożliwienie nadpisania/aktualizacji wartości rejestru `DecConfig`
+  modbus_write[MODBUS_Reg_DecConfig] = true;
+}
+
+// Deklaracja struktury Modbusa Slave
+MODBUS_Slave_t modbus_slave = {
+  .uart = &RS2, // Wybór interfejsu `RS2`
+  .address = MODBUS_ADDR,
+  .regmap = modbus_memory,
+  .regmap_size = MODBUS_REG_COUNT,
+  .write_mask = modbus_write,
+  .update_flag = modbus_update
+};
+```
+
+Dla komunikacji, która oczekuje na przychodzące ramki, jaką jest **Modbus Slave**, należy przeznaczyć osobny wątek. W tym wątku należy umieścić funkcję `MODBUS_Loop`, która obsługuje całość komunikacji na przekazanej strukturze `MODBUS_Slave_t`.
+
+Jeśli w wyniku komunikacji jakakolwiek wartość została nadpisana, funkcja `MODBUS_IsUpdate` zwróci `true`. Wówczas należy przejrzeć tablicę `update_flag`. Jeśli natrafimy na komórkę o wartości true, oznacza to, że rejestr odpowiadający indeksowi z tablicy `update_flag` został nadpisany i możemy obsłużyć taką operację. W przypadku wartości konfiguracyjnej może być konieczna ponowna inicjalizacji lub zmiany stanu powiązanych peryferiów, a czasem będziemy chcieli tę wartość zapisać w pamięci nieulotnej. Po obsłużeniu aktualizacji zminnej `update_flag` należy ponownie ustawić ją na `false`.
+
+```c
+void loop(void)
+{
+  init(); 
+  while(1) {
+    MODBUS_Loop(&modbus_slave); // Modbus Slave Engine
+    // Sprawdzanie, czy jakikolwiek rejestr został nadpisany/zaktualizowany
+    if(MODBUS_IsUpdate(&modbus_slave)) {
+      // Poszukiwania nadpisanych/zaktualizowanych rejestrów
+      for(MODBUS_Reg_e reg = 0; reg < MODBUS_REG_COUNT; reg++) {
+        if(modbus_slave.update_flag[reg]) {
+          switch(reg) {
+            case MODBUS_Reg_HexConfig: // aktualizacja `HexConfig`
+              // TODO: HexConfig Job
+              DBG_String("UPDATE HexConfig:");
+              DBG_Hex16(modbus_memory[reg]);
+              DBG_Enter();
+              break;
+            case MODBUS_Reg_DecConfig:  // aktualizacja `DecConfig`
+              // TODO: DecConfig Job
+              DBG_String("UPDATE HexConfig:");
+              DBG_Dec(modbus_memory[reg]);
+              DBG_Enter();
+              break;
+            default:
+              break;
+          }
+          // Reset flagi aktualizacji `update_flag`
+          modbus_slave.update_flag[reg] = false;
+        } 
+      }
+    }
+    let();
+  }
+}
+```
+
+## Komunikacja `I2C`
 
 ```c
 #include "opencplc-uno.h"

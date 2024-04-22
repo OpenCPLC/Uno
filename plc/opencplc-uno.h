@@ -38,7 +38,7 @@ void XO_Frequency(float frequency);
 extern DIN_t DI1;
 extern DIN_t DI2;
 extern DIN_t DI3;
-extern DIN_t DI3;
+extern DIN_t DI4;
 
 // Wejścia analogowe (AI)
 extern AIN_t AI1;
