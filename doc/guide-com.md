@@ -169,12 +169,12 @@ void loop(void)
 
 🚀 Kompletny przykład: [Komunikacja RS485 Modbuse Slave](./example/rs485-modbus-slave.c)
 
-## Komunikacja `I2C`
+## 🔀 Komunikacja `I2C`
 
 ```c
 #include "opencplc-uno.h"
 
-static uint32_t stack_plc[256];make
+static uint32_t stack_plc[256];
 
 static uint32_t stack_loop[256];
 
