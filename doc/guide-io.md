@@ -114,7 +114,7 @@ void loop(void)
 
 🚀 Kompletny przykład: [Dioda LED pojedyńcze mignięcie](./example/led-one-shot.c)
 
-### 🐢 Wyjścia przekażnikowe `RO`
+### 🐢 Wyjścia przekaźnikowe `RO`
 
 Włączanie / wyłącznie wyjścia
 
