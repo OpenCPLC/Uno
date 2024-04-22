@@ -72,7 +72,6 @@ void clear()
   }
 }
 
-
 void *aloc(size_t size)
 {
   uint16_t i = 0;

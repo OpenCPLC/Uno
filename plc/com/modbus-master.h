@@ -5,6 +5,22 @@
 #include "modbus.h"
 #include "crc.h"
 
+typedef enum {
+  MODBUS_Ok = 0,
+  MODBUS_Error_Uart,
+  MODBUS_Error_Sending,
+  MODBUS_Error_Timeout,
+  MODBUS_Error_MinLength,
+  MODBUS_Error_Length,
+  MODBUS_Error_Adrress,
+  MODBUS_Error_Crc,
+  MODBUS_Error_Function,
+  MODBUS_Error_Start,
+  MODBUS_Error_Index,
+  MODBUS_Error_Count,
+  MODBUS_Error_Value
+} MODBUS_Error_e;
+
 //-------------------------------------------------------------------------------------------------
 
 MODBUS_Error_e MODBUS_ReadBits(UART_t *uart, uint8_t addr, uint16_t start, uint16_t count, bool *memory, uint32_t timeout_ms);

@@ -4,7 +4,7 @@
 static uint32_t stack_plc[256];
 static uint32_t stack_loop[256];
 
-#define MODBUS_ADDR 0x12 // Adres urządzenia Modbus slave
+#define MODBUS_ADDR 0x07 // Adres urządzenia Modbus slave
 #define MODBUS_REG_COUNT 3 // Ilość rejestrów Modbus
 
 // Stworzenie mapy rejestrów Modbusa
@@ -48,33 +48,43 @@ void loop(void)
 {
   init(); 
   while(1) {
-    MODBUS_Loop(&modbus_slave); // Modbus Slave Engine
-    // Sprawdzanie, czy jakikolwiek rejestr został nadpisany/zaktualizowany
-    if(MODBUS_IsUpdate(&modbus_slave)) {
-      // Poszukiwania nadpisanych/zaktualizowanych rejestrów
-      for(MODBUS_Reg_e reg = 0; reg < MODBUS_REG_COUNT; reg++) {
-        if(modbus_slave.update_flag[reg]) {
-          switch(reg) {
-            case MODBUS_Reg_HexConfig: // aktualizacja `HexConfig`
-              // TODO: HexConfig Job
-              DBG_String("UPDATE HexConfig:");
-              DBG_Hex16(modbus_memory[reg]);
-              DBG_Enter();
-              break;
-            case MODBUS_Reg_DecConfig:  // aktualizacja `DecConfig`
-              // TODO: DecConfig Job
-              DBG_String("UPDATE HexConfig:");
-              DBG_Dec(modbus_memory[reg]);
-              DBG_Enter();
-              break;
-            default:
-              break;
-          }
-          // Reset flagi aktualizacji `update_flag`
-          modbus_slave.update_flag[reg] = false;
-        } 
+    MODBUS_Status_e status = MODBUS_Loop(&modbus_slave); // Modbus Slave Engine
+    if(MODBUS_STATUS_ERROR(status)) {
+      // Mignięcie czerwoną diodą w przypadku błędu komunikacji
+      LED_OneShoot(RGB_Red, 200);
+      continue;
+    }
+    else if(status == MODBUS_Status_FrameForMe) {
+      // Mignięcie zieloną diodą w przypadku poprawnej komunikacji
+      LED_OneShoot(RGB_Green, 200);
+      // Sprawdzanie, czy jakikolwiek rejestr został nadpisany/zaktualizowany
+      if(MODBUS_IsUpdate(&modbus_slave)) {
+        // Poszukiwania nadpisanych/zaktualizowanych rejestrów
+        for(MODBUS_Reg_e reg = 0; reg < MODBUS_REG_COUNT; reg++) {
+          if(modbus_slave.update_flag[reg]) {
+            switch(reg) {
+              case MODBUS_Reg_HexConfig: // aktualizacja `HexConfig`
+                // TODO: HexConfig Job
+                DBG_String("UPDATE HexConfig:");
+                DBG_Hex16(modbus_memory[reg]);
+                DBG_Enter();
+                break;
+              case MODBUS_Reg_DecConfig: // aktualizacja `DecConfig`
+                // TODO: DecConfig Job
+                DBG_String("UPDATE HexConfig:");
+                DBG_Dec(modbus_memory[reg]);
+                DBG_Enter();
+                break;
+              default:
+                break;
+            }
+            // Reset flagi aktualizacji `update_flag`
+            modbus_slave.update_flag[reg] = false;
+          } 
+        }
       }
     }
+    clear();
     let();
   }
 }

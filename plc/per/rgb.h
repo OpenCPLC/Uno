@@ -27,6 +27,7 @@ typedef struct {
   uint16_t blink_ms;
   uint64_t tick;
   bool blink_on;
+  bool one_shot;
 } RGB_t;
 
 void RGB_Init(RGB_t *rgb);
@@ -55,6 +56,7 @@ void LED_Set(RGB_e color);
 void LED_Rst(void);
 void LED_Blink_ON(uint16_t ms);
 void LED_Blink_OFF(void);
+void LED_OneShoot(RGB_e color, uint16_t ms);
 bool LED_Bash(char **argv, uint16_t argc);
 
 //-------------------------------------------------------------------------------------------------

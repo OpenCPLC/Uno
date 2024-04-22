@@ -24,6 +24,7 @@ static void UART_InterruptEV(UART_t *uart)
     uart->reg->CR1 &= ~USART_CR1_TCIE;
     uart->reg->ICR |= USART_ICR_TCCF;
     uart->_busy_tc = false;
+    if(uart->gpio_direction) GPIO_Rst(uart->gpio_direction);
   }
   if(uart->reg->ISR & USART_ISR_RTOF) {
     uart->reg->ICR |= USART_ICR_RTOCF;

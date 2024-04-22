@@ -2,22 +2,6 @@
 #define MODBUS_H_
 
 typedef enum {
-  MODBUS_Ok = 0,
-  MODBUS_Error_Uart,
-  MODBUS_Error_Sending,
-  MODBUS_Error_Timeout,
-  MODBUS_Error_MinLength,
-  MODBUS_Error_Length,
-  MODBUS_Error_Adrress,
-  MODBUS_Error_Crc,
-  MODBUS_Error_Function,
-  MODBUS_Error_Start,
-  MODBUS_Error_Index,
-  MODBUS_Error_Count,
-  MODBUS_Error_Value
-} MODBUS_Error_e;
-
-typedef enum {
   MODBUS_Fnc_Unknown = 0x00,
   MODBUS_Fnc_ReadBits = 0x01,
   MODBUS_Fnc_ReadOuts = 0x02,

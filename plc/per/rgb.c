@@ -68,7 +68,13 @@ void RGB_Loop(RGB_t *rgb)
     if(waitfor(&rgb->tick)) {
       rgb->blink_on = !rgb->blink_on;
       if(rgb->blink_on) RGB_Preset(rgb, rgb->state);
-      else RGB_Preset(rgb, RGB_Off);
+      else {
+        RGB_Preset(rgb, RGB_Off);
+        if(rgb->one_shot) {
+          rgb_focus->blink_ms = 0;
+          rgb->one_shot = false;
+        }
+      }
     };
     if(!rgb->tick) {
       rgb->tick = gettick(rgb->blink_ms);
@@ -107,6 +113,15 @@ void LED_Blink_OFF(void)
   LED_Set(rgb_focus->state);
 }
 
+void LED_OneShoot(RGB_e color, uint16_t ms)
+{
+  if(!rgb_focus) return;
+  LED_Set(color);
+  LED_Blink_ON(ms);
+  rgb_focus->one_shot = true;
+}
+
+// TODO: OneShot
 bool LED_Bash(char **argv, uint16_t argc)
 {
   if(!rgb_focus) return false;

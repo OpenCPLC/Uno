@@ -31,9 +31,11 @@ int main(void)
 }
 ```
 
-### Wyjścia cyfrowe
+## Wyjścia cyfrowe
 
-W pierwszych krokach zwarto uruchomić program, który nie wymaga podłączania żadnych urządzeń zewnętrznych. [Programem takim jest sterowanie diodą **LED**](example/io-dout-led.c). Może ona informować użytkownika o stanie urządzenia oraz występujących błędach. Wywołując funkcję `LED_Set`, należy przekazać kolor, który chcemy ustawić _(`RGB_Red`, `RGB_Green`, `RGB_Blue`, `RGB_Yellow`, `RGB_Cyan`, `RGB_Magenta`,  `RGB_White`)_. Funkcją `LED_Rst` wyłączamy diodę.
+### 🚨 Dioda `LED`
+
+W pierwszych krokach zwarto uruchomić program, który nie wymaga podłączania żadnych urządzeń zewnętrznych. Programem takim jest sterowanie diodą **LED**. Może ona informować użytkownika o stanie urządzenia oraz występujących błędach. Wywołując funkcję `LED_Set`, należy przekazać kolor, który chcemy ustawić _(`RGB_Red`, `RGB_Green`, `RGB_Blue`, `RGB_Yellow`, `RGB_Cyan`, `RGB_Magenta`,  `RGB_White`)_. Funkcją `LED_Rst` wyłączamy diodę.
 
 ```c
 void loop(void)
@@ -55,8 +57,9 @@ void loop(void)
 }
 ```
 
-Ponieważ oko ludzkie lepiej reaguje na zmiany obrazu, popularną praktyką jest [miganie lampkami informacyjnymi](example/io-dout-blink.c), co pozwala lepiej zwrócić uwagę na ewentualne błędy. Miganie można aktywować za pomocą funkcji `LED_Blink_ON`, przekazując czas w **ms** między zmianami stanu diody. Miganie można w każdej chwili wyłączyć za pomocą funkcji `LED_Blink_OFF`.
+🚀 Kompletny przykład: [Dioda LED włącz i wyłącz](./example/led-set-rst.c)
 
+Ponieważ oko ludzkie lepiej reaguje na zmiany obrazu, popularną praktyką jest miganie lampkami informacyjnymi, co pozwala lepiej zwrócić uwagę na ewentualne błędy. Miganie można aktywować za pomocą funkcji `LED_Blink_ON`, przekazując czas w **ms** między zmianami stanu diody. Miganie można w każdej chwili wyłączyć za pomocą funkcji `LED_Blink_OFF`.
 
 ```c
 void loop(void)
@@ -88,12 +91,30 @@ void loop(void)
 }
 ```
 
-Wyjścia przekażnikowe
+🚀 Kompletny przykład: [Dioda LED miganie](./example/led-blink.c)
 
-Wyjścia tranzystorowe sterują napięciem takim samym, jakie jest dostarczone do zasilania płytki.
+Jednak, gdy chcemy szybko wskazać na jakieś zdarzenie, dobrze jest wykonać pojedyńcze mignięcie wykorzystując funkcję `LED_OneShot`, która ustawia diodę na określony kolor i wyłącza ją po podanym czasie.
 
+```c
+void loop(void)
+{
+  while(1) {
+    // Wykonaj pojedyncze mignięcie diodą czerwoną trwające 100ms
+    LED_OneShoot(RGB_Red, 100);
+    delay(2000); // Odczekaj 2s
+    // Wykonaj pojedyncze mignięcie diodą zeiloną trwające 300ms
+    LED_OneShoot(RGB_Green, 300);
+    delay(2000); // Odczekaj 2s
+    // Wykonaj pojedyncze mignięcie diodą zeiloną trwające 600ms
+    LED_OneShoot(RGB_Blue, 600);
+    delay(2000); // Odczekaj 2s
+  }
+}
+```
 
+🚀 Kompletny przykład: [Dioda LED pojedyńcze mignięcie](./example/led-one-shot.c)
 
+### 🐢 Wyjścia przekażnikowe `RO`
 
 Włączanie / wyłącznie wyjścia
 
@@ -176,6 +197,8 @@ void loop(void)
   }
 }
 ```
+
+### 🐇 Wyjścia tranzystorowe `TO` i triakowe `XO`
 
 Pulse
 

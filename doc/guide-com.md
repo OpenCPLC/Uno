@@ -4,7 +4,7 @@
 
 W sterowniku **Uno** dostępne są dwa interfejsy **RS485**: `RS1` oraz `RS2`. Wsparcie obejmuje protokoły **Modbus RTU** oraz **BACnet** w trybach master i slave.
 
-### Modbus Master 
+### 🧔🏻 Modbus Master 
 
 W przykładzie nawiązujemy komunikację z urządzeniem o adresie `0x02` za pomocą protokołu **Modbus RTU**. W konfiguracji rejestr `0x10` jest ustawiany na wartość `1152`. Proces konfiguracji jest powtarzany, dopóki urządzenie nie udzieli odpowiedzi. W głównej pętli loop dokonuje się odczytu trzech rejestrów. Wartość `uint16` jest odczytywana z rejestru `0x14`, natomiast wartości `uint32` z rejestru `0x15` i `0x16`. Warto zauważyć, że protokół Modbus nie narzuca konkretnej kolejności bajtów dla zmiennych 32-bitowych, co może wymagać odwrócenia kolejności słów 16-bitowych, aby uzyskać prawidłową wartość. W trakcie komunikacji, `timeout` jest ustawiany na `1000`ms, a przerwa między odpowiedzią a kolejnym zapytaniem wynosi `500`ms.
 
@@ -59,7 +59,7 @@ int app(void)
 }
 ```
 
-### Modbus Slave
+### 👨🏿‍🦲 Modbus Slave
 
 W konfiguracji **Modbus** w trybie **Slave** należy stworzyć strukturę `MODBUS_Slave_t` oraz ustawić w niej:
 
@@ -72,10 +72,10 @@ W konfiguracji **Modbus** w trybie **Slave** należy stworzyć strukturę `MODBU
 
 Tablice regmap, write_mask i update_flag muszą mieć taką samą długość wynoszącą regmap_size i są powiązane ze sobą indeksem tablicy. Zatem o tym, czy wartość `regmap[index]` będzie można nadpisać, decyduje maska `write_mask[index]`. Gdy wartość zostanie nadpisana, wartość `update_flag[index]` zostanie ustawiona na true. Dodatkowo warto stworzyć sobie zmienną wyliczeniową `enum` z nazwami rejestrów powiązanymi z ich numerami.
 
-[W przykładzie](./example/rs485-modbus-slave.c) urządzeniu slave został nadany adres `0x12`. Urządzenie udostępnia `3` rejestry: `DigitalInputs`, `HexConfig` i `DecConfig`. Rejestry `HexConfig` oraz `DecConfig` mogą zostać nadpisane.
+W przykładzie urządzeniu slave został nadany adres `0x07`. Urządzenie udostępnia `3` rejestry: `DigitalInputs`, `HexConfig` i `DecConfig`. Rejestry `HexConfig` oraz `DecConfig` mogą zostać nadpisane.
 
 ```c
-#define MODBUS_ADDR 0x12 // Adres urządzenia Modbus slave
+#define MODBUS_ADDR 0x07 // Adres urządzenia Modbus slave
 #define MODBUS_REG_COUNT 3 // Ilość rejestrów Modbus
 
 // Stworzenie mapy rejestrów Modbusa
@@ -123,39 +123,51 @@ Jeśli w wyniku komunikacji jakakolwiek wartość została nadpisana, funkcja `M
 ```c
 void loop(void)
 {
-  init(); 
+  init(); // Inicjacja mapy pamięci
   while(1) {
-    MODBUS_Loop(&modbus_slave); // Modbus Slave Engine
-    // Sprawdzanie, czy jakikolwiek rejestr został nadpisany/zaktualizowany
-    if(MODBUS_IsUpdate(&modbus_slave)) {
-      // Poszukiwania nadpisanych/zaktualizowanych rejestrów
-      for(MODBUS_Reg_e reg = 0; reg < MODBUS_REG_COUNT; reg++) {
-        if(modbus_slave.update_flag[reg]) {
-          switch(reg) {
-            case MODBUS_Reg_HexConfig: // aktualizacja `HexConfig`
-              // TODO: HexConfig Job
-              DBG_String("UPDATE HexConfig:");
-              DBG_Hex16(modbus_memory[reg]);
-              DBG_Enter();
-              break;
-            case MODBUS_Reg_DecConfig:  // aktualizacja `DecConfig`
-              // TODO: DecConfig Job
-              DBG_String("UPDATE HexConfig:");
-              DBG_Dec(modbus_memory[reg]);
-              DBG_Enter();
-              break;
-            default:
-              break;
-          }
-          // Reset flagi aktualizacji `update_flag`
-          modbus_slave.update_flag[reg] = false;
-        } 
+    // Engine Modbus Slave zwracający status komunikacji
+    MODBUS_Status_e status = MODBUS_Loop(&modbus_slave);
+    if(MODBUS_STATUS_ERROR(status)) {
+      // Mignięcie czerwoną diodą w przypadku błędu komunikacji
+      LED_OneShoot(RGB_Red, 200);
+      continue;
+    }
+    else if(status == MODBUS_Status_FrameForMe) {
+      // Mignięcie zieloną diodą w przypadku poprawnej komunikacji
+      LED_OneShoot(RGB_Green, 200);
+      // Sprawdzanie, czy jakikolwiek rejestr został nadpisany/zaktualizowany
+      if(MODBUS_IsUpdate(&modbus_slave)) {
+        // Poszukiwania nadpisanych/zaktualizowanych rejestrów
+        for(MODBUS_Reg_e reg = 0; reg < MODBUS_REG_COUNT; reg++) {
+          if(modbus_slave.update_flag[reg]) {
+            switch(reg) {
+              case MODBUS_Reg_HexConfig: // aktualizacja `HexConfig`
+                // TODO: HexConfig Job
+                DBG_String("UPDATE HexConfig:");
+                DBG_Hex16(modbus_memory[reg]);
+                DBG_Enter();
+                break;
+              case MODBUS_Reg_DecConfig: // aktualizacja `DecConfig`
+                // TODO: DecConfig Job
+                DBG_String("UPDATE HexConfig:");
+                DBG_Dec(modbus_memory[reg]);
+                DBG_Enter();
+                break;
+              default:
+                break;
+            }
+            // Reset flagi aktualizacji `update_flag`
+            modbus_slave.update_flag[reg] = false;
+          } 
+        }
       }
     }
     let();
   }
 }
 ```
+
+🚀 Kompletny przykład: [Komunikacja RS485 Modbuse Slave](./example/rs485-modbus-slave.c)
 
 ## Komunikacja `I2C`
 
