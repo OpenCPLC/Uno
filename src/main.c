@@ -1,7 +1,11 @@
+// Import podstawowych funkcji sterownika.
 #include "opencplc-uno.h"
+// Import funkcji dla modbus slave
 #include "modbus-slave.h"
 
+// Stos pamięci dla wątku PLC
 static uint32_t stack_plc[256];
+// Stos pamięci dla funkcji loop
 static uint32_t stack_loop[256];
 
 #define MODBUS_ADDR 0x07 // Adres urządzenia Modbus slave
@@ -46,9 +50,10 @@ MODBUS_Slave_t modbus_slave = {
 
 void loop(void)
 {
-  init(); 
+  init(); // Inicjacja mapy pamięci
   while(1) {
-    MODBUS_Status_e status = MODBUS_Loop(&modbus_slave); // Modbus Slave Engine
+    // Engine Modbus Slave zwracający status komunikacji
+    MODBUS_Status_e status = MODBUS_Loop(&modbus_slave);
     if(MODBUS_STATUS_ERROR(status)) {
       // Mignięcie czerwoną diodą w przypadku błędu komunikacji
       LED_OneShoot(RGB_Red, 200);
@@ -84,16 +89,20 @@ void loop(void)
         }
       }
     }
-    clear();
     let();
   }
 }
 
 int main(void)
 {
-  PLC_Init();
+  // Inicjacja sterownika
+  PLC_Init(); 
+  // Dodanie wątku sterownika
   thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
+  // Dodanie funkcji loop jako wątek
   thread(&loop, stack_loop, sizeof(stack_loop));
+  // Włączenie systemy przełączania wątków VRTS
   VRTS_Init();
+  // W to miejsce program nigdy nie powinien dojść
   while(1);
 }
