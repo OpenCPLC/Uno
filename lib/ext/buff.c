@@ -127,7 +127,7 @@ bool BUFF_Skip(BUFF_t *buff)
  */
 void BUFF_Clear(BUFF_t *buff)
 {
-  while(1) BUFF_Skip(buff);
+  while(BUFF_Skip(buff));
 }
 
 //-------------------------------------------------------------------------------------------------

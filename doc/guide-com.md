@@ -6,62 +6,92 @@ W sterowniku **Uno** dostępne są dwa interfejsy **RS485**: `RS1` oraz `RS2`. W
 
 ### 🧔🏻 Modbus Master 
 
-W przykładzie nawiązujemy komunikację z urządzeniem o adresie `0x02` za pomocą protokołu **Modbus RTU**. W konfiguracji rejestr `0x10` jest ustawiany na wartość `1152`. Proces konfiguracji jest powtarzany, dopóki urządzenie nie udzieli odpowiedzi. W głównej pętli loop dokonuje się odczytu trzech rejestrów. Wartość `uint16` jest odczytywana z rejestru `0x14`, natomiast wartości `uint32` z rejestru `0x15` i `0x16`. Warto zauważyć, że protokół Modbus nie narzuca konkretnej kolejności bajtów dla zmiennych 32-bitowych, co może wymagać odwrócenia kolejności słów 16-bitowych, aby uzyskać prawidłową wartość. W trakcie komunikacji, `timeout` jest ustawiany na `1000`ms, a przerwa między odpowiedzią a kolejnym zapytaniem wynosi `500`ms.
+W przykładzie ustanawiamy komunikację z urządzeniem slave o adresie `0x07` przy użyciu protokołu **Modbus RTU**.
 
 ```c
-#include "opencplc-uno.h"
+// Import funkcji dla Modbus RTU Master
 #include "modbus-master.h"
 
-int loop(void);
-
+// Stos pamięci dla wątku PLC
 static uint32_t stack_plc[256];
-static uint32_t stack_app[512];
+// Stos pamięci dla funkcji loop
+static uint32_t stack_loop[256];
 
-UART_t *rs485 = &RS1;
+#define MODBUS_ADDR 0x07 // Adres urządzenia Modbus Slave
+#define MODBUS_REG_COUNT 3 // Ilość rejestrów Modbus
+#define MODBUS_TIMEOUT 1000 // Timeout dla wszystkich funkcji komunikacyjnych w protokole Modbus wynosi 1 sekundę.
 
-#define ADDR 0x02
+// Stworzenie mapy rejestrów Modbus'a
+typedef enum {
+  MODBUS_Reg_DigitalInputs,
+  MODBUS_Reg_HexConfig,
+  MODBUS_Reg_DecConfig,
+} MODBUS_Reg_e;
 
-int main(void)
+// Deklaracja pamięci podręcznej dla rejestrów odczytanych z urządzenia Slave
+uint16_t modbus_memory[MODBUS_REG_COUNT];
+// Mapowanie interfejsu `RS1` na protokół modbus_master
+UART_t *modbus_master = &RS1;
+```
+
+Podczas normalnej pracy funkcją `0x03` odczytywane są pierwsze **3** rejestry z urządzenia i wyświetlane poprzez interfejs `DBG`. Gdy zostanie naciśnięty przycisk, zamiast operacji odczytu zostanie wykonana operacja nadpisania rejestru funkcją 0x06. Przerwy między komunikacjami wynoszą **500ms**, chyba że wystąpi błąd, wtedy są zwiększane do **1s**.
+
+```c
+void loop(void)
 {
-  PLC_Init();
-  thread(&PLC_Loop, stack_plc, sizeof(stack_plc));
-  thread(&app, stack_app, sizeof(stack_app));
-  VRTS_Init();
-  while(1);
-}
-
-struct {
-  uint16_t uint16;
-  uint32_t uint32;
-} regmap;
-
-int app(void)
-{
-  while(MODBUS_PresetRegister(rs485, ADDR, 0x10, 1152, 1000)) { // config
-    DBG_String("MODBUS no-respond");
-    delay(1000);
-  }
   while(1) {
-    if(MODBUS_ReadHoldingRegisters(rs485, ADDR, 0x14, 3, (uint16_t *)&regmap, 1000)) {
-      DBG_String("MODBUS uint16:NULL uint32:NULL");
-      delay(1000);
+    // Jeżeli zostanie naciśnięty przycisk, wykonaj operację wpisywania
+    if(DIN_Fall(&BTN)) {
+      // Wpisz do rejestru `HexConfig` wartość `0x1234`
+      if(MODBUS_PresetRegister(modbus_master, MODBUS_ADDR, MODBUS_Reg_HexConfig, 0x1234, MODBUS_TIMEOUT)) {
+        // Obsługa błędów komunikacji lub braku odpowiedzi dla operacji wpisywania
+        DBG_String("MODBUS write:no-respond");
+        DBG_Enter();
+        LED_OneShoot(RGB_Yellow, 200);
+        // Dodatkowe opóźnienie umożliwia urządzeniom slave przygotowanie się na kolejne ramki komunikacyjne
+        delay(500);
+      }
+      else {
+        // Obsługa poprawnej komunikacji dla operacji wpisywania
+        DBG_String("MODBUS write:ok");
+        DBG_Enter();
+        LED_OneShoot(RGB_Cyan, 200);
+      }
     }
+    // Jeśli nie zostanie odnotowane zdarzenie wciśnięcia przycisku, wykonaj operację odczytu
     else {
-      DBG_String("MODBUS uint16:");
-      DBG_uDec(regmap.uint16);
-      // regmap.uint32 = (regmap.uint32 >> 16) | (regmap.uint32 << 16); // swap if necessary
-      DBG_String(" uint32:");
-      DBG_uDec(regmap.uint32);
-      DBG_Enter();
-      delay(500);
+      // Odczytaj 3 rejestry, rozpoczynając od rejestru `DigitalInputs`, a wartości odczytane umieść w tablicy `modbus_memory`
+      if(MODBUS_ReadHoldingRegisters(modbus_master, MODBUS_ADDR, MODBUS_Reg_DigitalInputs, 3, (uint16_t *)&modbus_memory, MODBUS_TIMEOUT)) {
+        // Obsługa błędów komunikacji lub braku odpowiedzi dla operacji odczytu
+        DBG_String("MODBUS read:no-respond");
+        DBG_Enter();
+        LED_OneShoot(RGB_Red, 200);
+        // Dodatkowe opóźnienie umożliwia urządzeniom slave przygotowanie się na kolejne ramki komunikacyjne
+        delay(500);
+      }
+      else {
+        // Wyświetlanie odczytanych wartości rejestrów w przypadku poprawnej komunikacji dla operacji odczytu
+        DBG_String("MODBUS 0b");
+        DBG_Bin16(modbus_memory[MODBUS_Reg_DigitalInputs], "");
+        DBG_String(" 0x");
+        DBG_Hex16(modbus_memory[MODBUS_Reg_HexConfig]);
+        DBG_Char(' ');
+        DBG_Dec(modbus_memory[MODBUS_Reg_DecConfig]);
+        DBG_Enter();
+        LED_OneShoot(RGB_Green, 200);
+      }
     }
+    // Zwolnij rdzeń i odczekaj 500 ms przed kolejną komunikacją
+    delay(500);
   }
 }
 ```
 
 ### 👨🏿‍🦲 Modbus Slave
 
-W konfiguracji **Modbus** w trybie **Slave** należy stworzyć strukturę `MODBUS_Slave_t` oraz ustawić w niej:
+W tej implementacji pamięć jest wspólna dla wszystkich funkcji Modbus. Zatem funkcje _"Read Input Registers"_ `0x04` oraz _"Read Holding Registers"_ `0x03` odwołują się do tego samego bloku pamięci. Podobnie funkcje _"Read Outputs"_ `0x02` oraz _"Read Bits"_ `0x01`. Funkcje bitowe odwołują się do tego samego magazynu pamięci, z tą różnicą, że pamięć indeksowana jest bitowe/binarne, a nie `uint16_t`.
+
+W przykładowej konfiguracji **Modbus RTU** w trybie **Slave** należy stworzyć strukturę `MODBUS_Slave_t` oraz ustawić w niej:
 
 - `uart` - wskaźnik na wykorzystywany interfejs **UART**,
 - `address` - adres urządzenia Modbus,
@@ -72,13 +102,18 @@ W konfiguracji **Modbus** w trybie **Slave** należy stworzyć strukturę `MODBU
 
 Tablice regmap, write_mask i update_flag muszą mieć taką samą długość wynoszącą regmap_size i są powiązane ze sobą indeksem tablicy. Zatem o tym, czy wartość `regmap[index]` będzie można nadpisać, decyduje maska `write_mask[index]`. Gdy wartość zostanie nadpisana, wartość `update_flag[index]` zostanie ustawiona na true. Dodatkowo warto stworzyć sobie zmienną wyliczeniową `enum` z nazwami rejestrów powiązanymi z ich numerami.
 
-W przykładzie urządzeniu slave został nadany adres `0x07`. Urządzenie udostępnia `3` rejestry: `DigitalInputs`, `HexConfig` i `DecConfig`. Rejestry `HexConfig` oraz `DecConfig` mogą zostać nadpisane.
+W przykładzie urządzeniu slave został nadany adres `0x07`. Urządzenie udostępnia **3** rejestry: `DigitalInputs`, `HexConfig` i `DecConfig`. Rejestry `HexConfig` oraz `DecConfig` mogą zostać nadpisane.
+
+🚀 Kompletny przykład: [Komunikacja RS485 Modbuse Master](./example/com/rs485-modbus-master.c)
 
 ```c
-#define MODBUS_ADDR 0x07 // Adres urządzenia Modbus slave
+// Import funkcji dla Modbus RTU Slave
+#include "modbus-slave.h"
+
+#define MODBUS_ADDR 0x07 // Adres urządzenia Modbus Slave
 #define MODBUS_REG_COUNT 3 // Ilość rejestrów Modbus
 
-// Stworzenie mapy rejestrów Modbusa
+// Stworzenie mapy rejestrów Modbus'a
 typedef enum {
   MODBUS_Reg_DigitalInputs,
   MODBUS_Reg_HexConfig,
@@ -130,7 +165,6 @@ void loop(void)
     if(MODBUS_STATUS_ERROR(status)) {
       // Mignięcie czerwoną diodą w przypadku błędu komunikacji
       LED_OneShoot(RGB_Red, 200);
-      continue;
     }
     else if(status == MODBUS_Status_FrameForMe) {
       // Mignięcie zieloną diodą w przypadku poprawnej komunikacji
@@ -167,7 +201,7 @@ void loop(void)
 }
 ```
 
-🚀 Kompletny przykład: [Komunikacja RS485 Modbuse Slave](./example/rs485-modbus-slave.c)
+🚀 Kompletny przykład: [Komunikacja RS485 Modbuse Slave](./example/com/rs485-modbus-slave.c)
 
 ## 🔀 Komunikacja `I2C`
 

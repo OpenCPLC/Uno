@@ -57,7 +57,7 @@ void loop(void)
 }
 ```
 
-🚀 Kompletny przykład: [Dioda LED włącz i wyłącz](./example/led-set-rst.c)
+🚀 Kompletny przykład: [Dioda LED włącz i wyłącz](./example/io/led-set-rst.c)
 
 Ponieważ oko ludzkie lepiej reaguje na zmiany obrazu, popularną praktyką jest miganie lampkami informacyjnymi, co pozwala lepiej zwrócić uwagę na ewentualne błędy. Miganie można aktywować za pomocą funkcji `LED_Blink_ON`, przekazując czas w **ms** między zmianami stanu diody. Miganie można w każdej chwili wyłączyć za pomocą funkcji `LED_Blink_OFF`.
 
@@ -91,7 +91,7 @@ void loop(void)
 }
 ```
 
-🚀 Kompletny przykład: [Dioda LED miganie](./example/led-blink.c)
+🚀 Kompletny przykład: [Dioda LED miganie](./example/io/led-blink.c)
 
 Jednak, gdy chcemy szybko wskazać na jakieś zdarzenie, dobrze jest wykonać pojedyńcze mignięcie wykorzystując funkcję `LED_OneShot`, która ustawia diodę na określony kolor i wyłącza ją po podanym czasie.
 
@@ -112,7 +112,7 @@ void loop(void)
 }
 ```
 
-🚀 Kompletny przykład: [Dioda LED pojedyńcze mignięcie](./example/led-one-shot.c)
+🚀 Kompletny przykład: [Dioda LED pojedyńcze mignięcie](./example/io/led-one-shot.c)
 
 ### 🐢 Wyjścia przekaźnikowe `RO`
 

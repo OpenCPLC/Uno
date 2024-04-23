@@ -28,7 +28,7 @@ void *new_static(size_t size);
 void *new(size_t size);
 void clear();
 void *aloc(size_t size);
-void dloc(void *pointer);
+void dloc(void **pointer);
 
 typedef struct {
   void *var[NEW_COUNT_LIMIT];

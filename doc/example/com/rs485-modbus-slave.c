@@ -1,6 +1,6 @@
 // Import podstawowych funkcji sterownika.
 #include "opencplc-uno.h"
-// Import funkcji dla modbus slave
+// Import funkcji dla Modbus RTU Slave
 #include "modbus-slave.h"
 
 // Stos pamięci dla wątku PLC
@@ -8,10 +8,10 @@ static uint32_t stack_plc[256];
 // Stos pamięci dla funkcji loop
 static uint32_t stack_loop[256];
 
-#define MODBUS_ADDR 0x07 // Adres urządzenia Modbus slave
+#define MODBUS_ADDR 0x07 // Adres urządzenia Modbus Slave
 #define MODBUS_REG_COUNT 3 // Ilość rejestrów Modbus
 
-// Stworzenie mapy rejestrów Modbusa
+// Stworzenie mapy rejestrów Modbus'a
 typedef enum {
   MODBUS_Reg_DigitalInputs,
   MODBUS_Reg_HexConfig,
@@ -57,7 +57,6 @@ void loop(void)
     if(MODBUS_STATUS_ERROR(status)) {
       // Mignięcie czerwoną diodą w przypadku błędu komunikacji
       LED_OneShoot(RGB_Red, 200);
-      continue;
     }
     else if(status == MODBUS_Status_FrameForMe) {
       // Mignięcie zieloną diodą w przypadku poprawnej komunikacji

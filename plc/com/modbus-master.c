@@ -5,16 +5,16 @@
 static MODBUS_Error_e MODBUS_SendRead(UART_t *uart, uint8_t addr, MODBUS_Fnc_e fnc, uint8_t *buffer, uint16_t tx_length, uint16_t rx_length, uint32_t timeout_ms)
 {
   CRC_Append(&crc16_modbus, buffer, tx_length - 2);
-  UART_ReadSkip(uart);
+  UART_ReadClear(uart);
   UART_Send(uart, buffer, tx_length);
   uint32_t wait_ms;
   wait_ms = 2 * UART_CalcTime(uart, tx_length) + 10;
-  if(timeout(wait_ms, WAIT_&UART_During, uart)) return MODBUS_Error_Sending;
+  if(timeout(wait_ms, WAIT_&UART_Idle, uart)) return MODBUS_Error_Sending;
   wait_ms = 2 * UART_CalcTime(uart, rx_length) + 10 + timeout_ms;
   if(timeout(wait_ms, WAIT_&UART_ReadSize, uart)) return MODBUS_Error_Timeout;
   uint16_t size = UART_ReadSize(uart);
   if(size != rx_length) {
-    UART_ReadSkip(uart);
+    UART_ReadClear(uart);
     return MODBUS_Error_Length;
   }
   UART_ReadArray(uart, buffer);
@@ -194,20 +194,20 @@ MODBUS_Error_e MODBUS_ReadHoldingRegisters(UART_t *uart, uint8_t addr, uint16_t 
 
 //------------------------------------------------------------------------------------------------- WRITE-REGS
 
-#define MODBUS_PRESSREG_TXLEN 7
-#define MODBUS_PRESSREG_RXLEN 7
+#define MODBUS_PRESSREG_TXLEN 8
+#define MODBUS_PRESSREG_RXLEN 8
 
 static MODBUS_Error_e _MODBUS_PresetRegister(UART_t *uart, uint8_t addr, uint16_t index, uint16_t value, uint32_t timeout_ms)
 {
   if(UART_IsBusy(uart)) return MODBUS_Error_Uart;
-  uint8_t *buffer = (uint8_t *)new(MODBUS_PRESSREG_RXLEN);
+  uint8_t *buffer = (uint8_t *)new(MODBUS_PRESSREG_TXLEN);
   buffer[0] = addr;
   buffer[1] = MODBUS_Fnc_PresetRegister;
   buffer[2] = (uint8_t)(index >> 8);
   buffer[3] = (uint8_t)index;
   buffer[4] = (uint8_t)(value >> 8);
   buffer[5] = (uint8_t)value;
-  MODBUS_Error_e error = MODBUS_SendRead(uart, addr, MODBUS_Fnc_PresetRegister, buffer, MODBUS_PRESETBIT_TXLEN, MODBUS_PRESSREG_RXLEN, timeout_ms);
+  MODBUS_Error_e error = MODBUS_SendRead(uart, addr, MODBUS_Fnc_PresetRegister, buffer, MODBUS_PRESSREG_TXLEN, MODBUS_PRESSREG_RXLEN, timeout_ms);
   if(error) return error;
   if(((uint16_t)buffer[2] << 8 | buffer[3]) != index) return MODBUS_Error_Index;
   if(((uint16_t)buffer[4] << 8 | buffer[5]) != value) return MODBUS_Error_Value;

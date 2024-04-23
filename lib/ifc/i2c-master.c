@@ -42,7 +42,7 @@ static void I2C_Master_InterruptEV(I2C_Master_t *i2c)
     i2c->reg->ICR |= I2C_ICR_STOPCF;
     i2c->reg->CR1 &= ~I2C_CR1_STOPIE;
     i2c->busy = 0;
-    dloc(i2c->tx_buffer);
+    dloc((void **)&i2c->tx_buffer);
     i2c->tx_buffer = 0;
   }
   if((i2c->reg->CR1 & I2C_CR1_NACKIE) && (i2c->reg->ISR & I2C_ISR_NACKF)) {

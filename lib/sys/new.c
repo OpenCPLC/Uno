@@ -89,14 +89,14 @@ void *aloc(size_t size)
   return pointer;
 }
 
-void dloc(void *pointer)
+void dloc(void **pointer)
 {
   if(!pointer) return;
   uint16_t i = 0;
   while(i < ALOC_COUNT_LIMIT) {
-    if(pointer == aloc_var[i]) {
-      free(pointer);
-      pointer = NULL;
+    if(*pointer == aloc_var[i]) {
+      free(*pointer);
+      *pointer = NULL;
       new_size -= aloc_size[i];
       aloc_size[i] = 0;
       aloc_var[i] = NULL;

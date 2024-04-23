@@ -77,6 +77,7 @@ typedef struct {
 void UART_Init(UART_t *uart);
 void UART_ReInit(UART_t *uart);
 bool UART_During(UART_t *uart);
+bool UART_Idle(UART_t *uart);
 bool UART_IsBusy(UART_t *uart);
 bool UART_IsFree(UART_t *uart);
 
@@ -87,6 +88,7 @@ uint16_t UART_ReadArray(UART_t *uart, uint8_t *array);
 char *UART_ReadString(UART_t *uart);
 uint8_t UART_ReadToFile(UART_t *uart, FILE_t *file);
 bool UART_ReadSkip(UART_t *uart);
+void UART_ReadClear(UART_t *uart);
 
 uint16_t UART_CalcTime(UART_t *uart, uint16_t length);
 

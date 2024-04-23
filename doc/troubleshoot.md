@@ -24,3 +24,18 @@ Ustaw wartość definicji `VRTS_SWITCHING` na `1` w pliku `main.h`
 
 #define VRTS_SWITCHING 1
 
+
+
+
+
+
+
+Brak obsługi przycisku
+Brak migającej diody
+Innyych standardowych funkcji, które dostaracz wątek PLC
+
+- Brak lub skrajnie żadnie wywoływanie funkcji zwalnjającej rdzeń w naszym wątku, takiej jaki let() czy delay()
+
+rozwiązanie:
+
+dodaj funkcję let() na końcu pętli while(1) w dwoim wątku

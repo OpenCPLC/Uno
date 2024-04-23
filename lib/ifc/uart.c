@@ -153,6 +153,11 @@ bool UART_During(UART_t *uart)
   return uart->_busy_tc;
 }
 
+bool UART_Idle(UART_t *uart)
+{
+  return !(uart->_busy_tc);
+}
+
 bool UART_IsBusy(UART_t *uart)
 {
   return uart->_busy_tx;

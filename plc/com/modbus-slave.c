@@ -5,7 +5,7 @@ MODBUS_Status_e MODBUS_Loop(MODBUS_Slave_t *modbus)
   if(UART_During(modbus->uart)) return MODBUS_Status_UartBusy;
   uint16_t size_rx = UART_ReadSize(modbus->uart);
   if(!size_rx) return MODBUS_Status_NoFrame;
-  dloc((void *)modbus->buffer_rx);
+  dloc((void **)&modbus->buffer_rx);
   modbus->buffer_rx = (uint8_t *)aloc(size_rx);
   size_rx = UART_ReadArray(modbus->uart, modbus->buffer_rx);
   if(size_rx <= 5) return MODBUS_Status_FrameTooShort;
@@ -13,7 +13,7 @@ MODBUS_Status_e MODBUS_Loop(MODBUS_Slave_t *modbus)
   if(CRC_Error(&crc16_modbus, modbus->buffer_rx, size_rx)) return MODBUS_Status_ErrorCRC;
   uint16_t reg, start, count, value;
   uint8_t bit;
-  dloc((void *)modbus->buffer_tx);
+  dloc((void **)&modbus->buffer_tx);
   uint16_t size_tx = 0;
   MODBUS_Fnc_e function_code = (MODBUS_Fnc_e)modbus->buffer_rx[1];
   switch(function_code) {
