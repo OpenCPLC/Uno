@@ -87,6 +87,8 @@ void loop(void)
 }
 ```
 
+🚀 Kompletny przykład: [Komunikacja RS485 Modbuse Master](./example/com/rs485-modbus-master.c)
+
 ### 👨🏿‍🦲 Modbus Slave
 
 W tej implementacji pamięć jest wspólna dla wszystkich funkcji Modbus. Zatem funkcje _"Read Input Registers"_ `0x04` oraz _"Read Holding Registers"_ `0x03` odwołują się do tego samego bloku pamięci. Podobnie funkcje _"Read Outputs"_ `0x02` oraz _"Read Bits"_ `0x01`. Funkcje bitowe odwołują się do tego samego magazynu pamięci, z tą różnicą, że pamięć indeksowana jest bitowe/binarne, a nie `uint16_t`.
@@ -103,8 +105,6 @@ W przykładowej konfiguracji **Modbus RTU** w trybie **Slave** należy stworzyć
 Tablice regmap, write_mask i update_flag muszą mieć taką samą długość wynoszącą regmap_size i są powiązane ze sobą indeksem tablicy. Zatem o tym, czy wartość `regmap[index]` będzie można nadpisać, decyduje maska `write_mask[index]`. Gdy wartość zostanie nadpisana, wartość `update_flag[index]` zostanie ustawiona na true. Dodatkowo warto stworzyć sobie zmienną wyliczeniową `enum` z nazwami rejestrów powiązanymi z ich numerami.
 
 W przykładzie urządzeniu slave został nadany adres `0x07`. Urządzenie udostępnia **3** rejestry: `DigitalInputs`, `HexConfig` i `DecConfig`. Rejestry `HexConfig` oraz `DecConfig` mogą zostać nadpisane.
-
-🚀 Kompletny przykład: [Komunikacja RS485 Modbuse Master](./example/com/rs485-modbus-master.c)
 
 ```c
 // Import funkcji dla Modbus RTU Slave

@@ -121,28 +121,49 @@ void LED_OneShoot(RGB_e color, uint16_t ms)
   rgb_focus->one_shot = true;
 }
 
-// TODO: OneShot
 bool LED_Bash(char **argv, uint16_t argc)
 {
-  if(!rgb_focus) return false;
   RGB_Hash_e sw = hash(argv[0]);
   if(sw != RGB_Hash_Rgb && sw != RGB_Hash_Led) return false;
+  if(!rgb_focus) return true;
   if(argc > 1) {
     switch(hash(argv[1])) {
       case RGB_Hash_Blink:
-        if(argc > 2) {
-          sw = hash(argv[2]);
-          if(sw == RGB_Hash_On && argc == 4) {
-            char *str = argv[3];
-            bool ok = str2nbr_valid(str);
-            if(!ok) return false;
-            uint16_t blink_ms = str2nbr(str);
-            LED_Blink_ON(blink_ms);
-          }
-          else if(sw == RGB_Hash_Off && argc == 3) {
-            LED_Blink_OFF();
-          }
+        if(argc < 3) return true;
+        sw = hash(argv[2]);
+        if(sw == RGB_Hash_On && argc == 4) {
+          char *str = argv[3];
+          bool ok = str2nbr_valid(str);
+          if(!ok) return true;
+          uint16_t blink_ms = str2nbr(str);
+          LED_Blink_ON(blink_ms);
         }
+        else if(sw == RGB_Hash_Off && argc == 3) {
+          LED_Blink_OFF();
+        }
+        break;
+      case RGB_Hash_Shot:
+        if(argc < 3) return true;
+        uint16_t shot_ms;
+        if(argc >= 4) {
+          char *str = argv[3];
+          bool ok = str2nbr_valid(str);
+          if(!ok) return true;
+          shot_ms = str2nbr(str);
+        }
+        else shot_ms = 200;
+        RGB_e color;
+        switch(hash(argv[2])) {
+          case RGB_Hash_Red: color = RGB_Red; break;
+          case RGB_Hash_Green: color = RGB_Green; break;
+          case RGB_Hash_Blue: color = RGB_Blue; break;
+          case RGB_Hash_Yellow: color = RGB_Yellow; break;
+          case RGB_Hash_Cyan: color = RGB_Cyan; break;
+          case RGB_Hash_Magenta: color = RGB_Magenta; break;
+          case RGB_Hash_White: color = RGB_White; break;
+          default: return true;
+        }
+        LED_OneShoot(color, shot_ms);
         break;
       case RGB_Hash_Off: LED_Set(RGB_Off); break;
       case RGB_Hash_Red: LED_Set(RGB_Red); break;
@@ -156,7 +177,9 @@ bool LED_Bash(char **argv, uint16_t argc)
   }
   DBG_String("RGB "); DBG_String((char *)rgb_color_name[rgb_focus->state]);
   if(rgb_focus->state && rgb_focus->blink_ms) {
-    DBG_String(" blink:"); DBG_uDec(rgb_focus->blink_ms); DBG_String("ms"); 
+    if(rgb_focus->one_shot) DBG_String(" shot:");
+    else DBG_String(" blink:");
+    DBG_uDec(rgb_focus->blink_ms); DBG_String("ms"); 
   }
   DBG_Enter();
   return true;

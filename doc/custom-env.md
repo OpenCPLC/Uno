@@ -1,6 +1,6 @@
 ## Custom environment config
 
-Do pracy ze sterownikami OpenCPLC wymagany jest również zestaw bardziej specjalistycznych narzędzi, identyczny z tym używanym do pracy z mikrokontrolerami **STM32**. W skład tego zestawu wchodzą:
+Do pracy ze sterownikami OpenCPLC wymagany jest zestaw bardziej specjalistycznych narzędzi, identyczny z tym używanym do pracy z mikrokontrolerami **STM32**. W skład tego zestawu wchodzą:
 
 - Pakiet narzędzi [**GNU Arm Embedded Toolchain**](https://developer.arm.com/downloads/-/gnu-rm) - Obejmuje on między innymi kompilator. Pakiet trzeba pobrać i zainstalować w lokalizacji `C:\OpenCPLC\ArmGCC`
 - On-Chip Debugger - [**OpenOCD** ](https://gnutoolchains.com/arm-eabi/openocd/) Umożliwia komunikację z mikrokontrolerem za pomocą programatora ST-Link. Pakiet trzeba pobrać, rozpakować i umieścić w lokalizacji `C:\OpenCPLC\OpenOCD`
@@ -29,3 +29,5 @@ arm-none-eabi-gcc --version
 openocd --version
 make --version
 ```
+
+W ten sposób możemy dostosować lokalizację zainstalowanych pakietów do własnych preferencji oraz mieć pewność, że zainstalowaliśmy najnowsze oprogramowanie.

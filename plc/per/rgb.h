@@ -40,6 +40,7 @@ typedef enum {
   RGB_Hash_Led = 193498042,
   RGB_Hash_Rgb = 193504640,
   RGB_Hash_Blink = 254371765,
+  RGB_Hash_Shot = 2090723395,
   RGB_Hash_On = 5863682,
   RGB_Hash_Off = 193501344,
   RGB_Hash_Red = 193504576,

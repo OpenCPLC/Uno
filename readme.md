@@ -103,7 +103,9 @@ END_PROGRAM
 | ------------------------------ | ---------------------------------- |
 | ![LAD-Classic](/img/lader.png) | ![LAD-SetReset](/img/lader-sr.png) |
 
-#### System start-stop ANSI C _(mapowanie z użyciem zmiennych)_
+#### System start-stop ANSI C
+
+**_(mapowanie z użyciem zmiennych)_**
 
 ```c
 #import "opencplc-uno.h"
@@ -130,7 +132,7 @@ int main(void)
 }
 ```
 
-#### System start-stop ANSI C _(mapowanie z użyciem wskaźników)_
+**_(mapowanie z użyciem wskaźników)_**
 
 ```c
 #import "opencplc-uno.h"
