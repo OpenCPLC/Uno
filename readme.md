@@ -11,7 +11,7 @@
     - 2\. [Communication](./doc/guide-com.md) - 🔗 Komunikacja RS485 i I2C
     - 3\. [Time & Utils](./doc/guide-time.md) - ⌚ Zarządzanie czasem i przydatne funkcje
 
-# 👋 OpenCPLC {#opencplc}
+# 👋 [OpenCPLC](#opencplc)
 
 Projekt zapewnia warstwę pośrednią pomiędzy Twoją aplikacją, a peryferiami mikrokontrolera. Trochę podobnie jak w **Arduino**, jednak bardziej w kierunku automatyki. Bez własnego IDE oraz angażowania C++.
 
