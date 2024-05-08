@@ -37,6 +37,8 @@ status_t CRC_Ok(const CRC_t *crc, uint8_t *buffer, uint16_t count);
   extern const CRC_t crc32;
   extern const CRC_t crc16_kermit;
   extern const CRC_t crc16_modbus;
+  extern const CRC_t crc16_buypass;
+  extern const CRC_t crc8_maxim;
   extern const CRC_t crc8;
 #endif
 

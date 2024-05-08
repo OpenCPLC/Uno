@@ -121,6 +121,26 @@ const CRC_t crc16_modbus = {
   .invert_out = true
 };
 
+const CRC_t crc16_buypass = {
+  .width = 16,
+  .polynomial = 0x8005,
+  .initial = 0x0000,
+  .reflect_data_in = false,
+  .reflect_data_out = false,
+  .final_xor = 0x0000,
+  .invert_out = false
+};
+
+const CRC_t crc8_maxim = {
+  .width = 8,
+  .polynomial = 0x31,
+  .initial = 0x00,
+  .reflect_data_in = 8,
+  .reflect_data_out = true,
+  .final_xor = 0x00,
+  .invert_out = false
+};
+
 const CRC_t crc8 = {
   .width = 8,
   .polynomial = 0x07,

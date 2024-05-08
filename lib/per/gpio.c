@@ -108,6 +108,18 @@ bool GPIO_NotIn(GPIO_t *gpio)
   return !GPIO_In(gpio);
 }
 
+void GPIO_ModeInput(GPIO_t *gpio)
+{
+  gpio->mode = GPIO_Mode_Input;
+  gpio->port->MODER = (gpio->port->MODER & ~(3 << (2 * gpio->pin))) | (gpio->mode << (2 * gpio->pin));
+}
+
+void GPIO_ModeOutput(GPIO_t *gpio)
+{
+  gpio->mode = GPIO_Mode_Output;
+  gpio->port->MODER = (gpio->port->MODER & ~(3 << (2 * gpio->pin))) | (gpio->mode << (2 * gpio->pin));
+}
+
 //----------------------------------------------------------------------------- GPIF
 
 bool GPIF_Input(GPIF_t *gpif)
@@ -121,10 +133,10 @@ bool GPIF_Toggling(GPIF_t *gpif)
   else return false;
 }
 
-bool GPIF_Rais(GPIF_t *gpif)
+bool GPIF_Rise(GPIF_t *gpif)
 {
-  if(gpif->rais) {
-    gpif->rais = false;
+  if(gpif->rise) {
+    gpif->rise = false;
     return true;
   }
   return false;
@@ -141,12 +153,11 @@ bool GPIF_Fall(GPIF_t *gpif)
 
 bool GPIF_Edge(GPIF_t *gpif)
 {
-  bool rais = GPIF_Rais(gpif);
+  bool rise = GPIF_Rise(gpif);
   bool fall = GPIF_Fall(gpif);
-  if(rais || fall) return true;
+  if(rise || fall) return true;
   return false;
 }
-
 
 void GPIF_Init(GPIF_t *gpif)
 {
@@ -169,8 +180,8 @@ bool GPIF_Loop(GPIF_t *gpif)
       gpif->value = in;
       gpif->_toggle_tick = gettick(gpif->toggle_ms);
       if(gpif->value) {
-        gpif->_res_rais_tick = gettick(GPIF_TRESET);
-        gpif->rais = true;
+        gpif->_res_rise_tick = gettick(GPIF_TRESET);
+        gpif->rise = true;
       }
       else {
         gpif->_res_fall_tick = gettick(GPIF_TRESET);
@@ -179,7 +190,7 @@ bool GPIF_Loop(GPIF_t *gpif)
     }
   }
   waitfor(&gpif->_toggle_tick);
-  if(waitfor(&gpif->_res_rais_tick)) gpif->rais = false;
+  if(waitfor(&gpif->_res_rise_tick)) gpif->rise = false;
   if(waitfor(&gpif->_res_fall_tick)) gpif->fall = false;
   return gpif->value;
 }

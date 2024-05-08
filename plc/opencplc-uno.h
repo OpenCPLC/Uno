@@ -8,8 +8,9 @@
 #include "dbg.h"
 #include "bash.h"
 #include "rgb.h"
-#include "vrts.h"
+#include "one-wire.h"
 #include "i2c-master.h"
+#include "vrts.h"
 #include "main.h"
 
 #ifndef PLC_BOOTLOADER
@@ -58,8 +59,20 @@ extern UART_t RS1;
 extern UART_t RS2;
 
 // I2C
+bool I2C_JustRead(uint8_t addr, uint8_t *ary, uint16_t n);
+bool I2C_JustWrite(uint8_t addr, uint8_t *ary, uint16_t n);
 bool I2C_Read(uint8_t addr, uint8_t reg, uint8_t *ary, uint16_t n);
 bool I2C_Write(uint8_t addr, uint8_t reg, uint8_t *ary, uint16_t n);
+
+// 1WIRE
+bool ONE_WIRE_Init(void);
+bool ONE_WIRE_Reset(void);
+void ONE_WIRE_Write(uint8_t value);
+void ONE_WIRE_WriteParasitePower(uint8_t value);
+uint8_t ONE_WIRE_Read(void);
+void ONE_WIRE_Select(uint8_t *addr);
+void ONE_WIRE_Skip(void);
+bool ONE_WIRE_Search(uint8_t *addr);
 
 // Dioda RGB i przycisk BTN
 extern RGB_t RGB;

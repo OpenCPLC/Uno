@@ -12,10 +12,10 @@ void loop(void)
     // Wykonaj pojedyncze mignięcie diodą czerwoną trwające 100ms
     LED_OneShoot(RGB_Red, 100);
     delay(2000); // Odczekaj 2s
-    // Wykonaj pojedyncze mignięcie diodą zeiloną trwające 300ms
+    // Wykonaj pojedyncze mignięcie diodą zieloną trwające 300ms
     LED_OneShoot(RGB_Green, 300);
     delay(2000); // Odczekaj 2s
-    // Wykonaj pojedyncze mignięcie diodą zeiloną trwające 600ms
+    // Wykonaj pojedyncze mignięcie diodą niebieską trwające 600ms
     LED_OneShoot(RGB_Blue, 600);
     delay(2000); // Odczekaj 2s
   }

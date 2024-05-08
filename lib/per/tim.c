@@ -139,6 +139,7 @@ uint16_t TIM_Event(TIM_t *tim)
 {
   if(tim->_inc) {
     uint16_t response = tim->_inc;
+    if(tim->one_pulse_mode) tim->enable = false;
     tim->_inc = 0;
     return response;
   }

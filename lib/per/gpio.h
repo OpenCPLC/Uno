@@ -84,6 +84,8 @@ void GPIO_Rst(GPIO_t *gpio);
 void GPIO_Tgl(GPIO_t *gpio);
 bool GPIO_In(GPIO_t *gpio);
 bool GPIO_NotIn(GPIO_t *gpio);
+void GPIO_ModeInput(GPIO_t *gpio);
+void GPIO_ModeOutput(GPIO_t *gpio);
 
 //------------------------------------------------------------------------------------------------- GPIF
 
@@ -95,20 +97,20 @@ bool GPIO_NotIn(GPIO_t *gpio);
 typedef struct {
   GPIO_t gpio;
   bool value;
-  bool rais;
+  bool rise;
   bool fall;
   uint32_t ton_ms;
   uint32_t toff_ms;
   uint32_t toggle_ms;
   uint64_t _tio_tick;
-  uint64_t _res_rais_tick;
+  uint64_t _res_rise_tick;
   uint64_t _res_fall_tick;
   uint64_t _toggle_tick;
 } GPIF_t;
 
 bool GPIF_Input(GPIF_t *gpif);
 bool GPIF_Toggling(GPIF_t *gpif);
-bool GPIF_Rais(GPIF_t *gpif);
+bool GPIF_Rise(GPIF_t *gpif);
 bool GPIF_Fall(GPIF_t *gpif);
 bool GPIF_Edge(GPIF_t *gpif);
 void GPIF_Init(GPIF_t *gpif);

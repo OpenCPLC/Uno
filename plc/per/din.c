@@ -33,9 +33,9 @@ bool DIN_Toggling(DIN_t *din)
  * @param din Wskaźnik do struktury reprezentującej wejście cyfrowe (DI).
  * @return Wartość `true`, gdy wystąpiło zbocze narastającego; w przeciwnym razie, `false`.
  */
-bool DIN_Rais(DIN_t *din)
+bool DIN_Rise(DIN_t *din)
 {
-  return GPIF_Rais(&din->gpif);
+  return GPIF_Rise(&din->gpif);
 }
 
 /**
@@ -51,7 +51,7 @@ bool DIN_Fall(DIN_t *din)
 }
 
 /**
- * @brief Wykrywa zbocze na wejściu cyfrowym (DI).
+ * @brief Wykrywa zbocze na wejściu cyfrowym (DI). Opadające i narastające.
  * Wywołanie tej funkcji skutkuje wyzerowaniem flagi zbocza narastającego i opadającego.
  * Zmiana sygnału krótsza niż din->gpif.edge_ms nie będzie traktowana jako nowe zbocze.
  * @param din Wskaźnik do struktury reprezentującej wejście cyfrowe (DI).

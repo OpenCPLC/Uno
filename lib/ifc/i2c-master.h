@@ -51,7 +51,7 @@ typedef struct {
 } I2C_Master_t;
 
 void I2C_Master_Init(I2C_Master_t *i2c);
-void I2C_Master_ReInit(I2C_Master_t *i2c);
+void I2C_Master_Disable(I2C_Master_t *i2c);
 bool I2C_Master_IsBusy(I2C_Master_t *i2c);
 bool I2C_Master_IsFree(I2C_Master_t *i2c);
 access_t I2C_Master_JustWrite(I2C_Master_t *i2c, uint8_t addr, uint8_t *ary, uint16_t n);

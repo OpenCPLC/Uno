@@ -28,7 +28,7 @@ typedef struct {
 
 bool DIN_State(DIN_t *din);
 bool DIN_Toggling(DIN_t *din);
-bool DIN_Rais(DIN_t *din);
+bool DIN_Rise(DIN_t *din);
 bool DIN_Fall(DIN_t *din);
 bool DIN_Edge(DIN_t *din);
 float DIN_Freq(DIN_t *din);

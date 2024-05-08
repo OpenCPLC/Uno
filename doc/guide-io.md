@@ -41,13 +41,13 @@ W pierwszych krokach zwarto uruchomić program, który nie wymaga podłączania 
 void loop(void)
 {
   while(1) {
-    // Ustawienie diody informacyjnej, aby świeciła na czerwono
+    // Ustawienie diody informacyjnej, aby świeciła na czerwoną
     LED_Set(RGB_Red);
     delay(1000); // Odczekaj 1s
-    // Ustawienie diody informacyjnej, aby świeciła na zielono
+    // Ustawienie diody informacyjnej, aby świeciła na zieloną
     LED_Set(RGB_Green);
     delay(1000); // Odczekaj 1s
-    // Ustawienie diody informacyjnej, aby świeciła na niebiesko
+    // Ustawienie diody informacyjnej, aby świeciła na niebieską
     LED_Set(RGB_Blue);
     delay(1000); // Odczekaj 1s
     // Wyłącz diodę
@@ -102,10 +102,10 @@ void loop(void)
     // Wykonaj pojedyncze mignięcie diodą czerwoną trwające 100ms
     LED_OneShoot(RGB_Red, 100);
     delay(2000); // Odczekaj 2s
-    // Wykonaj pojedyncze mignięcie diodą zeiloną trwające 300ms
+    // Wykonaj pojedyncze mignięcie diodą zieloną trwające 300ms
     LED_OneShoot(RGB_Green, 300);
     delay(2000); // Odczekaj 2s
-    // Wykonaj pojedyncze mignięcie diodą zeiloną trwające 600ms
+    // Wykonaj pojedyncze mignięcie diodą niebieską trwające 600ms
     LED_OneShoot(RGB_Blue, 600);
     delay(2000); // Odczekaj 2s
   }

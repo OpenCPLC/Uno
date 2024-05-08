@@ -84,6 +84,7 @@ typedef struct {
 	volatile uint16_t _inc;
 	volatile bool enable;
 	volatile bool enable_interrupt;
+  uint32_t _reserve;
 } TIM_t;
 
 //-------------------------------------------------------------------------------------------------

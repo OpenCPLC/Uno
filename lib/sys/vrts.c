@@ -2,9 +2,10 @@
 #include "new.h"
 
 volatile uint64_t vrts_ticker;
-uint32_t vrts_ms;
+uint32_t vrts_ms, vrts_overflow;
 volatile VRTS_Task_t *vrts_now_thread;
 volatile VRTS_Task_t *vrts_next_thread;
+uint16_t vrts_tick2ms; // How many clock-ticks make up 1ms
 
 #if(VRTS_SWITCHING)
 
@@ -149,8 +150,9 @@ int32_t watch(uint64_t tick)
 bool SYSTICK_Init(uint32_t systick_ms)
 {
   vrts_ms = systick_ms;
-  uint32_t systick_ticks = (uint32_t)((float)systick_ms * SystemCoreClock / 1000);
-  if(SysTick_Config(systick_ticks) != 0) return false;
+  vrts_tick2ms = SystemCoreClock / 1000;
+  vrts_overflow = (uint32_t)((float)vrts_ms * vrts_tick2ms);
+  if(SysTick_Config(vrts_overflow) != 0) return false;
   NVIC_SetPriority(SysTick_IRQn, 3);
   return true;
 }

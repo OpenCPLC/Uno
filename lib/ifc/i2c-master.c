@@ -108,16 +108,14 @@ void I2C_Master_Init(I2C_Master_t *i2c)
 	  }
   #endif
 	i2c->reg->CR1 |= I2C_CR1_PE | (i2c->filter << I2C_CR1_DNF_Pos);
+  i2c->busy = false;
 }
 
-void I2C_Master_ReInit(I2C_Master_t *i2c)
+void I2C_Master_Disable(I2C_Master_t *i2c)
 {
   i2c->busy = true;
   i2c->reg->CR1 &= ~(I2C_CR1_PE);
   RCC_DisableI2C(i2c->reg);
-  // TODO: Reset GPIO
-  I2C_Master_Init(i2c);
-  i2c->busy = false;
 }
 
 //------------------------------------------------------------------------------------------------- BASIC
@@ -145,7 +143,8 @@ access_t I2C_Master_JustWrite(I2C_Master_t *i2c, uint8_t addr, uint8_t *ary, uin
     i2c->tail = 1;
     i2c->head = n;
     i2c->reg->TXDR = ary[0];
-    i2c->reg->CR1 |= I2C_CR1_TXIE | I2C_CR1_NACKIE;
+    if(n == 1) i2c->reg->CR1 |= I2C_CR1_STOPIE | I2C_CR1_NACKIE;
+    else i2c->reg->CR1 |= I2C_CR1_TXIE | I2C_CR1_NACKIE;
   #endif
   i2c->reg->CR2 = I2C_CR2_AUTOEND | (n << 16) | (addr << 1) | I2C_CR2_START;
   i2c->busy = 1;

@@ -30,7 +30,11 @@ DOUT_t RO4 = { .name = "RO4", .relay = true, .gpio = { .port = GPIOB, .pin = 4 }
 
 PWM_t to_pwm = {
   .reg = TIM1,
-  .prescaler = 46,
+  #if(SYS_CLOCK_FREQ == 16000000)
+    .prescaler = 46,
+  #elif(SYS_CLOCK_FREQ == 18432000)
+
+  #endif
   .channel[TIM_CH1] = TIM1_CH1_PC8,
   .channel[TIM_CH2] = TIM1_CH2_PC9,
   .channel[TIM_CH3] = TIM1_CH3_PC10,
@@ -53,7 +57,11 @@ void TO_Frequency(float frequency)
 
 PWM_t xo_pwm = {
   .reg = TIM2,
-  .prescaler = 460,
+  #if(SYS_CLOCK_FREQ == 16000000)
+    .prescaler = 460,
+  #elif(SYS_CLOCK_FREQ == 18432000)
+
+  #endif
   .channel[TIM_CH1] = TIM2_CH1_PA15,
   .channel[TIM_CH2] = TIM2_CH2_PB3,
   .auto_reload = 1000,
@@ -143,7 +151,7 @@ UART_t RS2 = {
   .gpio_direction = &rs2_gpio_direction
 };
 
-//------------------------------------------------------------------------------------------------- RS485
+//------------------------------------------------------------------------------------------------- I2C
 
 I2C_Master_t i2c_master = {
   .reg = I2C1,
@@ -153,6 +161,24 @@ I2C_Master_t i2c_master = {
   .interrupt_level = 1,
   .I2C_TIMING_100kHz
 };
+
+bool I2C_JustRead(uint8_t addr, uint8_t *ary, uint16_t n)
+{
+  I2C_Master_JustRead(&i2c_master, addr, ary, n);
+  if(timeout(21 + n, WAIT_&I2C_Master_IsFree, &i2c_master)) {
+    return false;
+  }
+  return true;
+}
+
+bool I2C_JustWrite(uint8_t addr, uint8_t *ary, uint16_t n)
+{
+  I2C_Master_JustWrite(&i2c_master, addr, ary, n);
+  if(timeout(21 + n, WAIT_&I2C_Master_IsFree, &i2c_master)) {
+    return false;
+  }
+  return true;
+}
 
 bool I2C_Read(uint8_t addr, uint8_t reg, uint8_t *ary, uint16_t n)
 {
@@ -171,6 +197,25 @@ bool I2C_Write(uint8_t addr, uint8_t reg, uint8_t *ary, uint16_t n)
   }
   return true;
 }
+
+GPIO_t onewire_power_gpio = { .port = GPIOA, .pin = 9, .mode = GPIO_Mode_Output, .set = true };
+GPIO_t onewire_data_gpio = { .port = GPIOA, .pin = 10 };
+ONEWIRE_t onewire = { .gpio = &onewire_power_gpio };
+
+bool ONE_WIRE_Init(void)
+{
+  I2C_Master_Disable(&i2c_master);
+  GPIO_Init(&onewire_data_gpio);
+  return WIRE_Init(&onewire);
+}
+
+bool ONE_WIRE_Reset(void) { return WIRE_Reset(&onewire); }
+void ONE_WIRE_Write(uint8_t value) { WIRE_Write(&onewire, value); }
+void ONE_WIRE_WriteParasitePower(uint8_t value) { WIRE_WriteParasitePower(&onewire, value); }
+uint8_t ONE_WIRE_Read(void) { return WIRE_Read(&onewire); }
+void ONE_WIRE_Select(uint8_t *addr) { WIRE_Select(&onewire, addr); }
+void ONE_WIRE_Skip(void) { WIRE_Skip(&onewire); }
+bool ONE_WIRE_Search(uint8_t *addr) { return WIRE_Search(&onewire, addr); }
 
 //------------------------------------------------------------------------------------------------- RGB+BTN
 
@@ -230,7 +275,7 @@ void PLC_Init(void)
   // Konfiguracja systemowa
   RTC_Init();
   EEPROM_Cache(&cache_eeprom);
-  SYSTICK_Init(10);
+  SYSTICK_Init(1);
   RGB_Init(&RGB);
   DIN_Init(&BTN);
   DBG_Init(&dbg_uart, &dbg_file);
