@@ -23,7 +23,7 @@ uint16_t AIN_Raw(AIN_t *ain)
 float AIN_Value(AIN_t *ain)
 {
   uint16_t raw = ain->adc->measurements.output[ain->channel];
-  float value = resistor_divider_factor(3.3, 160, 330, 16) * raw;
+  float value = resistor_divider_factor(3.3, 340, 160, 16) * raw;
   if(ain->type == AIN_Type_mAmps) value *= 2;
   return value;
 }
