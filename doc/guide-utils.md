@@ -8,7 +8,7 @@ TODO
 
 Popularnym sposobem przechowywania zmiennych, których wartości zostają zachowane po resecie urządzenia lub utracie zasilania, jest pamięć **EEPROM**. Najprostszą metodą jest użycie domyślnego kontrolera tej pamięci do zapisu oraz wczytywania zmiennych podczas inicjalizacji programu lub w momencie, kiedy będą one potrzebne.
 
-W przykładzie wykorzystywane są 4 [wejścia cyfrowe DI](./guide-io.md#️-wejścia-cyfrowe-di). Operujemy na zmiennej `value`, której wartość jest inicjowana _(przed pętlą główną `while`)_, przez odczyt z pamięci EEPROM. Jeśli odczyt się nie powiedzie _(zmienna nie zostanie znaleziona)_, zostanie przypisana wartość domyślna. W pętli głównej program oczekuje na wciśnięcie jednego z przycisków podłączonych do wejść cyfrowych oraz realizuje ich obsługę:
+W przykładzie wykorzystywane są 4 [wejścia cyfrowe DI](./guide-io.md#%EF%B8%8F-wejścia-cyfrowe-di). Operujemy na zmiennej `value`, której wartość jest inicjowana _(przed pętlą główną `while`)_, przez odczyt z pamięci EEPROM. Jeśli odczyt się nie powiedzie _(zmienna nie zostanie znaleziona)_, zostanie przypisana wartość domyślna. W pętli głównej program oczekuje na wciśnięcie jednego z przycisków podłączonych do wejść cyfrowych oraz realizuje ich obsługę:
 
 - `DI1` - Inkrementacja zmiennej `value` (zwiększenie o 1)
 - `DI2` - Zapisanie wartości zmiennej `value` do pamięci EEPROM
