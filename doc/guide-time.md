@@ -1,4 +1,4 @@
-# ⌚ Time & Utils [➥](../readme.md)
+# ⌚ Time tools [➥](../readme.md)
 
 ## Synchronizacja procesu
 

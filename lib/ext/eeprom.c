@@ -166,4 +166,10 @@ void EEPROM_LoadList(uint32_t *data, ...)
   va_end(args);
 }
 
+void EEPROM_Remove(void)
+{
+  if(!eeprom_cache) return ERR;
+  return EEPROM_Clear(eeprom_cache);
+}
+
 //-------------------------------------------------------------------------------------------------

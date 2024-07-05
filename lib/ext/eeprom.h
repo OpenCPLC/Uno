@@ -40,6 +40,7 @@ uint8_t EEPROM_Save(uint32_t *data);
 uint8_t EEPROM_Load(uint32_t *data);
 void EEPROM_SaveList(uint32_t *data, ...);
 void EEPROM_LoadList(uint32_t *data, ...);
+void EEPROM_Remove(void);
 
 //-------------------------------------------------------------------------------------------------
 #endif

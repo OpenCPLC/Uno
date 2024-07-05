@@ -261,7 +261,7 @@ void loop(void)
 }
 ```
 
-### Wejścia cyfrowe **`DI`**
+## ⌨️ Wejścia cyfrowe **`DI`**
 
 Wejścia cyfrowe nieco odbiegają od standardów automatyki, umożliwiając traktowanie sygnału **12V** jako logicznej `1`. Głównie w celu obsługi pojazdów przemysłowych, takich jak podnośniki, koparki i dźwigi.
 
@@ -269,6 +269,12 @@ Wejścia cyfrowe nieco odbiegają od standardów automatyki, umożliwiając trak
 | :--------- | :----------- | :----------------- | :------------ |
 | Automatyka | poniżej `5V` | od `5VDC` do `15V` | powyżej `15V` |
 | OpenCPLC   | poniżej `4V` | od `4VDC` do `9V`  | powyżej `9V`  |
+
+Oczywiście, możemy sterować zarówno napięciem przemiennym **230VAC**, jak i międzyfazowym **400VAC**. Jednak podczas sterowania napięciem przemiennym konieczne jest umieszczenie zworki na styku **`ACx`**, gdzie **`x`** jest numerem wejścia cyfrowego.
+
+Dla wystąpienia stanu wysokiego kluczowy jest przepływ prądu pomiędzy wejściem cyfrowym **`DIx`**, a powiązanym z nim potencjałem **`ICOM`**, który zazwyczaj jest wspólny dla kilku wejść. W sterowniku **Uno** są **4** wejścia podzielone na **2** grupy, z przypisanym portem `ICOM` dla każdej z nich. W przykładzie `ICOM12` jest podłączony do potencjału masy `GND`, a wejścia `DI1` i `DI2` są podłączone do zasilania przez przełącznik. Z kolei `ICOM34` jest podłączony do sygnału neutralnego `N`, a wejścia `DI3` i `DI4` są podłączone do fazy `L1` przez przełącznik. W podłączeniu wejść cyfrowych można zamienić `GND` i `VCC` oraz `N` i `L1` między sobą, jeśli zajdzie taka potrzeba.
+
+![DI](./img/di.png)
 
 Podstawową funkcją, która informuje nas o stanie wyjścia, jest `DIN_State`. Zwraca wartość `1`|`true`, jeśli sygnał występuje, oraz wartość `0`|`false`, jeśli nie występuje.
 

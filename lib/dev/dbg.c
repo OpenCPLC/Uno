@@ -258,3 +258,10 @@ access_t DBG_SendFile(FILE_t *file)
 }
 
 //-------------------------------------------------------------------------------------------------
+
+void DBG_BeforeReset(void)
+{
+  while(UART_During(dbg_state.uart)) {
+    let();
+  }
+}

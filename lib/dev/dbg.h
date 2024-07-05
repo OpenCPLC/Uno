@@ -51,5 +51,7 @@ void DBG_PrintArrayBash(FILE_t *file, char **argv, uint16_t argc, uint8_t limit_
 access_t DBG_Send(uint8_t *array, uint16_t length);
 access_t DBG_SendFile(FILE_t *file);
 
+void DBG_BeforeReset(void);
+
 //-------------------------------------------------------------------------------------------------
 #endif

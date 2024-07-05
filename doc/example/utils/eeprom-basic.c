@@ -1,40 +1,15 @@
-// #include "gpio.h"
-// #include "extime.h"
-
-// uint8_t data = 12;
-
-// GPIO_t pin_scl = { .port = GPIOA, .pin = 9, .mode = GPIO_Mode_Output, .set = true };
-// GPIO_t pin_sda = { .port = GPIOA, .pin = 10, .mode = GPIO_Mode_Output, .out_type = GPIO_OutType_OpenDrain, .speed = GPIO_Speed_VeryHigh };
-
-// TIM_t time_delay = { .reg = TIM15 };
-
-// int main2(void)
-// {
-//   GPIO_Init(&pin_sda);
-//   sleep_us_init(&time_delay);
-//   // W to miejsce program nigdy nie powinien dojść
-//   while(1) {
-//     GPIO_Set(&pin_sda);
-//     // sleep_core_us(500);
-//     sleep_us(480);
-//     GPIO_Rst(&pin_sda);
-
-//     sleep_us(480);
-//     // sleep_core_us(500);
-//   }
-// }
-
-
-
 // Import podstawowych funkcji sterownika.
 #include "opencplc-uno.h"
 
+// Stos pamięci dla wątku PLC
 static uint32_t stack_plc[256];
+// Stos pamięci dla funkcji loop
 static uint32_t stack_loop[256];
 
-// Wartość domyślna zmiennej `value`, używana, gdy nie ma jej w pamięci EEPROM
+//
 #define DEFAULT_VALUE 1
-// Zmienna robocza, której wartość będzie przechowywana w pamięci EEPROM
+
+// 
 uint32_t value;
 
 void loop(void)
@@ -80,9 +55,14 @@ void loop(void)
 
 int main(void)
 {
+  // Inicjacja sterownika
   PLC_Init(); 
+  // Dodanie wątku sterownika
   thread(&PLC_Thread, stack_plc, sizeof(stack_plc));
+  // Dodanie funkcji loop jako wątek
   thread(&loop, stack_loop, sizeof(stack_loop));
+  // Włączenie systemy przełączania wątków VRTS
   VRTS_Init();
+  // W to miejsce program nigdy nie powinien dojść
   while(1);
 }
