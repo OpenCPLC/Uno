@@ -6,10 +6,9 @@ static uint32_t stack_plc[256];
 // Stos pamięci dla funkcji loop
 static uint32_t stack_loop[256];
 
-//
+// Wartość domyślna zmiennej `value`, używana, gdy nie ma jej w pamięci EEPROM
 #define DEFAULT_VALUE 1
-
-// 
+// Zmienna robocza, której wartość będzie przechowywana w pamięci EEPROM
 uint32_t value;
 
 void loop(void)
