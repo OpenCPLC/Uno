@@ -24,28 +24,33 @@ void loop(void)
     DBG_String("EEPROM load value:");
   }
   DBG_uDec(value);
+  DBG_Enter();
 
   while(1) {
     // Pojawienie się sygnału na wejściu cyfrowym DI1
-    if(DIN_Rise(&DI1)) { 
+    if(DIN_Rise(&DI1)) {
       value++; // Zwiększenie wartości zmiennej `value` o 1
       DBG_String("EEPROM inc value:");
       DBG_uDec(value);
+      DBG_Enter();
     }
     // Pojawienie się sygnału na wejściu cyfrowym DI2
     if(DIN_Rise(&DI2)) {
       EEPROM_Save(&value); // Zapisz aktualną wartość zmiennej `value` w pamięci EEPROM
-      DBG_String("EEPROM save"); 
+      DBG_String("EEPROM save");
+      DBG_Enter();
     }
     // Pojawienie się sygnału na wejściu cyfrowym DI3
     if(DIN_Rise(&DI3)) {
       DBG_String("PWR Reset");
+      DBG_Enter();
       DBG_BeforeReset(); // Poczekaj, aż wszystkie dane z DBG zostaną wysłane
       PWR_Reset(); // Zresetuj sterownik - program rozpocznie się od nowa
     }
     if(DIN_Rise(&DI4)) {
       EEPROM_Remove(); // Reset wszystkich zmiennych z pamięci EEPROM
-      DBG_String("EEPROM remove"); 
+      DBG_String("EEPROM remove");
+      DBG_Enter();
       value = DEFAULT_VALUE; // Ustawienie wartości na domyślną
     }
     let();

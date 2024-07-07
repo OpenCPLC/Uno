@@ -15,7 +15,12 @@ uint8_t FLASH_Erase(uint16_t page)
 {
   while(FLASH->SR & FLASH_SR_BSY1) __DSB();
   FLASH->CR &= ~FLASH_CR_PNB;
-  FLASH->CR |= FLASH_CR_PER | (page << 3);
+  #ifdef STM32G081xx
+    FLASH->CR |= (page << 3) | FLASH_CR_PER;
+  #endif
+  #ifdef STM32G0C1xx
+    FLASH->CR |= ((page > 127 ? 1 : 0) << 13) | (page << 3) | FLASH_CR_PER;
+  #endif
   FLASH->CR |= FLASH_CR_STRT;
   while(FLASH->SR & FLASH_SR_BSY1) __DSB();
   FLASH->CR &= ~FLASH_CR_PER;

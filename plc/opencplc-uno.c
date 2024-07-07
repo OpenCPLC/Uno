@@ -330,9 +330,9 @@ void PLC_Init(void)
     PWMI_Init(&din_pwmi);
   }
   // Wejścia analogowe (AI)
-  // ADC_Init(&ain_adc);
-  // ADC_Measurements(&ain_adc);
-  // ADC_Wait(&ain_adc);
+  ADC_Init(&ain_adc);
+  ADC_Measurements(&ain_adc);
+  ADC_Wait(&ain_adc);
   // Interfejsy RS485
   UART_Init(&RS1);
   UART_Init(&RS2);
@@ -375,13 +375,13 @@ void PLC_Loop(void)
     // PWMI_Print(&fan_inputs);
   }
   // Wejścia analogowe (AI)
-  // ADC_Measurements(&ain_adc);
-  // if(ain_adc.overrun) {
-  //   // DBG_String("ADC overrun:");
-  //   // DBG_uDec(ain_adc.overrun);
-  //   // DBG_Enter();
-  //   ain_adc.overrun = 0;
-  // }
+  ADC_Measurements(&ain_adc);
+  if(ain_adc.overrun) {
+    // DBG_String("ADC overrun:");
+    // DBG_uDec(ain_adc.overrun);
+    // DBG_Enter();
+    ain_adc.overrun = 0;
+  }
 }
 
 void PLC_Thread(void)

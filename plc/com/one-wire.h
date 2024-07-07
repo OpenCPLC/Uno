@@ -2,7 +2,7 @@
 #define ONE_WIRE_H_
 
 #include "gpio.h"
-// #include "w8.h"
+#include "extime.h"
 
 #define ONEWIRE_CMD_SKIP_ROM 0xCC
 #define ONEWIRE_CMD_READ_ROM 0x33

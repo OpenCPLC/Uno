@@ -1,5 +1,10 @@
 #include "one-wire.h"
 
+// void sleep_core_us(void)
+// {
+//   // TODO
+// }
+
 bool WIRE_Init(ONEWIRE_t *onewire)
 {
   onewire->gpio->out_type = GPIO_OutType_OpenDrain;
