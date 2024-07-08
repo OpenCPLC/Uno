@@ -39,3 +39,5 @@ Innyych standardowych funkcji, które dostaracz wątek PLC
 rozwiązanie:
 
 dodaj funkcję let() na końcu pętli while(1) w dwoim wątku
+
+Obecnie występuje pewien problem: czyszczenie pamięci procesora _(erase full chip)_ powoduje jego zawieszenie. Aby przywrócić działanie procesora, należy wgrać jakiś działający program z nijcjacją, który nie dochodzi do końca instrukcji, a następnie odłączyć i ponownie podłączyć zasilanie. Rozwiązaniem będzie przygotowanie wbudowanego skryptu, który zamiast usuwać, wgra przykładowy program _(np. zmienianie koloru diody LED)_
