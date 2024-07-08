@@ -1,16 +1,21 @@
 # 🧰 Utils [➥](../readme.md)
 
-## Reset
+## 🔄 Reset
 
 TODO
 
-## Pamięć EEPROM
+## 🔎 Suma kontrolna CRC
+
+## 🎲 Losowanie RNG
+
+
+## 💾 Pamięć EEPROM
 
 Popularnym sposobem przechowywania zmiennych, których wartości zostają zachowane po resecie urządzenia lub utracie zasilania, jest pamięć **EEPROM**. Najprostszą metodą jest użycie domyślnego kontrolera tej pamięci do zapisu oraz wczytywania zmiennych podczas inicjalizacji programu lub w momencie, kiedy będą one potrzebne.
 
 W przykładzie wykorzystywane są 4 [wejścia cyfrowe DI](./guide-io.md#%EF%B8%8F-wejścia-cyfrowe-di). Operujemy na zmiennej `value`, której wartość jest inicjowana _(przed pętlą główną `while`)_, przez odczyt z pamięci EEPROM. Jeśli odczyt się nie powiedzie _(zmienna nie zostanie znaleziona)_, zostanie przypisana wartość domyślna. W pętli głównej program oczekuje na wciśnięcie jednego z przycisków podłączonych do wejść cyfrowych oraz realizuje ich obsługę:
 
-- `DI1` - Inkrementacja zmiennej `value` (zwiększenie o 1)
+- `DI1` - Inkrementacja zmiennej `value` _(zwiększenie o 1)_
 - `DI2` - Zapisanie wartości zmiennej `value` do pamięci EEPROM
 - `DI3` - Reset sterownika
 - `DI4` - Wyczyszczenie pamięci EEPROM
@@ -70,12 +75,20 @@ void loop(void)
 
 🚀 Kompletny przykład: [Podstawowa obsługa EEPROM](./example/utils/eeprom-basic.c)
 
-Ale jest kilka haczyków. Zmienna, którą chcemy przechowywać musi zajmować 4 bajty. Najlepiej jak jest typem `unit32_t`.
-Możemy 
+Ale jest kilka haczyków. Zmienna, którą zapisujemy, musi być zadeklarowana **globalnie** lub być zmienną **typu `static`**. Zmienne lokalne, które nie są statyczne, za każdym wywołaniem funkcji alokują się w innym miejscu pamięci, co uniemożliwia ich poprawne zaindeksowanie w pamięci EEPROM.
 
+Dodatkowo zmienna, którą chcemy przechowywać, musi zajmować 4 bajty, więc nadają się `uint32_t`, `int32_t`, `float`. Gdy typ jest różny od **`uint32_t`**, należy dokonać rzutowania na niego. Gdy zmienna zajmuje mniej bajtów _(`char`, `uint8_t`, `int8_t`, `uint16_t`, `int16_t`)_, należy zrobić wyjątek i zmienić jej deklarację na `uint32_t` lub `int32_t`, w zależności czy korzystamy ze zmiennej z znakiem czy bez. Gdy zmienna zajmuje 8 bajtów _(`uint64_t`, `int64_t`, `double`)_, należy ją podzielić na dwie części i każdą z nich potraktować jak `uint32_t`. W przypadku innych typów niż `uint32_t`, podczas odczytu trzeba dokonać odwrotnego rzutowania.
 
-Zmienna, którą zaapisujemy musi być zadeklarowana globalnie lub być zmienną statyczną `static`
+W przykładzie ponownie wykorzystywane są 4 [wejścia cyfrowe DI](./guide-io.md#%EF%B8%8F-wejścia-cyfrowe-di), a sygnały z nich bedą wywoływać zdarzenia:
 
+- `DI1` - Wczytanie różnych typów zmiennych z pamięci EEPROM
+- `DI2` - Zapisanie różnych typów zmiennych do pamięci EEPROM
+- `DI3` - Reset sterownika
+- `DI4` - Wyczyszczenie pamięci EEPROM
+
+```c
+// TODO
+```
 
 
 
