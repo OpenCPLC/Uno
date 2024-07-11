@@ -127,14 +127,14 @@ Jeżeli projekt wykorzystuje diodę z 2 kolorami, niektóre stany będą nieobs�
 
 Lista stanów: `code`
 
-- dioda wyłączona (off): `0`
-- kolor czerwony (red): `1`
-- kolor zielony (green): `2`
-- kolor niebieski (blue): `3`
-- kolor żółty (yellow): `4`
-- kolor turkusowy (cyan): `5`
-- kolor fioletowy (magenta): `6`
-- kolor biały (white): `7`
+- dioda wyłączona _(off)_: `0`
+- kolor czerwony _(red)_: `1`
+- kolor zielony _(green)_: `2`
+- kolor niebieski _(blue)_: `3`
+- kolor żółty _(yellow)_: `4`
+- kolor turkusowy _(cyan)_: `5`
+- kolor fioletowy _(magenta)_: `6`
+- kolor biały _(white)_: `7`
 
 Przykład mignięcia 2 razy czerwoną diodą
 

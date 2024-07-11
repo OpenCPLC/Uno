@@ -61,7 +61,13 @@ const GPIO_Map_t tim_channel_map[] = {
   [TIM17_CH1_PA7] = { .port = GPIOA, .pin = 7, .alternate = 5 },
   [TIM17_CH1N_PB7] = { .port = GPIOB, .pin = 7, .alternate = 2 },
   [TIM17_CH1_PB9] = { .port = GPIOB, .pin = 9, .alternate = 2 },
-  [TIM17_CH1_PD1] = { .port = GPIOD, .pin = 1, .alternate = 2 }
+  [TIM17_CH1_PD1] = { .port = GPIOD, .pin = 1, .alternate = 2 },
+  #ifdef STM32G0C1xx
+    [TIM14_CH1_PA4] = { .port = GPIOA, .pin = 4, .alternate = 4 },
+    [TIM14_CH1_PA7] = { .port = GPIOA, .pin = 7, .alternate = 4 },
+    [TIM14_CH1_PB1] = { .port = GPIOB, .pin = 1, .alternate = 0 },
+    [TIM14_CH1_PC12] = { .port = GPIOC, .pin = 12, .alternate = 2 },
+  #endif
 };
 
 //------------------------------------------------------------------------------------------------- TIM-Interface

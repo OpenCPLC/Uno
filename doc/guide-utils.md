@@ -2,18 +2,27 @@
 
 ## 🔄 Reset
 
-TODO
+## 🪪 Unikatowy identyfikator `UID`
+
+
+
+
+## 📇 Files
+
+
+
 
 ## 🔎 Suma kontrolna CRC
 
 ## 🎲 Losowanie RNG
 
+ 
 
 ## 💾 Pamięć EEPROM
 
 Popularnym sposobem przechowywania zmiennych, których wartości zostają zachowane po resecie urządzenia lub utracie zasilania, jest pamięć **EEPROM**. Najprostszą metodą jest użycie domyślnego kontrolera tej pamięci do zapisu oraz wczytywania zmiennych podczas inicjalizacji programu lub w momencie, kiedy będą one potrzebne.
 
-W przykładzie wykorzystywane są 4 [wejścia cyfrowe DI](./guide-io.md#%EF%B8%8F-wejścia-cyfrowe-di). Operujemy na zmiennej `value`, której wartość jest inicjowana _(przed pętlą główną `while`)_, przez odczyt z pamięci EEPROM. Jeśli odczyt się nie powiedzie _(zmienna nie zostanie znaleziona)_, zostanie przypisana wartość domyślna. W pętli głównej program oczekuje na wciśnięcie jednego z przycisków podłączonych do wejść cyfrowych oraz realizuje ich obsługę:
+W przykładzie wykorzystywane są 4 [wejścia cyfrowe DI](./guide-io.md#%EF%B8%8F-wejścia-cyfrowe-di). Operujemy na zmiennej `value`, której wartość jest inicjowana _(przed pętlą główną `while`)_, przez odczyt z pamięci EEPROM. Jeśli odczyt się nie powiedzie _(zmienna nie zostanie znaleziona)_, zostanie przypisana wartość domyślna. _Możemy przypisać tę wartość od razu, ponieważ jeśli wartość nie zostanie znaleziona, zmienna pozostanie niezmieniona._ W pętli głównej program oczekuje na wciśnięcie jednego z przycisków podłączonych do wejść cyfrowych oraz realizuje ich obsługę:
 
 - `DI1` - Inkrementacja zmiennej `value` _(zwiększenie o 1)_
 - `DI2` - Zapisanie wartości zmiennej `value` do pamięci EEPROM
@@ -88,17 +97,62 @@ W przykładzie ponownie wykorzystywane są 4 [wejścia cyfrowe DI](./guide-io.md
 
 ```c
 // TODO
+
+int32_t value_int32 = -69;
+int32_t value_float = 21.37;
+int32_t value_uint64 = 0x0123456789ABCDEF;
+int32_t value_double = -4.2;
+
+bool load(uint32_t &value_static)
+{
+  if(EEPROM_Load(value_static)) return false;
+  if(EEPROM_Load((uint32_t)&value_int32)) return false;
+  if(EEPROM_Load((uint32_t)&value_float)) return false;
+  if(EEPROM_Load((uint32_t)&value_uint64)) return false;
+  if(EEPROM_Load(((uint32_t)&value_uint64)++)) return false;
+  if(EEPROM_Load((uint32_t)&value_double)) return false;
+  if(EEPROM_Load(((uint32_t)&value_double)++)) return false;
+  return true;
+}
+
+bool save(uint32_t &value_static)
+{
+  if(EEPROM_Save(value_static)) return false;
+  if(EEPROM_Save((uint32_t)&value_int32)) return false;
+  if(EEPROM_Save((uint32_t)&value_float)) return false;
+  if(EEPROM_Save((uint32_t)&value_uint64)) return false;
+  if(EEPROM_Save(((uint32_t)&value_uint64)++)) return false;
+  if(EEPROM_Save((uint32_t)&value_double)) return false;
+  if(EEPROM_Save(((uint32_t)&value_double)++)) return false;
+  return true;
+}
+
+void loop(void)
+{
+  static uint32_t value_static;
+
+  while(1) {
+    if(DIN_Rise(&DI1)) {
+      if(load()) {
+
+      }
+      else {
+        
+      }
+    }
+  }
+
+}
+```
+W rzeczywisości na płytkce nie ma dołączonej pamięci EEPROM. Część pamięci FLASH jest wydzielona.
+
+Jeden kontroler EEPROM nie powinien przekaczać 30 zmiennych, które często aktualizują zwoją wartość lub 100, które żadko są aktualizowane. Warości te są jedynie oszacowane. Gdy liczba ta będzie znacząco przekracała oszacowane limity lepiej stworzyć własny kontroler EEPROM, ale żeby to zrobić trzeba 
+
 ```
 
 
 
-
-
-W rzeczywisości na płytkce nie ma dołączonej pamięci EEPROM
-
-
-
-
+```
 
 ## Plik konfiguracyjny FLASH
 

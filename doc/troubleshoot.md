@@ -22,8 +22,9 @@ undefined reference to `VRTS_Init'
 
 Ustaw wartość definicji `VRTS_SWITCHING` na `1` w pliku `main.h` 
 
+```c
 #define VRTS_SWITCHING 1
-
+```
 
 
 
@@ -32,7 +33,7 @@ Ustaw wartość definicji `VRTS_SWITCHING` na `1` w pliku `main.h`
 
 Brak obsługi przycisku
 Brak migającej diody
-Innyych standardowych funkcji, które dostaracz wątek PLC
+Innych standardowych funkcji, które dostaracz wątek PLC
 
 - Brak lub skrajnie żadnie wywoływanie funkcji zwalnjającej rdzeń w naszym wątku, takiej jaki let() czy delay()
 

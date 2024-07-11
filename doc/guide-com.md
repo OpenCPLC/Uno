@@ -4,7 +4,7 @@
 
 W sterowniku **Uno** dostępne są dwa interfejsy **RS485**: `RS1` oraz `RS2`. Wsparcie obejmuje protokoły **Modbus RTU** oraz **BACnet** w trybach master i slave.
 
-### 🧔🏻 Modbus Master 
+### 🧔🏻 Modbus Master
 
 W przykładzie ustanawiamy komunikację z urządzeniem slave o adresie `0x07` przy użyciu protokołu **Modbus RTU**.
 

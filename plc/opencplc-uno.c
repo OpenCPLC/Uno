@@ -19,21 +19,21 @@
   };
 #endif
 
-//------------------------------------------------------------------------------------------------- RELAY RO
+//------------------------------------------------------------------------------------------------- DOUT-RO
 
 DOUT_t RO1 = { .name = "RO1", .relay = true, .gpio = { .port = GPIOB, .pin = 7 }, .eeprom = &io_eeprom[0], .save = true };
 DOUT_t RO2 = { .name = "RO2", .relay = true, .gpio = { .port = GPIOB, .pin = 6 }, .eeprom = &io_eeprom[0], .save = true };
 DOUT_t RO3 = { .name = "RO3", .relay = true, .gpio = { .port = GPIOB, .pin = 5 }, .eeprom = &io_eeprom[1], .save = true };
 DOUT_t RO4 = { .name = "RO4", .relay = true, .gpio = { .port = GPIOB, .pin = 4 }, .eeprom = &io_eeprom[1], .save = true };
 
-//------------------------------------------------------------------------------------------------- DOUT TO
+//------------------------------------------------------------------------------------------------- DOUT-TO
 
 PWM_t to_pwm = {
   .reg = TIM1,
   #if(SYS_CLOCK_FREQ == 16000000)
     .prescaler = 46,
   #elif(SYS_CLOCK_FREQ == 18432000)
-
+    // .prescaler = TODO, 
   #endif
   .channel[TIM_CH1] = TIM1_CH1_PC8,
   .channel[TIM_CH2] = TIM1_CH2_PC9,
@@ -53,7 +53,7 @@ void TO_Frequency(float frequency)
   PWM_Frequency(&to_pwm, frequency);
 };
 
-//------------------------------------------------------------------------------------------------- DOUT XO
+//------------------------------------------------------------------------------------------------- DOUT-XO
 
 PWM_t xo_pwm = {
   .reg = TIM2,
@@ -101,7 +101,7 @@ bool din_pwmi_init = false;
 //------------------------------------------------------------------------------------------------- AIN
 
 uint8_t ain_channels[] = {
-  ADC_IN_PA0, ADC_IN_PA1
+  ADC_IN_PA0, ADC_IN_PA1, ADC_IN_PA5
 };
 
 uint16_t ain_output[sizeof(ain_channels)];
@@ -123,10 +123,17 @@ ADC_t ain_adc = {
 AIN_t AI1 = { .adc = &ain_adc, .channel = 0, .type = AIN_Type_Volts };
 AIN_t AI2 = { .adc = &ain_adc, .channel = 1, .type = AIN_Type_Volts };
 
+float VCC_Value(void)
+{
+  uint16_t raw = ain_adc.measurements.output[2];
+  float value = resistor_divider_factor(3.3, 110, 10, 16) * raw;
+  return value;
+}
+
 //------------------------------------------------------------------------------------------------- RS485
 
-uint8_t rs1_buff_buffer[PLC_RS485_BUFFER_SIZE];
-BUFF_t rs1_buff = { .mem = rs1_buff_buffer, .size = PLC_RS485_BUFFER_SIZE };
+uint8_t rs1_buff_buffer[RS_BUFFER_SIZE];
+BUFF_t rs1_buff = { .mem = rs1_buff_buffer, .size = RS_BUFFER_SIZE };
 GPIO_t rs1_gpio_direction = { .port = GPIOA, .pin = 4, .speed = GPIO_Speed_VeryHigh };
 UART_t RS1 = {
   .reg = USART2,
@@ -138,8 +145,8 @@ UART_t RS1 = {
   .gpio_direction = &rs1_gpio_direction
 };
 
-uint8_t rs2_buff_buffer[PLC_RS485_BUFFER_SIZE];
-BUFF_t rs2_buff = { .mem = rs2_buff_buffer, .size = PLC_RS485_BUFFER_SIZE };
+uint8_t rs2_buff_buffer[RS_BUFFER_SIZE];
+BUFF_t rs2_buff = { .mem = rs2_buff_buffer, .size = RS_BUFFER_SIZE };
 GPIO_t rs2_gpio_direction = { .port = GPIOB, .pin = 2, .speed = GPIO_Speed_VeryHigh };
 UART_t RS2 = {
   .reg = USART1,
@@ -264,9 +271,6 @@ STREAM_t dbg_stream = {
 
 //------------------------------------------------------------------------------------------------- Functions PLC
 
-DOUT_t *plc_douts[] = { &RO1, &RO2, &RO3, &RO4, &TO1, &TO2, &TO3, &TO4, &XO1, &XO2, NULL };
-DIN_t *plc_dins[] = { &BTN, &DI1, &DI2, &DI3, &DI4 };
-
 void PLC_Init(void)
 {
   #if PLC_BOOTLOADER
@@ -308,21 +312,21 @@ void PLC_Init(void)
   }
   if(DIN_Init(&DI2)) {
     din_pwmi.channel[TIM_CH2] = TIM3_CH2_PA7;
-    DI1.frequency = &din_pwmi.frequency[1];
-    DI1.fill = &din_pwmi.fill[1];
+    DI2.frequency = &din_pwmi.frequency[1];
+    DI2.fill = &din_pwmi.fill[1];
     din_pwmi_init = true;
   }
   if(DIN_Init(&DI3)) {
     din_pwmi.channel[TIM_CH3] = TIM3_CH3_PB0;
-    DI1.frequency = &din_pwmi.frequency[2];
-    DI1.fill = &din_pwmi.fill[2];
+    DI3.frequency = &din_pwmi.frequency[2];
+    DI3.fill = &din_pwmi.fill[2];
     din_pwmi_init = true;
     din_pwmi.trig3 = &din_trig3;
   }
   if(DIN_Init(&DI4)) {
     din_pwmi.channel[TIM_CH4] = TIM3_CH4_PB1;
-    DI1.frequency = &din_pwmi.frequency[3];
-    DI1.fill = &din_pwmi.fill[3];
+    DI4.frequency = &din_pwmi.frequency[3];
+    DI4.fill = &din_pwmi.fill[3];
     din_pwmi_init = true;
     din_pwmi.trig4 = &din_trig4;
   }
@@ -372,7 +376,7 @@ void PLC_Loop(void)
   DIN_Loop(&DI3);
   DIN_Loop(&DI4);
   if(din_pwmi_init && PWMI_Loop(&din_pwmi)) {
-    // PWMI_Print(&fan_inputs);
+    // PWMI_Print(&din_pwmi);
   }
   // Wejścia analogowe (AI)
   ADC_Measurements(&ain_adc);
@@ -386,6 +390,7 @@ void PLC_Loop(void)
 
 void PLC_Thread(void)
 {
+  PLC_Init();
   while(1) {
     PLC_Loop();
     let();

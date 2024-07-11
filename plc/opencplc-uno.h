@@ -44,17 +44,12 @@ extern DIN_t DI4;
 // Wejścia analogowe (AI)
 extern AIN_t AI1;
 extern AIN_t AI2;
-
-// Functions
-void PLC_Init(void);
-void PLC_Loop(void);
-void PLC_Thread(void);
-
-#ifndef PLC_RS485_BUFFER_SIZE
-  #define PLC_RS485_BUFFER_SIZE 1000
-#endif
+float VCC_Value(void);
 
 // RS485
+#ifndef RS_BUFFER_SIZE
+  #define RS_BUFFER_SIZE 1000
+#endif
 extern UART_t RS1;
 extern UART_t RS2;
 
@@ -78,8 +73,12 @@ bool ONE_WIRE_Search(uint8_t *addr);
 extern RGB_t RGB;
 extern DIN_t BTN;
 
-//-------------------------------------------------------------------------------------------------
+// Functions
+void PLC_Init(void);
+void PLC_Loop(void);
+void PLC_Thread(void);
 
+// PT100/PT1000
 extern MAX31865_t RTD;
 void RTD_Main(void);
 float RTD_Temperature(void);

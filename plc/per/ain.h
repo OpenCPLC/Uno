@@ -14,8 +14,9 @@
 //-------------------------------------------------------------------------------------------------
 
 typedef enum {
-  AIN_Type_Volts, // Wejście napięciowe 0-10V
-  AIN_Type_mAmps  // Wejście prądowe    0-20mA
+  AIN_Type_Volts,  // Wejście napięciowe   0-10V
+  AIN_Type_mAmps,  // Wejście prądowe      0-20mA
+  AIN_Type_Percent // Wartość w procentach 0-100%
 } AIN_Type_t;
 
 typedef struct {
